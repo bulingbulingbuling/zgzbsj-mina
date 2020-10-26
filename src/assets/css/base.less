@@ -1,0 +1,94 @@
+view,
+scroll-view, image {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: rgba(
+    0,
+    0,
+    0,
+    0
+  ); //  remove tap highlight color for mobile safari
+}
+
+scroll-view:before,
+view:before,
+scroll-view:after,
+view:after {
+  box-sizing: border-box;
+}
+
+/*base*/
+page {
+  height: 100%;
+  color: rgb(52,55,61);
+}
+
+image {
+  vertical-align: top;
+}
+
+@selectors: 24, 28, 30, 32, 36, 40, 48, 54, 60;
+each(@selectors, {
+  .mb-@{value} {
+    margin-bottom: @value * 1px;
+  }
+  .ft-@{value} {
+    font-size: @value * 1px;
+  }
+});
+
+.fl {
+  float: left;
+}
+.fr {
+  float: right;
+}
+
+.flex1 {
+  flex: 1;
+}
+
+.invisible {
+  visibility: hidden;
+}
+
+.clearfix() {
+  zoom: 1;
+  &:before,
+  &:after {
+    content: " ";
+    display: table;
+  }
+  &:after {
+    clear: both;
+    visibility: hidden;
+    font-size: 0;
+    height: 0;
+  }
+}
+
+// Utility classes
+.clearfix {
+  .clearfix();
+}
+
+button, .button-hover {
+  padding: 0;
+  background: none;
+  line-height: 0;
+}
+
+.navigator-hover {
+  background: none;
+  opacity: 1;
+}
+button::after { border: none; }
+
+// 去掉scroll-view的滚动条
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  color: transparent;
+}
+::-webkit-input-placeholder { 
+  color: #ccc; 
+} 

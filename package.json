@@ -1,0 +1,34 @@
+{
+  "name": "ai_referral-mina",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "megalo-cli-service serve",
+    "build:dev": "megalo-cli-service build --mode development",
+    "build:production": "megalo-cli-service build --mode production",
+    "lint": "megalo-cli-service lint"
+  },
+  "license": "ISC",
+  "babel": {
+    "presets": [
+      "@megalo/app"
+    ]
+  },
+  "devDependencies": {
+    "@megalo/babel-preset-app": "latest",
+    "@megalo/cli-plugin-eslint": "latest",
+    "@megalo/cli-service": "latest",
+    "@megalo/eslint-config-standard": "latest",
+    "@megalo/target": "latest",
+    "@megalo/template-compiler": "latest",
+    "eslint": "^5.15.3",
+    "less": "^3.8.1",
+    "less-loader": "^4.1.0"
+  },
+  "dependencies": {
+    "@megalo/api": "latest",
+    "@megalo/vhtml-plugin": "latest",
+    "megalo": "latest",
+    "octoparse": "^0.4.2"
+  }
+}
