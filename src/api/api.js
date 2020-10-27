@@ -34,6 +34,7 @@ const request = (url, params, method, header) => {
             icon: 'none',
             duration: 2000
           });
+          reject()
         } else {
           resolve(res.data.data);
         }

@@ -4,12 +4,12 @@ export const baseApi = apiFn('question', process.env.VUE_APP_BASE_URL);
 export const api = {
   // 获取首页数据
   async getIndexData({
-    referrer,
-    channel
+    scene,
+    source
   } = {}) {
     return await baseApi.get('/referral_miniapp/landing/index', {
-      referrer,
-      channel
+      scene,
+      source
     });
   },
   // 注册和登录
@@ -19,7 +19,8 @@ export const api = {
     mobile,
     country_code,
     sms_code,
-    referrer
+    referrer,
+    source
   */
   async register(param) {
     return await baseApi.post('/referral_miniapp/landing/register', param);
@@ -52,10 +53,12 @@ export const api = {
   },
   // 发送验证码
   async sendCode({
-    mobile
+    mobile,
+    country_code
   } = {}) {
     return await baseApi.get('/referral_miniapp/landing/send_sms_code', {
-      mobile
+      mobile,
+      country_code
     });
   }
 }

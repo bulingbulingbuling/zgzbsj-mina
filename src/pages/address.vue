@@ -41,7 +41,9 @@ export default {
     },
     handleClick(country_code) {
       this.store.country_code = country_code
-      this.go('/pages/index')
+      wx.redirectTo({
+        url: '/pages/index'
+      });
     }
   }
 }

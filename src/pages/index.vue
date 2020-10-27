@@ -1,5 +1,5 @@
 <template>
-  <div class="container index-container">
+  <scroll-view class="container index-container" :scroll-y="!showVideo" @scroll="handleScroll">
     <div class="index-container-wrapper">
       <div class="header-wrapper">
         <img class="header" src="@/static/imgs/header.png" alt="">
@@ -13,20 +13,26 @@
         <div class="con">
           <div class="title">当前班次仅剩<span>{{remainNum}}</span>个名额，预购从速！</div>
           <swiper class="list-swiper" :circular="true" :vertical="true" :autoplay="true" :interval="1500" v-if="recent_purchase.length > 0">
-            <swiper-item v-for="(item, key) in recent_purchase" :key="key">
+            <swiper-item v-for="(item, key) in recent_purchase" :key="key" catchtouchmove="catchTouchMove">
+              <div class="item-wrapper" v-html="item">
+              </div>
+            </swiper-item>
+          </swiper>
+          <swiper v-show="showBottom" class="list-swiper fixed-list-swiper" :circular="true" :vertical="true" :autoplay="true" :interval="1500" v-if="recent_purchase.length > 0">
+            <swiper-item v-for="(item, key) in recent_purchase" :key="key" catchtouchmove="catchTouchMove">
               <div class="item-wrapper" v-html="item">
               </div>
             </swiper-item>
           </swiper>
           <div class="time-sec" v-if="timer"><span class="text">限时特惠</span><div class="time-wrapper"><span>{{minute}}</span>:<span>{{second}}</span>:<span>{{millisecond}}</span></div></div>
-          <img class="btn-img" src="@/static/imgs/btn.png" alt="" v-if="configData.mobile" @click="handleGetting">
-          <button class="btn-img" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" v-else>
+          <img class="btn-img" src="@/static/imgs/btn.png" alt="" v-if="configData.mobile" @click="handleGetting" id="mid-btn">
+          <button class="btn-img" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" v-else id="mid-btn" :disabled="hasBtnClicked">
             <img src="@/static/imgs/btn.png" alt="">
           </button>
         </div>
         <div class="common-sec video-wrapper">
           <h3>小叶子智能陪练</h3>
-          <swiper class="video-swiper" :circular="true" :indicator-dots="true" indicator-color="#bfbfbf" indicator-active-color="#ff867e" :interval="3000">
+          <swiper class="video-swiper" :circular="true" :indicator-dots="true" indicator-color="#bfbfbf" indicator-active-color="#ff867e" :autoplay="!showVideo" :interval="3000">
             <swiper-item v-for="(item, key) in 3" :key="key">
               <div class="item-wrapper">
                 <img :src="require(`@/static/imgs/video${item}.png`)" alt="">
@@ -63,20 +69,22 @@
           </div>
           <button class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" v-else>
             <img src="@/static/imgs/btn.png" alt="">
+            <p class="text">仅剩{{remainNum}}个名额</p>
           </button>
         </div>
       </div>
       <div class="video-box" v-show="showVideo">
         <div class="video-box-wrapper">
           <video id="myVideo" class="myVideo" :src="videoUrl" controls></video>
-          <img class="close" src="@/static/imgs/contact-close.png" alt="" @click="pauseVideo">
+          <!-- <img class="close" src="@/static/imgs/contact-close.png" alt="" @click="pauseVideo"> -->
+          <cover-image class="close" src="@/static/imgs/contact-close.png" @click="pauseVideo"/>
         </div>
       </div>
       <alert :isShow="showAlert" @close="closeAlert" :type="alertType" :isLogin="isLogin" @login="register">
       </alert>
       <img class="contact" src="@/static/imgs/contact.png" alt="" @click="handleShowAlert('contact')">
     </div>
-  </div>
+  </scroll-view>
 </template>
 
 <script>
@@ -86,7 +94,6 @@ import Alert from '@/components/alert'
 export default {
   data () {
     return {
-      query: this.$mp.query,
       showAlert: false, // 是否显示弹窗
       store: this.$mp.app.globalData,
       videoUrl: 'https://static.xiaoyezi.com/videos/aipl/langngAIG.mp4',
@@ -103,15 +110,28 @@ export default {
       remainNum: Math.floor(Math.random() * (30 - 20) + 20),
       configData: {},
       referrer_info: {
+        ticket: '',
         nickname: '小叶子',
         text: '自从有了小叶子，孩子终于会主动练琴了，也帮你领取了社群限时福利，快来体验吧！',
         headimgurl: 'https://oss-ai-peilian-app.xiaoyezi.com/prod/thumb/87beab4d8f802088056038464e54cf49.jpeg'
       },
       recent_purchase: [], // 滚动列表
-      isLogin: false
+      isLogin: false,
+      scene: '', // 通过小程序码进来
+      source: '', // 记录小程序的入口
+      btnDistance: '', // 购买按钮距离顶部的距离
+      hasBtnClicked: false, // 购买是否已经点了。
     }
   },
-  onShow() {
+  onLoad(options) {
+    console.log(options, 'options')
+    if (options.scene) {
+      this.scene = options.scene
+    } else if (options.source) {
+      this.source = options.source
+    }
+  },
+  onShow(options) {
     if (this.store.country_code) {
       this.handleShowAlert('phone')
     }
@@ -123,33 +143,35 @@ export default {
         this.handleNetError(res)
       }
     })
-    wx.getSystemInfo({
-      success: (res) => {
-        this.windowHeight = res.windowHeight
-      }
-    })
-  },
-  onPageScroll(e) {
-    const now = new Date().getTime();
-    if (now - this.lastCall < 200) return;
-    this.lastCall = now;
-    this.showBottom = e.scrollTop > this.windowHeight
+    // wx.getSystemInfo({
+    //   success: (res) => {
+    //     this.windowHeight = res.windowHeight
+    //   }
+    // })
+    this.videoContext && this.videoContext.seek(0)
+    this.getMidBtnInfo()
   },
   onHide() {
+    if (this.videoContext) {
+      this.videoContext.pause()
+    }
+    this.showVideo = false
+    this.showAlert = false
   },
   onShareAppMessage() {
-    return {
-      title: '郎朗推荐，练琴考级神器',
-      path: `/pages/index?r=${this.query.r}&c=${this.query.c}`
-    }
-  },
-  onShareTimeline() {
-    return {
-      title: '郎朗推荐，练琴考级神器',
-      query: `r=${this.query.r}&c=${this.query.c}`
-    }
   },
   methods: {
+    handleScroll(e) {
+      this.showBottom = e.detail.scrollTop > this.btnDistance
+    },
+    catchTouchMove() {
+      return false
+    },
+    getMidBtnInfo() {
+      wx.createSelectorQuery().select('#mid-btn').boundingClientRect((rect) => {
+        this.btnDistance = rect.height + rect.top
+      }).exec()
+    },
     handleNetError(res) {
       if (res.networkType === 'none') {
         this.toast('当前网络异常，请检查网络后再试')
@@ -190,12 +212,17 @@ export default {
     },
     // 获取手机号
     getPhoneNumber({ detail }) {
+      if (this.hasBtnClicked) return
+      console.log('phone..........')
+      this.hasBtnClicked = true
       if (detail.encryptedData) {
+        this.hasBtnClicked = false
         this.register({
           iv: detail.iv,
           encrypted_data: detail.encryptedData
         })
       } else {
+        this.hasBtnClicked = false
         this.handleShowAlert('phone')
       }
     },
@@ -203,8 +230,8 @@ export default {
     async getConfig() {
       this.loading()
       this.configData = await api.getIndexData({
-        referrer: this.query.r,
-        channel: this.query.c
+        scene: this.scene,
+        source: this.source
       })
       this.referrer_info = this.configData.referrer_info
       this.recent_purchase = this.configData.recent_purchase
@@ -226,24 +253,29 @@ export default {
       uuid = uuid || this.configData.uuid
       open_id = open_id || this.configData.openid
       this.loading()
-      let res = await api.createBill({
-        uuid,
-        open_id
-      })
-      let { timeStamp, nonceStr, package: p, signType, paySign } = res.params.credential.wx_lite
-      wx.requestPayment({
-        timeStamp,
-        nonceStr,
-        package: p,
-        signType,
-        paySign,
-        success: () => {
-          this.getStatus(res.bill.id)
-        },
-        fail: () => {
-        }
-      })
-      this.loading(false);
+      try {
+         let res = await api.createBill({
+          uuid,
+          open_id
+        })
+        let { timeStamp, nonceStr, package: p, signType, paySign } = res.params.credential.wx_lite
+        wx.requestPayment({
+          timeStamp,
+          nonceStr,
+          package: p,
+          signType,
+          paySign,
+          success: () => {
+            this.getStatus(res.bill.id)
+          },
+          fail: () => {
+          }
+        })
+      } catch (e) {
+      } finally {
+        this.isLogin = false
+        this.loading(false);
+      }
     },
     async getStatus(bill_id) {
       this.loading()
@@ -257,16 +289,23 @@ export default {
     },
     // 手机号注册
     async register(param) {
-      param.referrer = this.query.r
-      param.channel = this.query.c
+      param.referrer = this.referrer_info.ticket
+      param.source = this.source
       this.isLogin = true
       this.loading()
-      const data = await api.register(param)
-      if (data.uuid) {
-        this.createBill(data.uuid, data.openid)
+      try {
+        const data = await api.register(param)
+        if (data.had_purchased) {
+          return this.go('/pages/success')
+        }
+        if (data.uuid) {
+          await this.createBill(data.uuid, data.openid)
+        }
+      } catch (e) {
+      } finally {
+        this.isLogin = false
+        this.loading(false)
       }
-      this.isLogin = false
-      this.loading(false);
     }
   },
   components: {

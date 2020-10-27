@@ -11,11 +11,11 @@
       <h3 class="alert-form-title">想使用其他手机号?</h3>
       <div class="alert-form-item">
         <div class="num ft-32" @click="handleRedirect">+{{country_code}} <img class="arrow" src="@/static/imgs/arrow.png" alt=""></div>
-        <input class="phone" type="number" v-model="mobile" placeholder="请输入手机号号码">
+        <input class="phone ft-32" type="number" v-model="mobile" placeholder="请输入手机号号码">
       </div>
       <div class="alert-form-item">
         <div class="code-title ft-32">验证码</div>
-        <input class="code" type="number" v-model="sms_code" placeholder="请输入验证码">
+        <input class="code ft-32" type="number" v-model="sms_code" placeholder="请输入验证码">
         <div class="code-btn ft-30" :class="{disabled: code < 60 && code > 0}" @click="sendCode">{{smstext || code + 's'}}</div>
       </div>
       <p class="alert-form-error ft-24">{{errorText}}</p>
@@ -58,7 +58,9 @@ export default {
         mobile: this.mobile,
         sms_code: this.sms_code
       }
-      this.go('/pages/address')
+      wx.redirectTo({
+        url: '/pages/address'
+      });
     },
     close() {
       this.mobile = ''
@@ -81,7 +83,8 @@ export default {
       this.loading()
       try {
         await api.sendCode({
-          mobile: this.mobile
+          mobile: this.mobile,
+          country_code: this.country_code
         })
         this.setCountTime()
       } catch (e) {
@@ -202,9 +205,13 @@ export default {
     }
     &-item {
       display: flex;
+      align-items: center;
       height: 92px;
       border-bottom: solid 3px #ddd;
-      padding: 25px 0;
+      ::-webkit-input-placeholder { 
+        color: #ccc;
+        font-size: 32px; 
+      } 
       .num {
         letter-spacing: 1px;
         color: #444444;
@@ -220,6 +227,8 @@ export default {
         padding-left: 26px;
         color: #444;
         text-align: left;
+        height: 100%;
+        flex: 1;
       }
       .code-title {
         letter-spacing: 1px;
@@ -233,6 +242,7 @@ export default {
         padding-left: 26px;
         color: #444;
         padding-right: 10px;
+        height: 100%;
       }
       .code-btn {
         flex: 1;
