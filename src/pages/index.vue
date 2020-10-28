@@ -76,11 +76,11 @@
       <div class="video-box" v-show="showVideo">
         <div class="video-box-wrapper">
           <video id="myVideo" class="myVideo" :src="videoUrl" controls></video>
-          <!-- <img class="close" src="@/static/imgs/contact-close.png" alt="" @click="pauseVideo"> -->
+          <img class="close" src="@/static/imgs/contact-close.png" alt="" @click="pauseVideo">
           <cover-image class="close" src="@/static/imgs/contact-close.png" @click="pauseVideo"/>
         </div>
       </div>
-      <alert :isShow="showAlert" @close="closeAlert" :type="alertType" :isLogin="isLogin" @login="register">
+      <alert :isShow="showAlert" @close="closeAlert" :type="alertType" :isLogin="isLogin" :form="form" @login="register">
       </alert>
       <img class="contact" src="@/static/imgs/contact.png" alt="" @click="handleShowAlert('contact')">
     </div>
@@ -121,6 +121,7 @@ export default {
       source: '', // 记录小程序的入口
       btnDistance: '', // 购买按钮距离顶部的距离
       hasBtnClicked: false, // 购买是否已经点了。
+      form: {}
     }
   },
   onLoad(options) {
@@ -130,9 +131,15 @@ export default {
     } else if (options.source) {
       this.source = options.source
     }
+    this.getMidBtnInfo()
   },
   onShow(options) {
     if (this.store.country_code) {
+      this.form = {
+        country_code: this.store.country_code,
+        mobile: this.store.form.mobile,
+        sms_code: this.store.form.sms_code
+      }
       this.handleShowAlert('phone')
     }
     wx.onNetworkStatusChange((res) => {
@@ -149,14 +156,17 @@ export default {
     //   }
     // })
     this.videoContext && this.videoContext.seek(0)
-    this.getMidBtnInfo()
   },
   onHide() {
     if (this.videoContext) {
       this.videoContext.pause()
     }
+    this.form = {}
+    this.store.country_code = ''
     this.showVideo = false
     this.showAlert = false
+    clearInterval(this.timer)
+    this.timer = null
   },
   onShareAppMessage() {
   },
@@ -213,7 +223,6 @@ export default {
     // 获取手机号
     getPhoneNumber({ detail }) {
       if (this.hasBtnClicked) return
-      console.log('phone..........')
       this.hasBtnClicked = true
       if (detail.encryptedData) {
         this.hasBtnClicked = false
@@ -235,10 +244,11 @@ export default {
       })
       this.referrer_info = this.configData.referrer_info
       this.recent_purchase = this.configData.recent_purchase
-      if (!this.configData.first_flag) {
-        this.remainNum = 1
-      } else {
+      if (this.configData.first_flag) {
+        this.remainNum = Math.floor(Math.random() * (30 - 20) + 20)
         this.timer = setInterval(this.countDown, parseFloat(1000 / 60))
+      } else {
+        this.remainNum = 1
       }
       this.loading(false);
     },
@@ -290,6 +300,7 @@ export default {
     // 手机号注册
     async register(param) {
       param.referrer = this.referrer_info.ticket
+      param.scene = this.scene,
       param.source = this.source
       this.isLogin = true
       this.loading()

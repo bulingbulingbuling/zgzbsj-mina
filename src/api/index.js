@@ -20,6 +20,7 @@ export const api = {
     country_code,
     sms_code,
     referrer,
+    scene,
     source
   */
   async register(param) {

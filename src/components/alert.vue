@@ -38,6 +38,19 @@ export default {
     isLogin: {
       type: Boolean,
       default: false
+    },
+    form: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  watch: {
+    form(newVal) {
+      if (newVal) {
+        this.mobile = newVal.mobile
+        this.sms_code = newVal.sms_code
+        this.country_code = newVal.country_code || '86'
+      }
     }
   },
   data() {
@@ -48,7 +61,7 @@ export default {
       smstext: '发送验证码',
       errorText: '',
       store: this.$mp.app.globalData,
-      country_code: '',
+      country_code: '86',
       isSending: false
     }
   },
@@ -66,6 +79,7 @@ export default {
       this.mobile = ''
       this.sms_code = ''
       this.code = ''
+      this.errorText = ''
       this.$emit('close');
     },
     handleCall() {
@@ -107,11 +121,11 @@ export default {
       }, 1000)
     },
     login() {
-      if (!this.mobile || !(/\d{11}/.test(this.mobile))) {
+      if (!this.mobile || !(/^\d{6,20}$/.test(this.mobile))) {
         this.errorText = '*请输入正确的手机号'
         return
       }
-      if (!this.sms_code || !(/\d{4}/.test(this.sms_code))) {
+      if (!this.sms_code || !(/^\d{4,6}$/.test(this.sms_code))) {
         this.errorText = '*请输入正确的验证码'
         return
       }
@@ -121,11 +135,6 @@ export default {
         country_code: this.country_code
       });
     }
-  },
-  mounted() {
-    this.country_code = this.store.country_code || '86'
-    this.mobile = this.store.form.mobile
-    this.sms_code = this.store.form.sms_code
   }
 };
 </script>

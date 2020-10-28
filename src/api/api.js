@@ -41,11 +41,12 @@ const request = (url, params, method, header) => {
       },
       fail(res) {
         reject(res)
-        wx.showToast({
-          title: res.toString(),
-          icon: 'none',
-          duration: 2000
-        });
+        // 请求失败这种错误提示就不展示给用户了。
+        // wx.showToast({
+        //   title: res.toString(),
+        //   icon: 'none',
+        //   duration: 2000
+        // });
       }
     });
   });
