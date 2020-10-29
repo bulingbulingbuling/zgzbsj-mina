@@ -51,6 +51,9 @@ export default {
         this.sms_code = newVal.sms_code
         this.country_code = newVal.country_code || '86'
       }
+      if (Object.keys(newVal).length === 0) {
+        this.errorText = ''
+      }
     }
   },
   data() {
@@ -217,10 +220,10 @@ export default {
       align-items: center;
       height: 92px;
       border-bottom: solid 3px #ddd;
-      ::-webkit-input-placeholder { 
+      ::-webkit-input-placeholder {
         color: #ccc;
-        font-size: 32px; 
-      } 
+        font-size: 32px;
+      }
       .num {
         letter-spacing: 1px;
         color: #444444;
@@ -238,6 +241,7 @@ export default {
         text-align: left;
         height: 100%;
         flex: 1;
+        letter-spacing: 0;
       }
       .code-title {
         letter-spacing: 1px;
@@ -252,6 +256,7 @@ export default {
         color: #444;
         padding-right: 10px;
         height: 100%;
+        letter-spacing: 0;
       }
       .code-btn {
         flex: 1;

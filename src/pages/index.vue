@@ -24,7 +24,7 @@
               </div>
             </swiper-item>
           </swiper>
-          <div class="time-sec" v-if="timer"><span class="text">限时特惠</span><div class="time-wrapper"><span>{{minute}}</span>:<span>{{second}}</span>:<span>{{millisecond}}</span></div></div>
+          <div class="time-sec" v-if="timer"><span class="text">限时特惠</span><div class="time-wrapper"><span>{{hour}}</span>:<span>{{minute}}</span>:<span>{{second}}</span></div></div>
           <img class="btn-img" src="@/static/imgs/btn.png" alt="" v-if="configData.mobile" @click="handleGetting" id="mid-btn">
           <button class="btn-img" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" v-else id="mid-btn" :disabled="hasBtnClicked">
             <img src="@/static/imgs/btn.png" alt="">
@@ -61,7 +61,7 @@
         </div>
       </div>
       <div class="bottom" v-show="showBottom">
-        <p class="time" v-if="timer">剩余时间:{{minute}}:{{second}}:{{millisecond}}</p>
+        <p class="time" v-if="timer">剩余时间:{{hour}}:{{minute}}:{{second}}</p>
         <div class="img-wrapper">
           <div class="action" v-if="configData.mobile" @click="handleGetting">
             <img class="header" src="@/static/imgs/btn.png" alt="">
@@ -73,9 +73,9 @@
           </button>
         </div>
       </div>
-      <div class="video-box" v-show="showVideo">
+      <div class="video-box" v-if="showVideo">
         <div class="video-box-wrapper">
-          <video id="myVideo" class="myVideo" :src="videoUrl" controls></video>
+          <video id="myVideo" class="myVideo" :src="videoUrl" :initial-time="initialTime" controls></video>
           <img class="close" src="@/static/imgs/contact-close.png" alt="" @click="pauseVideo">
           <cover-image class="close" src="@/static/imgs/contact-close.png" @click="pauseVideo"/>
         </div>
@@ -98,12 +98,11 @@ export default {
       store: this.$mp.app.globalData,
       videoUrl: 'https://static.xiaoyezi.com/videos/aipl/langngAIG.mp4',
       showVideo: false,
-      minute: '9',
+      hour: '00',
+      minute: '09',
       second: '59',
-      millisecond: '59',
-      totalTime: 10 * 60 * 60,
+      totalTime: 10 * 60,
       timer: '',
-      windowHeight: '',
       showBottom: false,
       lastCall: 0,
       alertType: 'phone',
@@ -131,7 +130,6 @@ export default {
     } else if (options.source) {
       this.source = options.source
     }
-    this.getMidBtnInfo()
   },
   onShow(options) {
     if (this.store.country_code) {
@@ -150,17 +148,15 @@ export default {
         this.handleNetError(res)
       }
     })
-    // wx.getSystemInfo({
-    //   success: (res) => {
-    //     this.windowHeight = res.windowHeight
-    //   }
-    // })
-    this.videoContext && this.videoContext.seek(0)
+  },
+  onReady() {
+    this.getMidBtnInfo()
   },
   onHide() {
     if (this.videoContext) {
       this.videoContext.pause()
     }
+    this.videoContext = null
     this.form = {}
     this.store.country_code = ''
     this.showVideo = false
@@ -196,12 +192,10 @@ export default {
     countDown() {
       if (this.totalTime >= 1) {
         --this.totalTime
-        let m = Math.floor(this.totalTime / 60 / 60)
-        let s = Math.floor(this.totalTime / 60 % 60)
-        let ms = Math.floor(this.totalTime % 60)
+        let m = Math.floor(this.totalTime / 60)
+        let s = Math.floor(this.totalTime % 60)
         this.minute = m > 9 ? m : '0' + m
         this.second = s > 9 ? s : '0' + s
-        this.millisecond = ms > 9 ? ms : '0' + ms
       } else {
         clearInterval(this.timer)
       }
@@ -237,7 +231,6 @@ export default {
     },
     // 获取首页数据
     async getConfig() {
-      this.loading()
       this.configData = await api.getIndexData({
         scene: this.scene,
         source: this.source
@@ -246,11 +239,10 @@ export default {
       this.recent_purchase = this.configData.recent_purchase
       if (this.configData.first_flag) {
         this.remainNum = Math.floor(Math.random() * (30 - 20) + 20)
-        this.timer = setInterval(this.countDown, parseFloat(1000 / 60))
+        this.timer = setInterval(this.countDown, 1000)
       } else {
         this.remainNum = 1
       }
-      this.loading(false);
     },
     handleGetting() {
       if (this.configData.had_purchased) {
@@ -262,9 +254,8 @@ export default {
     async createBill(uuid, open_id) {
       uuid = uuid || this.configData.uuid
       open_id = open_id || this.configData.openid
-      this.loading()
       try {
-         let res = await api.createBill({
+        let res = await api.createBill({
           uuid,
           open_id
         })
@@ -284,26 +275,22 @@ export default {
       } catch (e) {
       } finally {
         this.isLogin = false
-        this.loading(false);
       }
     },
     async getStatus(bill_id) {
-      this.loading()
       let res = await api.getBillStatus({
         bill_id
       })
       if (res.bill_status === '1') {
         this.go('/pages/success?success=true')
       }
-      this.loading(false);
     },
     // 手机号注册
     async register(param) {
       param.referrer = this.referrer_info.ticket
-      param.scene = this.scene,
+      param.scene = this.scene
       param.source = this.source
-      this.isLogin = true
-      this.loading()
+      // this.isLogin = true
       try {
         const data = await api.register(param)
         if (data.had_purchased) {
@@ -313,9 +300,9 @@ export default {
           await this.createBill(data.uuid, data.openid)
         }
       } catch (e) {
+        this.isLogin = false
       } finally {
         this.isLogin = false
-        this.loading(false)
       }
     }
   },

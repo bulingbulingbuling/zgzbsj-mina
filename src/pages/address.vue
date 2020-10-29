@@ -35,9 +35,7 @@ export default {
   },
   methods: {
     async getCode() {
-      this.loading()
       this.list = await api.getCountryCode()
-      this.loading(false);
     },
     handleClick(country_code) {
       this.store.country_code = country_code
