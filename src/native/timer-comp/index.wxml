@@ -1,0 +1,12 @@
+<view wx:if="timer">
+  <view class="time-sec">
+    <view class="text">限时特惠</view>
+    <view class="time-wrapper"><text class="time-item">{{minute}}</text>:<text class="time-item">{{second}}</text>:<text class="time-item">{{millisecond}}</text></view>
+  </view>
+  <view class="time-bottom" wx:if="{{isBottom}}">
+    剩余时间:{{minute}}:{{second}}:{{millisecond}}
+  </view>
+</view>
+
+
+  

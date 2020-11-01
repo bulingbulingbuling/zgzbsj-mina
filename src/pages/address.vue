@@ -39,9 +39,7 @@ export default {
     },
     handleClick(country_code) {
       this.store.country_code = country_code
-      wx.redirectTo({
-        url: '/pages/index'
-      });
+      wx.navigateBack()
     }
   }
 }

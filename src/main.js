@@ -40,6 +40,9 @@ export default {
       'pages/address',
       'pages/success'
     ],
+    usingComponents: {
+      'timer-comp': './native/timer-comp/index'
+    },
     window: {
       backgroundTextStyle: 'dark',
       navigationBarBackgroundColor: '#ededed',

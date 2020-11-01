@@ -18,22 +18,22 @@
               </div>
             </swiper-item>
           </swiper>
-          <swiper v-show="showBottom" class="list-swiper fixed-list-swiper" :circular="true" :vertical="true" :autoplay="true" :interval="1500" v-if="recent_purchase.length > 0">
+          <swiper v-show="showBottom" class="list-swiper fixed-list-swiper" :circular="true" :vertical="true" :autoplay="true" :interval="1500">
             <swiper-item v-for="(item, key) in recent_purchase" :key="key" catchtouchmove="catchTouchMove">
               <div class="item-wrapper" v-html="item">
               </div>
             </swiper-item>
           </swiper>
-          <div class="time-sec" v-if="timer"><span class="text">限时特惠</span><div class="time-wrapper"><span>{{hour}}</span>:<span>{{minute}}</span>:<span>{{second}}</span></div></div>
+          <timer-comp :isBottom="showBottom" v-if="showTimer"/>
           <img class="btn-img" src="@/static/imgs/btn.png" alt="" v-if="configData.mobile" @click="handleGetting" id="mid-btn">
-          <button class="btn-img" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" v-else id="mid-btn" :disabled="hasBtnClicked">
+          <button class="btn-img" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" v-else id="mid-btn" :disabled="hasBtnClicked" @click="hasBtnClicked = true">
             <img src="@/static/imgs/btn.png" alt="">
           </button>
         </div>
         <div class="common-sec video-wrapper">
           <h3>小叶子智能陪练</h3>
           <swiper class="video-swiper" :circular="true" :indicator-dots="true" indicator-color="#bfbfbf" indicator-active-color="#ff867e" :autoplay="!showVideo" :interval="3000">
-            <swiper-item v-for="(item, key) in 3" :key="key">
+            <swiper-item v-for="(item, key) in 3" :key="item">
               <div class="item-wrapper">
                 <img :src="require(`@/static/imgs/video${item}.png`)" alt="">
                 <img v-show="key === 0" class="btn-play" src="@/static/imgs/btn-play.png" alt="" @click="playVideo">
@@ -44,7 +44,7 @@
         <div class="common-sec swiper-sec">
           <h3>看看大家怎么说</h3>
           <swiper class="video-swiper" :circular="true" :indicator-dots="true" previous-margin="120rpx" indicator-color="#bfbfbf" indicator-active-color="#ff867e" :autoplay="true" :interval="3000">
-            <swiper-item v-for="(item, key) in 6" :key="key">
+            <swiper-item v-for="item in 6" :key="item">
               <div class="item-wrapper">
                 <img :src="require(`@/static/imgs/s${item}.png`)" alt="">
               </div>
@@ -61,13 +61,12 @@
         </div>
       </div>
       <div class="bottom" v-show="showBottom">
-        <p class="time" v-if="timer">剩余时间:{{hour}}:{{minute}}:{{second}}</p>
         <div class="img-wrapper">
           <div class="action" v-if="configData.mobile" @click="handleGetting">
             <img class="header" src="@/static/imgs/btn.png" alt="">
             <p class="text">仅剩{{remainNum}}个名额</p>
           </div>
-          <button class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" v-else>
+          <button class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="hasBtnClicked = true" v-else>
             <img src="@/static/imgs/btn.png" alt="">
             <p class="text">仅剩{{remainNum}}个名额</p>
           </button>
@@ -98,11 +97,6 @@ export default {
       store: this.$mp.app.globalData,
       videoUrl: 'https://static.xiaoyezi.com/videos/aipl/langngAIG.mp4',
       showVideo: false,
-      hour: '00',
-      minute: '09',
-      second: '59',
-      totalTime: 10 * 60,
-      timer: '',
       showBottom: false,
       lastCall: 0,
       alertType: 'phone',
@@ -120,7 +114,8 @@ export default {
       source: '', // 记录小程序的入口
       btnDistance: '', // 购买按钮距离顶部的距离
       hasBtnClicked: false, // 购买是否已经点了。
-      form: {}
+      form: {},
+      showTimer: false
     }
   },
   onLoad(options) {
@@ -130,8 +125,10 @@ export default {
     } else if (options.source) {
       this.source = options.source
     }
+    this.getConfig()
   },
   onShow(options) {
+    console.log(this.scene, 'onshow')
     if (this.store.country_code) {
       this.form = {
         country_code: this.store.country_code,
@@ -141,7 +138,7 @@ export default {
       this.handleShowAlert('phone')
     }
     wx.onNetworkStatusChange((res) => {
-      this.handleNetError(res)
+      this.handleNetError(res, this.getConfig)
     })
     wx.getNetworkType({
       success: (res) => {
@@ -161,8 +158,7 @@ export default {
     this.store.country_code = ''
     this.showVideo = false
     this.showAlert = false
-    clearInterval(this.timer)
-    this.timer = null
+    this.showTimer = false
   },
   onShareAppMessage() {
   },
@@ -178,27 +174,16 @@ export default {
         this.btnDistance = rect.height + rect.top
       }).exec()
     },
-    handleNetError(res) {
+    handleNetError(res, callback) {
       if (res.networkType === 'none') {
         this.toast('当前网络异常，请检查网络后再试')
       } else {
-        this.getConfig()
+        callback && callback()
       }
     },
     handleShowAlert(type) {
       this.alertType = type
       this.showAlert = true
-    },
-    countDown() {
-      if (this.totalTime >= 1) {
-        --this.totalTime
-        let m = Math.floor(this.totalTime / 60)
-        let s = Math.floor(this.totalTime % 60)
-        this.minute = m > 9 ? m : '0' + m
-        this.second = s > 9 ? s : '0' + s
-      } else {
-        clearInterval(this.timer)
-      }
     },
     playVideo() {
       this.showVideo = true
@@ -212,20 +197,17 @@ export default {
       this.showVideo = false
     },
     closeAlert() {
+      this.hasBtnClicked = false
       this.showAlert = false
     },
     // 获取手机号
     getPhoneNumber({ detail }) {
-      if (this.hasBtnClicked) return
-      this.hasBtnClicked = true
       if (detail.encryptedData) {
-        this.hasBtnClicked = false
         this.register({
           iv: detail.iv,
           encrypted_data: detail.encryptedData
         })
       } else {
-        this.hasBtnClicked = false
         this.handleShowAlert('phone')
       }
     },
@@ -239,7 +221,7 @@ export default {
       this.recent_purchase = this.configData.recent_purchase
       if (this.configData.first_flag) {
         this.remainNum = Math.floor(Math.random() * (30 - 20) + 20)
-        this.timer = setInterval(this.countDown, 1000)
+        this.showTimer = true
       } else {
         this.remainNum = 1
       }
@@ -267,9 +249,14 @@ export default {
           signType,
           paySign,
           success: () => {
+            this.getConfig()
             this.getStatus(res.bill.id)
           },
           fail: () => {
+            this.form = {}
+            this.store.country_code = ''
+            this.showAlert = false
+            this.getConfig()
           }
         })
       } catch (e) {
@@ -287,12 +274,14 @@ export default {
     },
     // 手机号注册
     async register(param) {
+      this.hasBtnClicked = false
       param.referrer = this.referrer_info.ticket
       param.scene = this.scene
       param.source = this.source
-      // this.isLogin = true
+      this.isLogin = true
       try {
         const data = await api.register(param)
+        this.configData.mobile = data.mobile
         if (data.had_purchased) {
           return this.go('/pages/success')
         }
@@ -300,8 +289,6 @@ export default {
           await this.createBill(data.uuid, data.openid)
         }
       } catch (e) {
-        this.isLogin = false
-      } finally {
         this.isLogin = false
       }
     }

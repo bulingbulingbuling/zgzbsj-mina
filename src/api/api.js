@@ -41,6 +41,7 @@ const request = (url, params, method, header) => {
             icon: 'none',
             duration: 2000
           });
+          reject(new Error())
         } else {
           resolve(res.data.data);
         }

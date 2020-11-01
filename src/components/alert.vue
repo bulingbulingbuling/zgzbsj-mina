@@ -11,11 +11,11 @@
       <h3 class="alert-form-title">想使用其他手机号?</h3>
       <div class="alert-form-item">
         <div class="num ft-32" @click="handleRedirect">+{{country_code}} <img class="arrow" src="@/static/imgs/arrow.png" alt=""></div>
-        <input class="phone ft-32" type="number" v-model="mobile" placeholder="请输入手机号号码">
+        <input class="phone ft-32" type="number" placeholder="请输入手机号号码" @input="handleMobileInput">
       </div>
       <div class="alert-form-item">
         <div class="code-title ft-32">验证码</div>
-        <input class="code ft-32" type="number" v-model="sms_code" placeholder="请输入验证码">
+        <input class="code ft-32" type="number" placeholder="请输入验证码" @input="handleCodeInput">
         <div class="code-btn ft-30" :class="{disabled: code < 60 && code > 0}" @click="sendCode">{{smstext || code + 's'}}</div>
       </div>
       <p class="alert-form-error ft-24">{{errorText}}</p>
@@ -65,18 +65,29 @@ export default {
       errorText: '',
       store: this.$mp.app.globalData,
       country_code: '86',
-      isSending: false
+      isSending: false,
+      timer: ''
     }
   },
   methods: {
+    handleMobileInput(e) {
+      clearTimeout(this.timer)
+      this.timer = setTimeout(() => {
+        this.mobile = e.detail.value
+      }, 200)
+    },
+    handleCodeInput(e) {
+      clearTimeout(this.timer)
+      this.timer = setTimeout(() => {
+        this.sms_code = e.detail.value
+      }, 200)
+    },
     handleRedirect() {
       this.store.form = {
         mobile: this.mobile,
         sms_code: this.sms_code
       }
-      wx.redirectTo({
-        url: '/pages/address'
-      });
+      this.go('/pages/address')
     },
     close() {
       this.mobile = ''
@@ -132,6 +143,7 @@ export default {
         this.errorText = '*请输入正确的验证码'
         return
       }
+      this.errorText = ''
       this.$emit('login', {
         mobile: this.mobile,
         sms_code: this.sms_code,
@@ -157,7 +169,7 @@ export default {
   .alert-contact {
     position: fixed;
     left: 50%;
-    top: 50%;
+    top: 46%;
     width: 485px;
     height: 533px;
     transform: translate(-50%, -50%);
