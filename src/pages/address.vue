@@ -22,15 +22,11 @@ export default {
       store: this.$mp.app.globalData
     }
   },
-  computed: {
-    config() {
-      return this.store.config
-    }
-  },
   async created() {
     wx.setNavigationBarTitle({
       title: '选择号码归属地'
     })
+    this.store.country_code = '86'
     await this.getCode()
   },
   methods: {

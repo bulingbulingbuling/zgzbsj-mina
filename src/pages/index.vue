@@ -1,5 +1,5 @@
 <template>
-  <scroll-view class="container index-container" :scroll-y="!showVideo" @scroll="handleScroll">
+  <div class="container index-container">
     <div class="index-container-wrapper">
       <div class="header-wrapper">
         <img class="header" src="@/static/imgs/header.png" alt="">
@@ -76,14 +76,14 @@
         <div class="video-box-wrapper">
           <video id="myVideo" class="myVideo" :src="videoUrl" :initial-time="initialTime" controls></video>
           <img class="close" src="@/static/imgs/contact-close.png" alt="" @click="pauseVideo">
-          <cover-image class="close" src="@/static/imgs/contact-close.png" @click="pauseVideo"/>
+          <!-- <cover-image class="close" src="@/static/imgs/contact-close.png" @click="pauseVideo"/> -->
         </div>
       </div>
       <alert :isShow="showAlert" @close="closeAlert" :type="alertType" :isLogin="isLogin" :form="form" @login="register">
       </alert>
       <img class="contact" src="@/static/imgs/contact.png" alt="" @click="handleShowAlert('contact')">
     </div>
-  </scroll-view>
+  </div>
 </template>
 
 <script>
@@ -98,7 +98,6 @@ export default {
       videoUrl: 'https://static.xiaoyezi.com/videos/aipl/langngAIG.mp4',
       showVideo: false,
       showBottom: false,
-      lastCall: 0,
       alertType: 'phone',
       remainNum: Math.floor(Math.random() * (30 - 20) + 20),
       configData: {},
@@ -125,10 +124,9 @@ export default {
     } else if (options.source) {
       this.source = options.source
     }
-    this.getConfig()
   },
   onShow(options) {
-    console.log(this.scene, 'onshow')
+    console.log(this.scene, this.store.country_code, 'onshow')
     if (this.store.country_code) {
       this.form = {
         country_code: this.store.country_code,
@@ -138,13 +136,16 @@ export default {
       this.handleShowAlert('phone')
     }
     wx.onNetworkStatusChange((res) => {
-      this.handleNetError(res, this.getConfig)
+      this.handleNetError(res)
     })
     wx.getNetworkType({
       success: (res) => {
         this.handleNetError(res)
       }
     })
+  },
+  onPageScroll(e) {
+    this.showBottom = e.scrollTop > this.btnDistance
   },
   onReady() {
     this.getMidBtnInfo()
@@ -159,13 +160,12 @@ export default {
     this.showVideo = false
     this.showAlert = false
     this.showTimer = false
+    this.remainNum = 1
+    this.hasBtnClicked = false
   },
   onShareAppMessage() {
   },
   methods: {
-    handleScroll(e) {
-      this.showBottom = e.detail.scrollTop > this.btnDistance
-    },
     catchTouchMove() {
       return false
     },
@@ -174,11 +174,11 @@ export default {
         this.btnDistance = rect.height + rect.top
       }).exec()
     },
-    handleNetError(res, callback) {
+    handleNetError(res) {
       if (res.networkType === 'none') {
         this.toast('当前网络异常，请检查网络后再试')
       } else {
-        callback && callback()
+        this.getConfig()
       }
     },
     handleShowAlert(type) {
@@ -249,7 +249,6 @@ export default {
           signType,
           paySign,
           success: () => {
-            this.getConfig()
             this.getStatus(res.bill.id)
           },
           fail: () => {
@@ -281,7 +280,6 @@ export default {
       this.isLogin = true
       try {
         const data = await api.register(param)
-        this.configData.mobile = data.mobile
         if (data.had_purchased) {
           return this.go('/pages/success')
         }
