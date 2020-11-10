@@ -29,6 +29,7 @@
     "@megalo/api": "latest",
     "@megalo/vhtml-plugin": "latest",
     "megalo": "latest",
-    "octoparse": "^0.4.2"
+    "octoparse": "^0.4.2",
+    "sa-sdk-miniprogram": "^1.13.32"
   }
 }

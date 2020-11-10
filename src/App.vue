@@ -12,7 +12,8 @@ export default {
   globalData () {
     return {
       country_code: '',
-      form: {}
+      form: {},
+      mobile: ''
     }
   }
 }

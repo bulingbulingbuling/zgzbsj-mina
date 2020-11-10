@@ -89,6 +89,7 @@
 <script>
 import { api } from '@/api'
 import Alert from '@/components/alert'
+import { track } from '@/utils/util'
 
 export default {
   data () {
@@ -127,6 +128,11 @@ export default {
   },
   onShow(options) {
     console.log(this.scene, this.store.country_code, 'onshow')
+    track('$pageview', {
+      $title: '首页',
+      $url: 'pages/index',
+      visit_time: new Date().toLocaleDateString()
+    });
     if (this.store.country_code) {
       this.form = {
         country_code: this.store.country_code,
@@ -186,6 +192,12 @@ export default {
       this.showAlert = true
     },
     playVideo() {
+      track('$WebClick', {
+        $title: '首页',
+        $url: 'pages/index',
+        content: '视频播放',
+        visit_time: new Date().toLocaleDateString()
+      });
       this.showVideo = true
       if (!this.videoContext) {
         this.videoContext = wx.createVideoContext('myVideo')
@@ -202,12 +214,19 @@ export default {
     },
     // 获取手机号
     getPhoneNumber({ detail }) {
+      track('$WebClick', {
+        $title: '首页',
+        $url: 'pages/index',
+        content: '立即体验',
+        visit_time: new Date().toLocaleDateString()
+      });
       if (detail.encryptedData) {
         this.register({
           iv: detail.iv,
           encrypted_data: detail.encryptedData
-        })
+        }, true)
       } else {
+        track('$ai_applet_quxiao_click');
         this.handleShowAlert('phone')
       }
     },
@@ -219,6 +238,12 @@ export default {
       })
       this.referrer_info = this.configData.referrer_info
       this.recent_purchase = this.configData.recent_purchase
+      this.store.mobile = this.configData.mobile
+      this.sa.setProfile({
+        ai_phoneNumber: this.configData.mobile,
+        ai_open_id: this.configData.openid,
+        ai_uuid: this.configData.uuid
+      });
       if (this.configData.first_flag) {
         this.remainNum = Math.floor(Math.random() * (30 - 20) + 20)
         this.showTimer = true
@@ -227,6 +252,12 @@ export default {
       }
     },
     handleGetting() {
+      track('$WebClick', {
+        $title: '首页',
+        $url: 'pages/index',
+        content: '立即体验',
+        visit_time: new Date().toLocaleDateString()
+      });
       if (this.configData.had_purchased) {
         this.go('/pages/success')
       } else {
@@ -234,6 +265,9 @@ export default {
       }
     },
     async createBill(uuid, open_id) {
+      track('ai_applet_weixin_pay', {
+        ai_tel: this.store.mobile
+      });
       uuid = uuid || this.configData.uuid
       open_id = open_id || this.configData.openid
       try {
@@ -272,7 +306,7 @@ export default {
       }
     },
     // 手机号注册
-    async register(param) {
+    async register(param, isAuth) {
       this.hasBtnClicked = false
       param.referrer = this.referrer_info.ticket
       param.scene = this.scene
@@ -280,6 +314,21 @@ export default {
       this.isLogin = true
       try {
         const data = await api.register(param)
+        this.sa.setProfile({
+          ai_phoneNumber: data.mobile,
+          ai_open_id: data.openid,
+          ai_uuid: data.uuid
+        });
+        if (isAuth) {
+          track('ai_applet_shouquan_click', {
+            ai_tel: data.mobile
+          });
+        } else {
+          track('ai_applet_phone_fill', {
+            ai_tel: data.mobile
+          });
+        }
+        this.store.mobile = data.mobile
         if (data.had_purchased) {
           return this.go('/pages/success')
         }

@@ -1,3 +1,4 @@
+import sa from 'sa-sdk-miniprogram'
 import App from './App'
 import Vue from 'vue'
 import VHtmlPlugin from '@megalo/vhtml-plugin'
@@ -11,6 +12,26 @@ import './assets/css/index.less';
 Vue.use(toast);
 Vue.use(loading);
 Vue.use(store);
+
+const server_url = process.env.VUE_APP_SENSOR_URL
+sa.setPara({
+  server_url,
+  name: 'sensors',
+  autoTrack: {
+    appLaunch: true,
+    appShow: true,
+    appHide: true,
+    pageShow: true,
+    pageShare: true,
+    mpClick: true
+  },
+  show_log: true
+});
+sa.registerApp({
+  project_name: 'ai转介绍小程序'
+});
+sa.init();
+Vue.prototype.sa = sa
 
 Object.keys(filters).forEach(item => {
   Vue.filter(item, filters[item])
