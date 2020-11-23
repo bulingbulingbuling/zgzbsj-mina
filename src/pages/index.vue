@@ -2,7 +2,7 @@
   <div class="container index-container">
     <div class="index-container-wrapper">
       <div class="header-wrapper">
-        <img class="header" src="@/static/imgs/header.png" alt="">
+        <img class="header" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/header.png" alt="">
         <div class="avatar-wrapper">
           <img class="avatar" :src="referrer_info.headimgurl" alt="">
           <p>{{referrer_info.nickname}}</p>
@@ -25,63 +25,65 @@
             </swiper-item>
           </swiper>
           <timer-comp :isBottom="showBottom" v-if="showTimer"/>
-          <img class="btn-img" src="@/static/imgs/btn.png" alt="" v-if="configData.mobile" @click="handleGetting" id="mid-btn">
-          <button class="btn-img" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" v-else id="mid-btn" :disabled="hasBtnClicked" @click="hasBtnClicked = true">
+          <img class="btn-img" src="@/static/imgs/btn.png" alt="" v-if="configData.mobile" @click="handleGetting('页中立即体验')" id="mid-btn">
+          <button class="btn-img" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" v-else id="mid-btn" :disabled="hasBtnClicked" @click="handleBtnClick">
             <img src="@/static/imgs/btn.png" alt="">
           </button>
         </div>
-        <div class="common-sec video-wrapper">
-          <h3>小叶子智能陪练</h3>
-          <swiper class="video-swiper" :circular="true" :indicator-dots="true" indicator-color="#bfbfbf" indicator-active-color="#ff867e" :autoplay="!showVideo" :interval="3000">
-            <swiper-item v-for="(item, key) in 3" :key="item">
-              <div class="item-wrapper">
-                <img :src="require(`@/static/imgs/video${item}.png`)" alt="">
-                <img v-show="key === 0" class="btn-play" src="@/static/imgs/btn-play.png" alt="" @click="playVideo">
-              </div>
-            </swiper-item>
-          </swiper>
+        <div class="common-sec girl-wrapper">
+          <h3>孩子练琴那些坎儿</h3>
+          <img src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/girl.png" alt="">
+          <div class="video-sec">
+            <img class="btn-play" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/btn-play.png" alt="" @click="playGirlVideo">
+            <video id="girlVideo" class="girlVideo" :src="girlUrl" controls v-if="showGirlVideo" @play="pauseVideo('lang')" @fullscreenchange="handleFullscreenChange"></video>
+          </div>
+        </div>
+        <div class="common-sec feature-wrapper">
+          <h3>智能陪练三大核心</h3>
+          <img class="header" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/feature.png" alt="">
+        </div>
+        <div class="common-sec lang-wrapper">
+          <h3>郎朗亲测太准了</h3>
+          <div class="video-sec">
+            <img src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/lang.png" alt="">
+            <img class="btn-play" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/btn-play.png" alt="" @click="playLangVideo">
+            <video id="langVideo" class="myVideo" :src="langUrl" controls v-if="showLangVideo" @play="pauseVideo('girl')" @fullscreenchange="handleFullscreenChange"></video>
+          </div>
         </div>
         <div class="common-sec swiper-sec">
           <h3>看看大家怎么说</h3>
           <swiper class="video-swiper" :circular="true" :indicator-dots="true" previous-margin="120rpx" indicator-color="#bfbfbf" indicator-active-color="#ff867e" :autoplay="true" :interval="3000">
             <swiper-item v-for="item in 6" :key="item">
               <div class="item-wrapper">
-                <img :src="require(`@/static/imgs/s${item}.png`)" alt="">
+                <img :src="`https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/s${item}.png`" alt="">
               </div>
             </swiper-item>
           </swiper>
         </div>
         <div class="common-sec qustion-sec">
           <h3>您最关注的问题</h3>
-          <img src="@/static/imgs/question.png" alt="">
+          <img src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/question.png" alt="">
         </div>
         <div class="common-sec intro-sec">
           <h3>关于小叶子</h3>
-          <img src="@/static/imgs/intro.png" alt="">
+          <img src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/intro.png" alt="">
         </div>
       </div>
       <div class="bottom" v-show="showBottom">
         <div class="img-wrapper">
-          <div class="action" v-if="configData.mobile" @click="handleGetting">
+          <div class="action" v-if="configData.mobile" @click="handleGetting('页底立即体验')">
             <img class="header" src="@/static/imgs/btn.png" alt="">
             <p class="text">仅剩{{remainNum}}个名额</p>
           </div>
-          <button class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="hasBtnClicked = true" v-else>
+          <button id="bottom-btn" class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="handleBtnClick" v-else>
             <img src="@/static/imgs/btn.png" alt="">
             <p class="text">仅剩{{remainNum}}个名额</p>
           </button>
         </div>
       </div>
-      <div class="video-box" v-if="showVideo">
-        <div class="video-box-wrapper">
-          <video id="myVideo" class="myVideo" :src="videoUrl" :initial-time="initialTime" controls></video>
-          <img class="close" src="@/static/imgs/contact-close.png" alt="" @click="pauseVideo">
-          <!-- <cover-image class="close" src="@/static/imgs/contact-close.png" @click="pauseVideo"/> -->
-        </div>
-      </div>
       <alert :isShow="showAlert" @close="closeAlert" :type="alertType" :isLogin="isLogin" :form="form" @login="register">
       </alert>
-      <img class="contact" src="@/static/imgs/contact.png" alt="" @click="handleShowAlert('contact')">
+      <img class="contact" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/contact.png" alt="" @click="handleShowAlert('contact')">
     </div>
   </div>
 </template>
@@ -96,8 +98,8 @@ export default {
     return {
       showAlert: false, // 是否显示弹窗
       store: this.$mp.app.globalData,
-      videoUrl: 'https://static.xiaoyezi.com/videos/aipl/langngAIG.mp4',
-      showVideo: false,
+      langUrl: 'https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/langngAIG.mp4',
+      girlUrl: 'https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/compare.mp4',
       showBottom: false,
       alertType: 'phone',
       remainNum: Math.floor(Math.random() * (30 - 20) + 20),
@@ -115,13 +117,25 @@ export default {
       btnDistance: '', // 购买按钮距离顶部的距离
       hasBtnClicked: false, // 购买是否已经点了。
       form: {},
-      showTimer: false
+      showTimer: false,
+      showLangVideo: false,
+      showGirlVideo: false,
+      top: '',
+      platform: ''
     }
   },
   onLoad(options) {
     console.log(options, 'options')
     if (options.scene) {
       this.scene = options.scene
+      // options.scene = '%26r%3DzkR2HDs%3D%26c%3D1220'
+      let scene = decodeURIComponent(options.scene)
+      const match = scene.match(/c=(\d+)/)
+      if (match) {
+        this.sa.registerApp({
+          channel_id: match[1]
+        });
+      }
     } else if (options.source) {
       this.source = options.source
     }
@@ -149,21 +163,24 @@ export default {
         this.handleNetError(res)
       }
     })
+    wx.getSystemInfo({
+      success: (res) => {
+        this.platform = res.platform
+      }
+    })
   },
   onPageScroll(e) {
     this.showBottom = e.scrollTop > this.btnDistance
+    this.top = e.scrollTop
   },
   onReady() {
     this.getMidBtnInfo()
   },
   onHide() {
-    if (this.videoContext) {
-      this.videoContext.pause()
-    }
-    this.videoContext = null
+    this.pauseVideo('girl')
+    this.pauseVideo('lang')
     this.form = {}
     this.store.country_code = ''
-    this.showVideo = false
     this.showAlert = false
     this.showTimer = false
     this.remainNum = 1
@@ -172,6 +189,13 @@ export default {
   onShareAppMessage() {
   },
   methods: {
+    handleFullscreenChange(e) {
+      if (!e.detail.fullScreen && this.platform !== 'ios') {
+        wx.pageScrollTo({
+          scrollTop: Math.ceil(this.top)
+        })
+      }
+    },
     catchTouchMove() {
       return false
     },
@@ -191,35 +215,63 @@ export default {
       this.alertType = type
       this.showAlert = true
     },
-    playVideo() {
+    playLangVideo() {
       track('$WebClick', {
         $title: '首页',
         $url: 'pages/index',
-        content: '视频播放',
+        content: '郎朗视频播放',
         visit_time: new Date().toLocaleDateString()
       });
-      this.showVideo = true
-      if (!this.videoContext) {
-        this.videoContext = wx.createVideoContext('myVideo')
+      this.pauseVideo('girl')
+      this.showLangVideo = true
+      if (!this.langVideoCtx) {
+        this.langVideoCtx = wx.createVideoContext('langVideo')
       }
-      this.videoContext.play()
+      this.langVideoCtx.play()
     },
-    pauseVideo() {
-      this.videoContext.pause()
-      this.showVideo = false
+    playGirlVideo() {
+      track('$WebClick', {
+        $title: '首页',
+        $url: 'pages/index',
+        content: '其他视频播放',
+        visit_time: new Date().toLocaleDateString()
+      });
+      this.pauseVideo('lang')
+      this.showGirlVideo = true
+      if (!this.girlVideoCtx) {
+        this.girlVideoCtx = wx.createVideoContext('girlVideo')
+      }
+      this.girlVideoCtx.play()
+    },
+    pauseVideo(type) {
+      if (this.girlVideoCtx && type === 'girl') {
+        this.girlVideoCtx.pause()
+      }
+      if (this.langVideoCtx && type === 'lang') {
+        this.langVideoCtx.pause()
+      }
     },
     closeAlert() {
       this.hasBtnClicked = false
       this.showAlert = false
     },
-    // 获取手机号
-    getPhoneNumber({ detail }) {
+    handleBtnClick(e) {
+      this.hasBtnClicked = true
+      let content
+      if (e.target.id === 'mid-btn') {
+        content = '页中立即体验'
+      } else {
+        content = '页底立即体验'
+      }
       track('$WebClick', {
         $title: '首页',
         $url: 'pages/index',
-        content: '立即体验',
+        content,
         visit_time: new Date().toLocaleDateString()
       });
+    },
+    // 获取手机号
+    getPhoneNumber({ detail }) {
       if (detail.encryptedData) {
         this.register({
           iv: detail.iv,
@@ -251,11 +303,11 @@ export default {
         this.remainNum = 1
       }
     },
-    handleGetting() {
+    handleGetting(content) {
       track('$WebClick', {
         $title: '首页',
         $url: 'pages/index',
-        content: '立即体验',
+        content,
         visit_time: new Date().toLocaleDateString()
       });
       if (this.configData.had_purchased) {
