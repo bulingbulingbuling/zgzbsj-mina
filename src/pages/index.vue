@@ -62,11 +62,11 @@
         </div>
         <div class="common-sec qustion-sec">
           <h3>您最关注的问题</h3>
-          <img src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/question.png" alt="">
+          <img src="@/static/imgs/question.png" alt="">
         </div>
         <div class="common-sec intro-sec">
           <h3>关于小叶子</h3>
-          <img src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/intro.png" alt="">
+          <img src="@/static/imgs/intro.png" alt="">
         </div>
       </div>
       <div class="bottom" v-show="showBottom">
@@ -327,7 +327,7 @@ export default {
           uuid,
           open_id
         })
-        let { timeStamp, nonceStr, package: p, signType, paySign } = res.params.credential.wx_lite
+        let { timeStamp, nonceStr, package: p, signType, paySign } = res.data.credential.wx_lite
         wx.requestPayment({
           timeStamp,
           nonceStr,
