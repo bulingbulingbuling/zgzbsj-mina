@@ -13,7 +13,8 @@ export default {
     return {
       country_code: '',
       form: {},
-      mobile: ''
+      mobile: '',
+      had_purchased: false
     }
   }
 }

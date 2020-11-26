@@ -310,7 +310,7 @@ export default {
         content,
         visit_time: new Date().toLocaleDateString()
       });
-      if (this.configData.had_purchased) {
+      if (this.configData.had_purchased || this.store.had_purchased) {
         this.go('/pages/success')
       } else {
         this.createBill()
@@ -335,7 +335,9 @@ export default {
           signType,
           paySign,
           success: () => {
-            this.getStatus(res.bill.id)
+            this.store.had_purchased = true
+            this.go('/pages/success?success=true')
+            // this.getStatus(res.bill.id)
           },
           fail: () => {
             this.form = {}
@@ -363,7 +365,7 @@ export default {
       param.referrer = this.referrer_info.ticket
       param.scene = this.scene
       param.source = this.source
-      this.isLogin = true
+      // this.isLogin = true
       try {
         const data = await api.register(param)
         this.sa.setProfile({
