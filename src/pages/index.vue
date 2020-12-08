@@ -128,13 +128,24 @@ export default {
     console.log(options, 'options')
     if (options.scene) {
       this.scene = options.scene
-      // options.scene = '%26r%3DzkR2HDs%3D%26c%3D1220'
+      // 第一版二维码参数格式
+      // options.scene = '%26r%3DzkR2HDs%3D%26c%3D1220' 
+      // 第二版二维码参数格式 
+      // options.scene = 'UUX2WKF3Q%3D%3D%3D%261351%2611084'
       let scene = decodeURIComponent(options.scene)
       const match = scene.match(/c=(\d+)/)
       if (match) {
         this.sa.registerApp({
           channel_id: match[1]
         });
+      } else {
+        const params = scene.split('&')
+        if (params.length > 0) {
+          this.sa.registerApp({
+            channel_id: params[1],
+            activity_id: params[2]
+          });
+        }
       }
     } else if (options.source) {
       this.source = options.source
@@ -142,11 +153,6 @@ export default {
   },
   onShow(options) {
     console.log(this.scene, this.store.country_code, 'onshow')
-    track('$pageview', {
-      $title: '首页',
-      $url: 'pages/index',
-      visit_time: new Date().toLocaleDateString()
-    });
     if (this.store.country_code) {
       this.form = {
         country_code: this.store.country_code,
@@ -187,6 +193,9 @@ export default {
     this.hasBtnClicked = false
   },
   onShareAppMessage() {
+    return {
+      path: `/pages/index?scene=${this.scene}`
+    }
   },
   methods: {
     handleFullscreenChange(e) {
@@ -291,10 +300,25 @@ export default {
       this.referrer_info = this.configData.referrer_info
       this.recent_purchase = this.configData.recent_purchase
       this.store.mobile = this.configData.mobile
+      if (this.referrer_info.uuid) {
+        this.sa.registerApp({
+          referrer_uuid: this.referrer_info.uuid,
+        });
+      }
+      if (this.configData.staff) {
+        this.sa.registerApp({
+          staff_uuid: this.configData.staff.uuid,
+        });
+      }
       this.sa.setProfile({
         ai_phoneNumber: this.configData.mobile,
         ai_open_id: this.configData.openid,
         ai_uuid: this.configData.uuid
+      });
+      track('$pageview', {
+        $title: '首页',
+        $url: 'pages/index',
+        visit_time: new Date().toLocaleDateString()
       });
       if (this.configData.first_flag) {
         this.remainNum = Math.floor(Math.random() * (30 - 20) + 20)
