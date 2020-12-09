@@ -25,9 +25,9 @@
             </swiper-item>
           </swiper>
           <timer-comp :isBottom="showBottom" v-if="showTimer"/>
-          <img class="btn-img" src="@/static/imgs/btn.png" alt="" v-if="configData.mobile" @click="handleGetting('页中立即体验')" id="mid-btn">
+          <img class="btn-img" :src="btnUrl" alt="" v-if="configData.mobile" @click="handleGetting('页中立即体验')" id="mid-btn">
           <button class="btn-img" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" v-else id="mid-btn" :disabled="hasBtnClicked" @click="handleBtnClick">
-            <img src="@/static/imgs/btn.png" alt="">
+            <img :src="btnUrl" alt="">
           </button>
         </div>
         <div class="common-sec girl-wrapper">
@@ -72,11 +72,11 @@
       <div class="bottom" v-show="showBottom">
         <div class="img-wrapper">
           <div class="action" v-if="configData.mobile" @click="handleGetting('页底立即体验')">
-            <img class="header" src="@/static/imgs/btn.png" alt="">
+            <img class="header" :src="btnUrl" alt="">
             <p class="text">仅剩{{remainNum}}个名额</p>
           </div>
           <button id="bottom-btn" class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="handleBtnClick" v-else>
-            <img src="@/static/imgs/btn.png" alt="">
+            <img :src="btnUrl" alt="">
             <p class="text">仅剩{{remainNum}}个名额</p>
           </button>
         </div>
@@ -121,7 +121,8 @@ export default {
       showLangVideo: false,
       showGirlVideo: false,
       top: '',
-      platform: ''
+      platform: '',
+      btnUrl: ''
     }
   },
   onLoad(options) {
@@ -297,6 +298,7 @@ export default {
         scene: this.scene,
         source: this.source
       })
+      this.btnUrl = this.configData.pkg === 3 ? require('@/static/imgs/btn-1cents.png') : require('@/static/imgs/btn.png')
       this.referrer_info = this.configData.referrer_info
       this.recent_purchase = this.configData.recent_purchase
       this.store.mobile = this.configData.mobile
@@ -310,6 +312,9 @@ export default {
           staff_uuid: this.configData.staff.uuid,
         });
       }
+      this.sa.registerApp({
+        referrer_amount: this.configData.pkg === 3 ? 0.01 : 9.9,
+      });
       this.sa.setProfile({
         ai_phoneNumber: this.configData.mobile,
         ai_open_id: this.configData.openid,
@@ -349,7 +354,8 @@ export default {
       try {
         let res = await api.createBill({
           uuid,
-          open_id
+          open_id,
+          pkg: this.configData.pkg
         })
         let { timeStamp, nonceStr, package: p, signType, paySign } = res.data.credential.wx_lite
         wx.requestPayment({
