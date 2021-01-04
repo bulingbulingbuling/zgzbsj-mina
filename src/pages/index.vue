@@ -133,21 +133,23 @@ export default {
       // options.scene = '%26r%3DzkR2HDs%3D%26c%3D1220' 
       // 第二版二维码参数格式 
       // options.scene = 'UUX2WKF3Q%3D%3D%3D%261351%2611084'
-      let scene = decodeURIComponent(options.scene)
-      const match = scene.match(/c=(\d+)/)
-      if (match) {
-        this.sa.registerApp({
-          channel_id: match[1]
-        });
-      } else {
-        const params = scene.split('&')
-        if (params.length > 0) {
-          this.sa.registerApp({
-            channel_id: params[1],
-            activity_id: params[2]
-          });
-        }
-      }
+
+      // 改用从接口获取埋点数据
+      // let scene = decodeURIComponent(options.scene)
+      // const match = scene.match(/c=(\d+)/)
+      // if (match) {
+      //   this.sa.registerApp({
+      //     channel_id: match[1]
+      //   });
+      // } else {
+      //   const params = scene.split('&')
+      //   if (params.length > 0) {
+      //     this.sa.registerApp({
+      //       channel_id: params[1],
+      //       activity_id: params[2]
+      //     });
+      //   }
+      // }
     } else if (options.source) {
       this.source = options.source
     }
@@ -310,6 +312,16 @@ export default {
       if (this.configData.staff) {
         this.sa.registerApp({
           staff_uuid: this.configData.staff.uuid,
+        });
+      }
+      if (this.configData.scene_data.c) {
+        this.sa.registerApp({
+          channel_id: this.configData.scene_data.c
+        });
+      }
+      if (this.configData.scene_data.a) {
+        this.sa.registerApp({
+          activity_id: this.configData.scene_data.a
         });
       }
       this.sa.registerApp({
