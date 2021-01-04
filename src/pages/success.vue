@@ -1,21 +1,47 @@
 <template>
   <div class="container success-container">
-    <img v-if="isSuccess" class="img-top" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/result-success.png" alt="">
-    <img v-else class="img-top" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/result-fail.png" alt="">
-    <div class="result-bottom">
-      <img src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/result-bottom.png" alt="">
-      <button class="btn" open-type="contact">点击并回复“1”获取助教微信</button>
-    </div>
+    <template v-if="isSuccess">
+      <img class="img-top" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/result-success.png" alt="">
+      <div class="result-bottom">
+        <img src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/result-bottom.png" alt="">
+        <button class="btn" open-type="contact">点击并回复“1”获取助教微信</button>
+      </div>
+    </template>
+    <template v-else>
+      <div class="fail-wrapper-top">
+        <img class="fail-top" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/result-fail.png" alt="">
+        <button class="btn" open-type="contact">点击并回复“1”获取助教微信</button>
+      </div>
+      <div class="fail-wrapper-bottom">
+        <img class="fail-bottom" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/result-fail-bg.png" alt="">
+        <img class="poster" :src="posterUrl" alt="">
+        <div class="share-wrapper">
+          <div class="share-item">
+            <button open-type="share" @click="sendFriends">
+              <img class="fail-top" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/weixin.png" alt="">
+            </button>
+            <p>分享给朋友</p>
+          </div>
+          <div class="share-item">
+            <img class="fail-top" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/download.png" alt="" @click="savePoster">
+            <p>分享到朋友圈</p>
+          </div>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
 <script>
+import { api } from '@/api'
 import { track } from '@/utils/util'
 export default {
   data () {
     return {
       isSuccess: this.$mp.query.success,
-      store: this.$mp.app.globalData
+      store: this.$mp.app.globalData,
+      posterUrl: '',
+      isDownloading: false
     }
   },
   onShow() {
@@ -37,6 +63,76 @@ export default {
       track('ai_applet_had_buy_view', {
         ai_tel: this.store.mobile
       });
+    }
+    wx.hideShareMenu({
+      menus: ['shareAppMessage']
+    })
+    this.getPoster()
+  },
+  onShareAppMessage(res) {
+    let param = {};
+    if (res.from === 'button') {
+      // 来自页面内转发按钮
+      param = {
+        title: '小叶子智能陪练体验营',
+        path: `/pages/index?scene=${this.store.scene}`,
+        imageUrl: 'https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/share-header.png'
+      }
+      return param;
+    }
+  },
+  methods: {
+    sendFriends() {
+      track('ai_applet_had_buy_share_click', {
+        ai_tel: this.store.mobile,
+        share_type: '微信'
+      });
+    },
+    async getPoster() {
+      const data = await api.getPoster()
+      this.posterUrl = data
+    },
+    savePoster() {
+      if (this.isDownloading) return
+      this.isDownloading = true
+      wx.downloadFile({
+        url: this.posterUrl,
+        success: (res) => {
+           wx.saveImageToPhotosAlbum({
+            filePath: res.tempFilePath,
+            success: () => {
+              track('ai_applet_had_buy_share_click', {
+                ai_tel: this.store.mobile,
+                share_type: '朋友圈'
+              });
+              this.toast('海报已保存到本地，请到朋友圈分享此海报')
+            },
+            fail: (res) => {
+              wx.showModal({
+                title: '获取授权失败',
+                content: '请打开“保存到相册”选项开关',
+                cancelText: '取消',
+                confirmText: '去设置',
+                confirmColor: '#8ecd7e',
+                success: (res) => {
+                  if (res.confirm) {
+                    wx.openSetting({
+                      success: (data) => {
+                        if (data.authSetting["scope.writePhotosAlbum"]) {
+                          this.savePoster();
+                        }
+                      }
+                    })
+                  }
+                }
+              })
+            },
+            complete: () => {
+              this.isDownloading = false
+            }
+          }) 
+        }
+      })
     }
   }
 }

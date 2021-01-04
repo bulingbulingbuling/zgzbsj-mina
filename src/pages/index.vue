@@ -11,6 +11,10 @@
       </div>
       <div class="content">
         <div class="con">
+          <img class="btn-img" :src="btnUrl" alt="" v-if="configData.mobile" @click="handleGetting('页中立即体验')" id="mid-btn">
+          <button class="btn-img" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" v-else id="mid-btn" :disabled="hasBtnClicked" @click="handleBtnClick">
+            <img :src="btnUrl" alt="">
+          </button>
           <div class="title">当前班次仅剩<span>{{remainNum}}</span>个名额，预购从速！</div>
           <swiper class="list-swiper" :circular="true" :vertical="true" :autoplay="true" :interval="1500" v-if="recent_purchase.length > 0">
             <swiper-item v-for="(item, key) in recent_purchase" :key="key" catchtouchmove="catchTouchMove">
@@ -25,10 +29,6 @@
             </swiper-item>
           </swiper>
           <timer-comp :isBottom="showBottom" v-if="showTimer"/>
-          <img class="btn-img" :src="btnUrl" alt="" v-if="configData.mobile" @click="handleGetting('页中立即体验')" id="mid-btn">
-          <button class="btn-img" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" v-else id="mid-btn" :disabled="hasBtnClicked" @click="handleBtnClick">
-            <img :src="btnUrl" alt="">
-          </button>
         </div>
         <div class="common-sec girl-wrapper">
           <h3>孩子练琴那些坎儿</h3>
@@ -107,7 +107,7 @@ export default {
       referrer_info: {
         ticket: '',
         nickname: '小叶子',
-        text: '自从有了小叶子，孩子终于会主动练琴了，也帮你领取了社群限时福利，快来体验吧！',
+        text: '自从有了小叶子，孩子错音变少了，也学会主动练琴了，9.9元也给你家宝贝一个提升的机会',
         headimgurl: 'https://oss-ai-peilian-app.xiaoyezi.com/prod/thumb/87beab4d8f802088056038464e54cf49.jpeg'
       },
       recent_purchase: [], // 滚动列表
@@ -303,6 +303,7 @@ export default {
       this.btnUrl = this.configData.pkg === 3 ? require('@/static/imgs/btn-1cents.png') : require('@/static/imgs/btn.png')
       this.referrer_info = this.configData.referrer_info
       this.recent_purchase = this.configData.recent_purchase
+      this.scene = this.store.scene = this.configData.share_scene
       this.store.mobile = this.configData.mobile
       if (this.referrer_info.uuid) {
         this.sa.registerApp({
@@ -322,6 +323,11 @@ export default {
       if (this.configData.scene_data.a) {
         this.sa.registerApp({
           activity_id: this.configData.scene_data.a
+        });
+      }
+      if (this.configData.scene_data.p) {
+        this.sa.registerApp({
+          poster_id: this.configData.scene_data.p
         });
       }
       this.sa.registerApp({

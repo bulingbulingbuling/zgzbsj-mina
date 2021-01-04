@@ -24,7 +24,7 @@ const request = (url, params, method, header) => {
       success: async (res) => {
         wx.hideLoading();
         if (res.data.code !== 0) {
-          if (res.data.errors[0].err_no === 401) {
+          if (res.data.errors[0] && res.data.errors[0].err_no === 401) {
             const code = await getCode()
             const res = await request(url, { code }, method, { token: '' })
             wx.setStorageSync('token', res.token);
@@ -36,8 +36,14 @@ const request = (url, params, method, header) => {
             resolve(result)
             return
           }
+          let errMsg 
+          if (!res.data.errors[0]) {
+            Object.keys(res.data.errors).forEach(errKey => {
+              errMsg = res.data.errors[errKey][0].err_msg
+            })
+          }
           wx.showToast({
-            title: res.data.errors[0].err_msg + '',
+            title: errMsg || res.data.errors[0].err_msg + '',
             icon: 'none',
             duration: 2000
           });

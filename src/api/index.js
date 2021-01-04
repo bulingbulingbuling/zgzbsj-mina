@@ -61,5 +61,9 @@ export const api = {
       mobile,
       country_code
     });
+  },
+  // 获取成功页海报
+  async getPoster() {
+    return await baseApi.get('/referral_miniapp/landing/buy_poster');
   }
 }
