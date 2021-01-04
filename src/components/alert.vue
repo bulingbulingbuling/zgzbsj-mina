@@ -2,15 +2,15 @@
   <div class="alert" v-if="isShow">
     <div class="mask"></div>
     <div class="alert-contact" v-if="type === 'contact'">
-      <img class="alert-contact-close" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/contact-close.png" alt="" @click="close">
-      <img class="img-bg" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/contact-help.png">
+      <img class="alert-contact-close" :src="`${imgPath}/ai_mina/contact-close.png`" alt="" @click="close">
+      <img class="img-bg" :src="`${imgPath}/ai_mina/contact-help.png`">
       <div class="call" @click="handleCall">现在拨打</div>
     </div>
     <div class="alert-form" v-else>
-      <img class="alert-form-close" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/phone-close.png" alt="" @click="close">
+      <img class="alert-form-close" :src="`${imgPath}/ai_mina/phone-close.png`" alt="" @click="close">
       <h3 class="alert-form-title">想使用其他手机号?</h3>
       <div class="alert-form-item">
-        <div class="num ft-32" @click="handleRedirect">+{{country_code}} <img class="arrow" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/arrow.png" alt=""></div>
+        <div class="num ft-32" @click="handleRedirect">+{{country_code}} <img class="arrow" :src="`${imgPath}/ai_mina/arrow.png`" alt=""></div>
         <input class="phone ft-32" type="number" placeholder="请输入手机号号码" @input="handleMobileInput">
       </div>
       <div class="alert-form-item">
@@ -66,7 +66,8 @@ export default {
       store: this.$mp.app.globalData,
       country_code: '86',
       isSending: false,
-      timer: ''
+      timer: '',
+      imgPath: process.env.VUE_APP_IMG_PATH
     }
   },
   methods: {

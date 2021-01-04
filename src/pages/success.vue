@@ -1,29 +1,29 @@
 <template>
   <div class="container success-container">
     <template v-if="isSuccess">
-      <img class="img-top" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/result-success.png" alt="">
+      <img class="img-top" :src="`${imgPath}/ai_mina/result-success.png`" alt="">
       <div class="result-bottom">
-        <img src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/result-bottom.png" alt="">
+        <img :src="`${imgPath}/ai_mina/result-bottom.png`" alt="">
         <button class="btn" open-type="contact">点击并回复“1”获取助教微信</button>
       </div>
     </template>
     <template v-else>
       <div class="fail-wrapper-top">
-        <img class="fail-top" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/result-fail.png" alt="">
+        <img class="fail-top" :src="`${imgPath}/ai_mina/result-fail.png`" alt="">
         <button class="btn" open-type="contact">点击并回复“1”获取助教微信</button>
       </div>
       <div class="fail-wrapper-bottom">
-        <img class="fail-bottom" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/result-fail-bg.png" alt="">
+        <img class="fail-bottom" :src="`${imgPath}/ai_mina/result-fail-bg.png`" alt="">
         <img class="poster" :src="posterUrl" alt="">
         <div class="share-wrapper">
           <div class="share-item">
             <button open-type="share" @click="sendFriends">
-              <img class="fail-top" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/weixin.png" alt="">
+              <img class="fail-top" :src="`${imgPath}/ai_mina/weixin.png`" alt="">
             </button>
             <p>分享给朋友</p>
           </div>
           <div class="share-item">
-            <img class="fail-top" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/download.png" alt="" @click="savePoster">
+            <img class="fail-top" :src="`${imgPath}/ai_mina/download.png`" alt="" @click="savePoster">
             <p>分享到朋友圈</p>
           </div>
         </div>
@@ -41,7 +41,8 @@ export default {
       isSuccess: this.$mp.query.success,
       store: this.$mp.app.globalData,
       posterUrl: '',
-      isDownloading: false
+      isDownloading: false,
+      imgPath: process.env.VUE_APP_IMG_PATH
     }
   },
   onShow() {
@@ -76,7 +77,7 @@ export default {
       param = {
         title: '小叶子智能陪练体验营',
         path: `/pages/index?scene=${this.store.scene}`,
-        imageUrl: 'https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/share-header.png'
+        imageUrl: '${imgPath}/ai_mina/share-header.png'
       }
       return param;
     }

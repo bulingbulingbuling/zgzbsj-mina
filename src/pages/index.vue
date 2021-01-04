@@ -2,7 +2,7 @@
   <div class="container index-container">
     <div class="index-container-wrapper">
       <div class="header-wrapper">
-        <img class="header" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/header.png" alt="">
+        <img class="header" :src="`${imgPath}/ai_mina/header.png`" alt="">
         <div class="avatar-wrapper">
           <img class="avatar" :src="referrer_info.headimgurl" alt="">
           <p>{{referrer_info.nickname}}</p>
@@ -32,21 +32,21 @@
         </div>
         <div class="common-sec girl-wrapper">
           <h3>孩子练琴那些坎儿</h3>
-          <img src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/girl.png" alt="">
+          <img :src="`${imgPath}/ai_mina/girl.png`" alt="">
           <div class="video-sec">
-            <img class="btn-play" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/btn-play.png" alt="" @click="playGirlVideo">
+            <img class="btn-play" :src="`${imgPath}/ai_mina/btn-play.png`" alt="" @click="playGirlVideo">
             <video id="girlVideo" class="girlVideo" :src="girlUrl" controls v-if="showGirlVideo" @play="pauseVideo('lang')" @fullscreenchange="handleFullscreenChange"></video>
           </div>
         </div>
         <div class="common-sec feature-wrapper">
           <h3>智能陪练三大核心</h3>
-          <img class="header" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/feature.png" alt="">
+          <img class="header" :src="`${imgPath}/ai_mina/feature.png`" alt="">
         </div>
         <div class="common-sec lang-wrapper">
           <h3>郎朗亲测太准了</h3>
           <div class="video-sec">
-            <img src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/lang.png" alt="">
-            <img class="btn-play" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/btn-play.png" alt="" @click="playLangVideo">
+            <img :src="`${imgPath}/ai_mina/lang.png`" alt="">
+            <img class="btn-play" :src="`${imgPath}/ai_mina/btn-play.png`" alt="" @click="playLangVideo">
             <video id="langVideo" class="myVideo" :src="langUrl" controls v-if="showLangVideo" @play="pauseVideo('girl')" @fullscreenchange="handleFullscreenChange"></video>
           </div>
         </div>
@@ -55,7 +55,7 @@
           <swiper class="video-swiper" :circular="true" :indicator-dots="true" previous-margin="120rpx" indicator-color="#bfbfbf" indicator-active-color="#ff867e" :autoplay="true" :interval="3000">
             <swiper-item v-for="item in 6" :key="item">
               <div class="item-wrapper">
-                <img :src="`https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/s${item}.png`" alt="">
+                <img :src="`${imgPath}/ai_mina/s${item}.png`" alt="">
               </div>
             </swiper-item>
           </swiper>
@@ -83,7 +83,7 @@
       </div>
       <alert :isShow="showAlert" @close="closeAlert" :type="alertType" :isLogin="isLogin" :form="form" @login="register">
       </alert>
-      <img class="contact" src="https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/contact.png" alt="" @click="handleShowAlert('contact')">
+      <img class="contact" :src="`${imgPath}/ai_mina/contact.png`" alt="" @click="handleShowAlert('contact')">
     </div>
   </div>
 </template>
@@ -98,8 +98,8 @@ export default {
     return {
       showAlert: false, // 是否显示弹窗
       store: this.$mp.app.globalData,
-      langUrl: 'https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/langngAIG.mp4',
-      girlUrl: 'https://ai-peilian-app.oss-cn-beijing.aliyuncs.com/prod/ai_mina/compare.mp4',
+      langUrl: '${imgPath}/ai_mina/langngAIG.mp4',
+      girlUrl: '${imgPath}/ai_mina/compare.mp4',
       showBottom: false,
       alertType: 'phone',
       remainNum: Math.floor(Math.random() * (30 - 20) + 20),
@@ -122,7 +122,8 @@ export default {
       showGirlVideo: false,
       top: '',
       platform: '',
-      btnUrl: ''
+      btnUrl: '',
+      imgPath: process.env.VUE_APP_IMG_PATH
     }
   },
   onLoad(options) {
@@ -156,6 +157,7 @@ export default {
   },
   onShow(options) {
     console.log(this.scene, this.store.country_code, 'onshow')
+    console.log(process.env.VUE_APP_IMG_PATH, 'path')
     if (this.store.country_code) {
       this.form = {
         country_code: this.store.country_code,
