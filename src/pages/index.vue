@@ -123,7 +123,8 @@ export default {
       top: '',
       platform: '',
       btnUrl: '',
-      imgPath: process.env.VUE_APP_IMG_PATH
+      imgPath: process.env.VUE_APP_IMG_PATH,
+      shareScene: '' // 分享给他人的scene
     }
   },
   onLoad(options) {
@@ -199,7 +200,7 @@ export default {
   },
   onShareAppMessage() {
     return {
-      path: `/pages/index?scene=${this.scene}`
+      path: `/pages/index?scene=${this.shareScene}`
     }
   },
   methods: {
@@ -305,7 +306,7 @@ export default {
       this.btnUrl = this.configData.pkg === 3 ? require('@/static/imgs/btn-1cents.png') : require('@/static/imgs/btn.png')
       this.referrer_info = this.configData.referrer_info
       this.recent_purchase = this.configData.recent_purchase
-      this.scene = this.store.scene = this.configData.share_scene
+      this.shareScene = this.store.scene = this.configData.share_scene
       this.store.mobile = this.configData.mobile
       if (this.referrer_info.uuid) {
         this.sa.registerApp({
@@ -433,6 +434,7 @@ export default {
           });
         }
         this.store.mobile = data.mobile
+        this.shareScene = data.share_scene
         if (data.had_purchased) {
           return this.go('/pages/success')
         }

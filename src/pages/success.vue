@@ -77,7 +77,7 @@ export default {
       param = {
         title: '小叶子智能陪练体验营',
         path: `/pages/index?scene=${this.store.scene}`,
-        imageUrl: '${imgPath}/ai_mina/share-header.png'
+        imageUrl: `${this.imgPath}/ai_mina/share-header.png`
       }
       return param;
     }
