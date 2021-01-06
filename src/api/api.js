@@ -36,7 +36,7 @@ const request = (url, params, method, header) => {
             resolve(result)
             return
           }
-          let errMsg 
+          let errMsg
           if (!res.data.errors[0]) {
             Object.keys(res.data.errors).forEach(errKey => {
               errMsg = res.data.errors[errKey][0].err_msg

@@ -98,8 +98,8 @@ export default {
     return {
       showAlert: false, // 是否显示弹窗
       store: this.$mp.app.globalData,
-      langUrl: '${imgPath}/ai_mina/langngAIG.mp4',
-      girlUrl: '${imgPath}/ai_mina/compare.mp4',
+      langUrl: `${process.env.VUE_APP_IMG_PATH}/ai_mina/langngAIG.mp4`,
+      girlUrl: `${process.env.VUE_APP_IMG_PATH}/ai_mina/compare.mp4`,
       showBottom: false,
       alertType: 'phone',
       remainNum: Math.floor(Math.random() * (30 - 20) + 20),
@@ -132,8 +132,8 @@ export default {
     if (options.scene) {
       this.scene = options.scene
       // 第一版二维码参数格式
-      // options.scene = '%26r%3DzkR2HDs%3D%26c%3D1220' 
-      // 第二版二维码参数格式 
+      // options.scene = '%26r%3DzkR2HDs%3D%26c%3D1220'
+      // 第二版二维码参数格式
       // options.scene = 'UUX2WKF3Q%3D%3D%3D%261351%2611084'
 
       // 改用从接口获取埋点数据
@@ -158,7 +158,6 @@ export default {
   },
   onShow(options) {
     console.log(this.scene, this.store.country_code, 'onshow')
-    console.log(process.env.VUE_APP_IMG_PATH, 'path')
     if (this.store.country_code) {
       this.form = {
         country_code: this.store.country_code,
@@ -306,16 +305,16 @@ export default {
       this.btnUrl = this.configData.pkg === 3 ? require('@/static/imgs/btn-1cents.png') : require('@/static/imgs/btn.png')
       this.referrer_info = this.configData.referrer_info
       this.recent_purchase = this.configData.recent_purchase
-      this.shareScene = this.store.scene = this.configData.share_scene
+      this.shareScene = this.configData.share_scene
       this.store.mobile = this.configData.mobile
       if (this.referrer_info.uuid) {
         this.sa.registerApp({
-          referrer_uuid: this.referrer_info.uuid,
+          referrer_uuid: this.referrer_info.uuid
         });
       }
       if (this.configData.staff) {
         this.sa.registerApp({
-          staff_uuid: this.configData.staff.uuid,
+          staff_uuid: this.configData.staff.uuid
         });
       }
       if (this.configData.scene_data.c) {
@@ -334,7 +333,7 @@ export default {
         });
       }
       this.sa.registerApp({
-        referrer_amount: this.configData.pkg === 3 ? 0.01 : 9.9,
+        referrer_amount: this.configData.pkg === 3 ? 0.01 : 9.9
       });
       this.sa.setProfile({
         ai_phoneNumber: this.configData.mobile,

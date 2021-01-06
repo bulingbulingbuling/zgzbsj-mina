@@ -42,7 +42,8 @@ export default {
       store: this.$mp.app.globalData,
       posterUrl: '',
       isDownloading: false,
-      imgPath: process.env.VUE_APP_IMG_PATH
+      imgPath: process.env.VUE_APP_IMG_PATH,
+      shareScene: ''
     }
   },
   onShow() {
@@ -76,7 +77,7 @@ export default {
       // 来自页面内转发按钮
       param = {
         title: '小叶子智能陪练体验营',
-        path: `/pages/index?scene=${this.store.scene}`,
+        path: `/pages/index?scene=${this.shareScene}`,
         imageUrl: `${this.imgPath}/ai_mina/share-header.png`
       }
       return param;
@@ -91,24 +92,34 @@ export default {
     },
     async getPoster() {
       const data = await api.getPoster()
-      this.posterUrl = data
+      this.posterUrl = data.poster
+      this.shareScene = data.share_scene
     },
     savePoster() {
       if (this.isDownloading) return
       this.isDownloading = true
+      wx.showLoading({
+        mask: true
+      });
       wx.downloadFile({
         url: this.posterUrl,
         success: (res) => {
-           wx.saveImageToPhotosAlbum({
+          wx.saveImageToPhotosAlbum({
             filePath: res.tempFilePath,
             success: () => {
+              console.log('save success')
               track('ai_applet_had_buy_share_click', {
                 ai_tel: this.store.mobile,
                 share_type: '朋友圈'
               });
-              this.toast('海报已保存到本地，请到朋友圈分享此海报')
+              wx.hideLoading({
+                success: () => {
+                  this.toast('海报已保存到本地，请到朋友圈分享此海报')
+                }
+              });
             },
             fail: (res) => {
+              console.log('save fail')
               wx.showModal({
                 title: '获取授权失败',
                 content: '请打开“保存到相册”选项开关',
@@ -119,7 +130,7 @@ export default {
                   if (res.confirm) {
                     wx.openSetting({
                       success: (data) => {
-                        if (data.authSetting["scope.writePhotosAlbum"]) {
+                        if (data.authSetting['scope.writePhotosAlbum']) {
                           this.savePoster();
                         }
                       }
@@ -130,8 +141,14 @@ export default {
             },
             complete: () => {
               this.isDownloading = false
+              wx.hideLoading();
             }
-          }) 
+          })
+        },
+        fail: () => {
+          console.log('download fail')
+          wx.hideLoading();
+          this.isDownloading = false
         }
       })
     }

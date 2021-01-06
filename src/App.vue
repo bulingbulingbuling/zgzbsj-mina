@@ -14,8 +14,7 @@ export default {
       country_code: '',
       form: {},
       mobile: '',
-      had_purchased: false,
-      scene: ''
+      had_purchased: false
     }
   }
 }
