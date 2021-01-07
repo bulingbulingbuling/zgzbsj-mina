@@ -359,7 +359,7 @@ export default {
         content,
         visit_time: new Date().toLocaleDateString()
       });
-      if (this.configData.had_purchased || this.store.had_purchased) {
+      if (this.configData.had_purchased || (this.store.had_purchased && this.configData.mobile)) {
         this.go('/pages/success')
       } else {
         this.createBill()
@@ -394,6 +394,7 @@ export default {
             this.store.country_code = ''
             this.showAlert = false
             this.getConfig()
+            this.store.had_purchased = false
           }
         })
       } catch (e) {

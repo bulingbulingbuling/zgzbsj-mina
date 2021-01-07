@@ -118,26 +118,34 @@ export default {
                 }
               });
             },
-            fail: (res) => {
-              console.log('save fail')
-              wx.showModal({
-                title: '获取授权失败',
-                content: '请打开“保存到相册”选项开关',
-                cancelText: '取消',
-                confirmText: '去设置',
-                confirmColor: '#8ecd7e',
-                success: (res) => {
-                  if (res.confirm) {
-                    wx.openSetting({
-                      success: (data) => {
-                        if (data.authSetting['scope.writePhotosAlbum']) {
-                          this.savePoster();
+            fail: (err) => {
+              console.log(err, 'save fail')
+              if (err.errMsg === 'saveImageToPhotosAlbum:fail auth deny' || err.errMsg === 'saveImageToPhotosAlbum:fail:auth denied') {
+                wx.showModal({
+                  title: '获取授权失败',
+                  content: '请打开“保存到相册”选项开关',
+                  cancelText: '取消',
+                  confirmText: '去设置',
+                  confirmColor: '#8ecd7e',
+                  success: (res) => {
+                    if (res.confirm) {
+                      wx.openSetting({
+                        success: (data) => {
+                          if (data.authSetting['scope.writePhotosAlbum']) {
+                            this.savePoster();
+                          }
                         }
-                      }
-                    })
+                      })
+                    }
                   }
-                }
-              })
+                })
+              } else if (err.errMsg === 'saveImageToPhotosAlbum:fail system deny' || err.errMsg === 'saveImageToPhotosAlbum:fail:system denied') {
+                wx.showModal({
+                  title: '无法保存',
+                  content: '请在手机的“设置-隐私-照片”选项中，允许微信访问照片。',
+                  showCancel: false
+                })
+              } 
             },
             complete: () => {
               this.isDownloading = false
