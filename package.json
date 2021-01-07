@@ -6,7 +6,7 @@
     "dev": "megalo-cli-service serve",
     "build:dev": "megalo-cli-service build --mode development",
     "build:production": "megalo-cli-service build --mode production",
-    "lint": "megalo-cli-service lint"
+    "lint": "megalo-cli-service lint --fix"
   },
   "license": "ISC",
   "babel": {
