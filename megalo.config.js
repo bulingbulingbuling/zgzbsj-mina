@@ -34,7 +34,7 @@ module.exports = {
       stylus: {
         // https://github.com/shama/stylus-loader
       },
-        // https://github.com/megalojs/megalo-px2rpx-loader
+      // https://github.com/megalojs/megalo-px2rpx-loader
       px2rpx: {
         rpxUnit: 1
       }

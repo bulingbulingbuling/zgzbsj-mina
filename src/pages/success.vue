@@ -145,7 +145,7 @@ export default {
                   content: '请在手机的“设置-隐私-照片”选项中，允许微信访问照片。',
                   showCancel: false
                 })
-              } 
+              }
             },
             complete: () => {
               this.isDownloading = false
