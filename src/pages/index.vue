@@ -104,12 +104,7 @@ export default {
       alertType: 'phone',
       remainNum: Math.floor(Math.random() * (30 - 20) + 20),
       configData: {},
-      referrer_info: {
-        ticket: '',
-        nickname: '小叶子',
-        text: '自从有了小叶子，孩子错音变少了，也学会主动练琴了，9.9元也给你家宝贝一个提升的机会',
-        headimgurl: 'https://oss-ai-peilian-app.xiaoyezi.com/prod/thumb/87beab4d8f802088056038464e54cf49.jpeg'
-      },
+      referrer_info: {},
       recent_purchase: [], // 滚动列表
       isLogin: false,
       scene: '', // 通过小程序码进来
