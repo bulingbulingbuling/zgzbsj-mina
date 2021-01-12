@@ -5,7 +5,8 @@
         <img class="header" :src="`${imgPath}/ai_mina/header.png`" alt="">
         <div class="avatar-wrapper">
           <img class="avatar" :src="referrer_info.headimgurl" alt="">
-          <p>{{referrer_info.nickname}}</p>
+          <p><span class='limited'>{{referrer_info.nickname}}</span></p>
+          <!-- <p>{{referrer_info.nickname}}</p> -->
         </div>
         <p class="desc" v-html="referrer_info.text"></p>
       </div>
@@ -81,6 +82,25 @@
           </button>
         </div>
       </div>
+      <div class='stay' v-show="showStay">
+        <div class="mask"></div>
+        <div class="stay-content">
+          <img class="_logo" src="@/static/imgs/sad-logo.png" alt="">
+          <div class='stay-content-title' >
+              <h3 class="_title">您确定要放弃吗？</h3>
+              <p class='_p'> 让孩子跟小叶子一起练琴，每天提高吧～</p>
+          </div>
+          <div class='stay-content-body'>
+            <img src="@/static/imgs/stay.png" alt="" class='_img'>
+            <p class='_test'><span>9.9元5天</span>不限次数体验</p>
+            <p class='_exp'>练1遍，顶10遍</p>
+          </div>
+          <div class="stay-content-btngroup">
+            <button class="_close" @click="closeStay">残忍拒绝</button>
+            <button class="_pay"  @click="handleGetting('页底立即体验')">继续支付</button>
+          </div>
+        </div>
+      </div>
       <alert :isShow="showAlert" @close="closeAlert" :type="alertType" :isLogin="isLogin" :form="form" @login="register">
       </alert>
       <img class="contact" :src="`${imgPath}/ai_mina/contact.png`" alt="" @click="handleShowAlert('contact')">
@@ -97,6 +117,7 @@ export default {
   data () {
     return {
       showAlert: false, // 是否显示弹窗
+      showStay: false, //支付失败挽留弹窗
       store: this.$mp.app.globalData,
       langUrl: `${process.env.VUE_APP_IMG_PATH}/ai_mina/langngAIG.mp4`,
       girlUrl: `${process.env.VUE_APP_IMG_PATH}/ai_mina/compare.mp4`,
@@ -119,7 +140,7 @@ export default {
       platform: '',
       btnUrl: '',
       imgPath: process.env.VUE_APP_IMG_PATH,
-      shareScene: '' // 分享给他人的scene
+      shareScene: '' // 分享给他人的scen
     }
   },
   onLoad(options) {
@@ -264,6 +285,9 @@ export default {
       this.hasBtnClicked = false
       this.showAlert = false
     },
+    closeStay() {
+      this.showStay = false;
+    },
     handleBtnClick(e) {
       this.hasBtnClicked = true
       let content
@@ -297,6 +321,7 @@ export default {
         scene: this.scene,
         source: this.source
       })
+      console.log('this.configData', this.configData);
       this.btnUrl = this.configData.pkg === 3 ? require('@/static/imgs/btn-1cents.png') : require('@/static/imgs/btn.png')
       this.referrer_info = this.configData.referrer_info
       this.recent_purchase = this.configData.recent_purchase
@@ -389,7 +414,11 @@ export default {
             this.store.country_code = ''
             this.showAlert = false
             this.getConfig()
-            this.store.had_purchased = false
+            this.store.had_purchased = false;
+          },
+          cancel: () => {
+            console.log('stay')
+            this.showStay = true;
           }
         })
       } catch (e) {
