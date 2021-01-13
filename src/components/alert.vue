@@ -16,14 +16,14 @@
       </div>
       <div class="alert-form-item">
         <div class="num item-left ft-28" @click="handleRedirect">+{{country_code}} <img class="arrow" :src="`${imgPath}/ai_mina/arrow.png`" alt=""></div>
-        <input class="phone ft-24" type="number" placeholder="请输入手机号号码" @input="handleMobileInput">
+        <input class="phone ft-28" type="number" placeholder="请输入手机号号码" @input="handleMobileInput">
       </div>
       <div class="alert-form-item">
         <div class="code-title ft-28 item-left">验证码</div>
-        <input class="code ft-24" type="number" placeholder="请输入验证码" @input="handleCodeInput">
-        <div class="code-btn ft-24" :class="{disabled: code < 60 && code > 0}" @click="sendCode">{{smstext || code + 's'}}</div>
+        <input class="code ft-28" type="number" placeholder="请输入验证码" @input="handleCodeInput">
+        <div class="code-btn ft-26" :class="{disabled: code < 60 && code > 0}" @click="sendCode">{{smstext || code + 's'}}</div>
       </div>
-      <p class="alert-form-error ft-24">{{errorText}}</p>
+      <p class="alert-form-error ft-26">{{errorText}}</p>
       <button class="alert-form-btn" @click="login" :disabled="isLogin">立即注册</button>
       <p class="_decr">* 训练营期间打卡5天还可得<span class="_strong">19.8</span>元学费返现</p>
       <img class="alert-form-close" src="@/static/imgs/close.png" alt="" @click="close">
@@ -320,7 +320,7 @@ export default {
       }
       .code {
         box-sizing: border-box;
-        width: 238px;
+        width: 230px;
         text-align: left;
         padding-left: 26px;
         color: #444;

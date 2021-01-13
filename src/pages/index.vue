@@ -119,7 +119,7 @@ import { track } from '@/utils/util'
 export default {
   data () {
     return {
-      showAlert: true, // 是否显示弹窗
+      showAlert: false, // 是否显示弹窗
       showStay: false, // 支付失败挽留弹窗
       store: this.$mp.app.globalData,
       langUrl: `${process.env.VUE_APP_IMG_PATH}/ai_mina/langngAIG.mp4`,
@@ -427,7 +427,8 @@ export default {
         })
       } catch (e) {
       } finally {
-        this.isLogin = false
+        this.isLogin = false;
+        this.showStay = false;
       }
     },
     async getStatus(bill_id) {
