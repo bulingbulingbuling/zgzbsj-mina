@@ -69,6 +69,9 @@
           <h3>关于小叶子</h3>
           <img src="@/static/imgs/intro.png" alt="">
         </div>
+        <div class="common-sec rules-sec">
+          <a class='rule-link' href='/pages/rules'>*智能陪练购买协议</a>
+        </div>
       </div>
       <div class="bottom" v-show="showBottom">
         <div class="img-wrapper">
@@ -116,8 +119,8 @@ import { track } from '@/utils/util'
 export default {
   data () {
     return {
-      showAlert: false, // 是否显示弹窗
-      showStay: false, //支付失败挽留弹窗
+      showAlert: true, // 是否显示弹窗
+      showStay: false, // 支付失败挽留弹窗
       store: this.$mp.app.globalData,
       langUrl: `${process.env.VUE_APP_IMG_PATH}/ai_mina/langngAIG.mp4`,
       girlUrl: `${process.env.VUE_APP_IMG_PATH}/ai_mina/compare.mp4`,
@@ -405,7 +408,8 @@ export default {
           signType,
           paySign,
           success: () => {
-            this.store.had_purchased = true
+            this.store.had_purchased = true;
+            this.showStay = false;
             this.go('/pages/success?success=true')
             // this.getStatus(res.bill.id)
           },

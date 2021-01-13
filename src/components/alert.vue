@@ -15,19 +15,19 @@
         <img class="_logo" src="@/static/imgs/tip-logo.png" alt="">
       </div>
       <div class="alert-form-item">
-        <div class="num ft-28" @click="handleRedirect">+{{country_code}} <img class="arrow" :src="`${imgPath}/ai_mina/arrow.png`" alt=""></div>
+        <div class="num item-left ft-28" @click="handleRedirect">+{{country_code}} <img class="arrow" :src="`${imgPath}/ai_mina/arrow.png`" alt=""></div>
         <input class="phone ft-24" type="number" placeholder="请输入手机号号码" @input="handleMobileInput">
       </div>
       <div class="alert-form-item">
-        <div class="code-title ft-28">验证码</div>
-        <input class="code ft-28" type="number" placeholder="请输入验证码" @input="handleCodeInput">
+        <div class="code-title ft-28 item-left">验证码</div>
+        <input class="code ft-24" type="number" placeholder="请输入验证码" @input="handleCodeInput">
         <div class="code-btn ft-24" :class="{disabled: code < 60 && code > 0}" @click="sendCode">{{smstext || code + 's'}}</div>
       </div>
       <p class="alert-form-error ft-24">{{errorText}}</p>
       <button class="alert-form-btn" @click="login" :disabled="isLogin">立即注册</button>
       <p class="_decr">* 训练营期间打卡5天还可得<span class="_strong">19.8</span>元学费返现</p>
+      <img class="alert-form-close" src="@/static/imgs/close.png" alt="" @click="close">
     </div>
-    <img class="alert-form-close" src="@/static/imgs/close.png" alt="" @click="close">
   </div>
 </template>
 <script>
@@ -74,7 +74,7 @@ export default {
       country_code: '86',
       isSending: false,
       timer: '',
-      imgPath: process.env.VUE_APP_IMG_PATH,
+      imgPath: process.env.VUE_APP_IMG_PATH
     }
   },
   methods: {
@@ -245,14 +245,12 @@ export default {
         transform: scale(1, 0.322);
       }
     }
-    
     &-close {
       position: absolute;
       right: 50%;
-      margin-left: -34px;
-      bottom: 130px;
       width: 68px;
       height: 68px;
+      transform: translate(50%, 90px);
     }
     &-tip {
       color: #333333;
@@ -286,17 +284,20 @@ export default {
       align-items: center;
       height: 52px;
       border-bottom: solid 3px #ddd;
-      margin: 0 auto; 
+      margin: 0 auto;
       margin-bottom: 42px;
       ::-webkit-input-placeholder {
         color: #ccc;
         font-size: 32px;
       }
+      .item-left {
+        width: 105px;
+        text-align: left;
+        border-right: 3px solid #ccc;
+      }
       .num {
         letter-spacing: 1px;
         color: #444444;
-        border-right: 3px solid #ccc;
-        padding-right: 38px;
         .arrow {
           width: 16px;
           height: 9px;
@@ -368,7 +369,6 @@ export default {
         color: #ff6a00;
       }
     }
-    
   }
 }
 </style>
