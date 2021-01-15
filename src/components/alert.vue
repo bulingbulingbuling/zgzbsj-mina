@@ -15,12 +15,12 @@
         <img class="_logo" src="@/static/imgs/tip-logo.png" alt="">
       </div>
       <div class="alert-form-item">
-        <div class="num item-left ft-28" @click="handleRedirect">+{{country_code}} <img class="arrow" :src="`${imgPath}/ai_mina/arrow.png`" alt=""></div>
-        <input class="phone ft-28" type="number" placeholder="请输入手机号号码" @input="handleMobileInput">
+        <div class="num item-left ft-26" @click="handleRedirect">+{{country_code}} <img class="arrow" :src="`${imgPath}/ai_mina/arrow.png`" alt=""></div>
+        <input class="phone ft-26" type="number" placeholder="请输入手机号号码" @input="handleMobileInput">
       </div>
       <div class="alert-form-item">
-        <div class="code-title ft-28 item-left">验证码</div>
-        <input class="code ft-28" type="number" placeholder="请输入验证码" @input="handleCodeInput">
+        <div class="code-title ft-26 item-left">验证码</div>
+        <input class="code ft-26" type="number" placeholder="请输入验证码" @input="handleCodeInput">
         <div class="code-btn ft-26" :class="{disabled: code < 60 && code > 0}" @click="sendCode">{{smstext || code + 's'}}</div>
       </div>
       <p class="alert-form-error ft-26">{{errorText}}</p>
@@ -215,7 +215,7 @@ export default {
   .alert-form {
     position: fixed;
     left: 50%;
-    top: 50%;
+    top: 43%;
     width: 630px;
     height: 635px;
     border-radius: 20px;
@@ -336,6 +336,9 @@ export default {
       .disabled {
         color: #999999;
       }
+      .ft-26 {
+        font-size: 26px;
+      }
     }
     &-error {
       // height: 46px;
@@ -346,7 +349,8 @@ export default {
       width: 469px;
       position: relative;
       top: -30px;
-
+      height: 24px;
+      font-size: 24px;
     }
     &-btn {
       width: 527px;

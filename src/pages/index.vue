@@ -2,7 +2,7 @@
   <div class="container index-container">
     <div class="index-container-wrapper">
       <div class="header-wrapper">
-        <img class="header" :src="`${imgPath}/ai_mina/header.png`" alt="">
+        <img class="header" src="@/static/imgs/header.png" alt="">
         <div class="avatar-wrapper">
           <img class="avatar" :src="referrer_info.headimgurl" alt="">
           <p><span class='limited'>{{referrer_info.nickname}}</span></p>
@@ -385,6 +385,7 @@ export default {
       if (this.configData.had_purchased || (this.store.had_purchased && this.configData.mobile)) {
         this.go('/pages/success')
       } else {
+        this.showStay = false;
         this.createBill()
       }
     },
@@ -409,7 +410,6 @@ export default {
           paySign,
           success: () => {
             this.store.had_purchased = true;
-            this.showStay = false;
             this.go('/pages/success?success=true')
             // this.getStatus(res.bill.id)
           },
