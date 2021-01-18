@@ -99,8 +99,8 @@
             <p class='_exp'>练1遍，顶10遍</p>
           </div>
           <div class="stay-content-btngroup">
-            <button class="_close" @click="closeStay">残忍拒绝</button>
-            <button class="_pay"  @click="handleGetting('页底立即体验')">继续支付</button>
+            <button class="_close" @click="closeStay('拒绝')">残忍拒绝</button>
+            <button class="_pay"  @click="handleGetting('继续', true)">继续支付</button>
           </div>
         </div>
       </div>
@@ -185,6 +185,7 @@ export default {
       }
       this.handleShowAlert('phone')
     }
+    // 监听网络状态变化
     wx.onNetworkStatusChange((res) => {
       this.handleNetError(res)
     })
@@ -193,6 +194,7 @@ export default {
         this.handleNetError(res)
       }
     })
+    // 获取系统信息
     wx.getSystemInfo({
       success: (res) => {
         this.platform = res.platform
@@ -216,12 +218,14 @@ export default {
     this.remainNum = 1
     this.hasBtnClicked = false
   },
+  // 设置自定义转发的内容
   onShareAppMessage() {
     return {
       path: `/pages/index?scene=${this.shareScene}`
     }
   },
   methods: {
+    // /点击全屏进入或离开全屏状态触发的事件
     handleFullscreenChange(e) {
       if (!e.detail.fullScreen && this.platform !== 'ios') {
         wx.pageScrollTo({
@@ -233,6 +237,7 @@ export default {
       return false
     },
     getMidBtnInfo() {
+      // 添加节点的布局位置的查询请求
       wx.createSelectorQuery().select('#mid-btn').boundingClientRect((rect) => {
         this.btnDistance = rect.height + rect.top
       }).exec()
@@ -272,6 +277,7 @@ export default {
       this.pauseVideo('lang')
       this.showGirlVideo = true
       if (!this.girlVideoCtx) {
+        // 创建 video 上下文 VideoContext 对象
         this.girlVideoCtx = wx.createVideoContext('girlVideo')
       }
       this.girlVideoCtx.play()
@@ -288,8 +294,12 @@ export default {
       this.hasBtnClicked = false
       this.showAlert = false
     },
-    closeStay() {
+    closeStay(content) {
       this.showStay = false;
+      track('ai_applet_retain_click', {
+        ai_tel: this.store.mobile,
+        click_item: content
+      });
     },
     handleBtnClick(e) {
       this.hasBtnClicked = true
@@ -375,7 +385,7 @@ export default {
         this.remainNum = 1
       }
     },
-    handleGetting(content) {
+    handleGetting(content, isContinue) {
       track('$WebClick', {
         $title: '首页',
         $url: 'pages/index',
@@ -386,6 +396,12 @@ export default {
         this.go('/pages/success')
       } else {
         this.showStay = false;
+        if (isContinue) {
+          track('ai_applet_retain_click', {
+            ai_tel: this.store.mobile,
+            click_item: content
+          })
+        }
         this.createBill()
       }
     },
@@ -422,6 +438,9 @@ export default {
           },
           cancel: () => {
             console.log('stay')
+            track('ai_applet_retain_view', {
+              ai_tel: this.store.mobile
+            });
             this.showStay = true;
           }
         })
