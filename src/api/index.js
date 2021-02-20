@@ -35,13 +35,17 @@ export const api = {
     pay_channel = 23,
     uuid,
     pkg = 2,
-    open_id
+    open_id,
+    scene,
+    source
   } = {}) {
     return await baseApi.post('/referral_miniapp/landing/create_bill', {
       pay_channel,
       uuid,
       pkg,
-      open_id
+      open_id,
+      scene,
+      source
     });
   },
   // 订单状态

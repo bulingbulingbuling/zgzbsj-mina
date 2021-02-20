@@ -415,7 +415,9 @@ export default {
         let res = await api.createBill({
           uuid,
           open_id,
-          pkg: this.configData.pkg
+          pkg: this.configData.pkg,
+          scene: this.scene,
+          source: this.source
         })
         let { timeStamp, nonceStr, package: p, signType, paySign } = res.data.credential.wx_lite
         wx.requestPayment({
