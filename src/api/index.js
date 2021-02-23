@@ -69,5 +69,13 @@ export const api = {
   // 获取成功页海报
   async getPoster() {
     return await baseApi.get('/referral_miniapp/landing/buy_poster');
+  },
+  // 获取演奏分享数据
+  async getPlayingData({
+    scene
+  } = {}) {
+    return await baseApi.get('/referral_miniapp/landing/play_review', {
+      scene
+    });
   }
 }

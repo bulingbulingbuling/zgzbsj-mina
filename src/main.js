@@ -60,10 +60,14 @@ export default {
       'pages/index',
       'pages/address',
       'pages/success',
-      'pages/rules'
+      'pages/rules',
+      'pages/playing/index',
+      'pages/playing/success',
+      'pages/playing/report'
     ],
     usingComponents: {
-      'timer-comp': './native/timer-comp/index'
+      'timer-comp': './native/timer-comp/index',
+      'ec-canvas': './native/ec-canvas/ec-canvas'
     },
     window: {
       backgroundTextStyle: 'dark',
