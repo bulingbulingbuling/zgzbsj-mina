@@ -14,6 +14,12 @@
   </div>
 </template>
 
+<config>
+{
+  "navigationBarTitleText": "演奏分享"
+}
+</config>
+
 <script>
 import { track } from '@/utils/util'
 export default {

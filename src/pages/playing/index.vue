@@ -6,17 +6,20 @@
         </div>
       </swiper-item>
     </swiper>
-    <div class="g-play-header">
+    <div class="g-play-header" :style="{height: headerHeight}">
       <img class="bg" src="@/static/imgs/playing/bg-top.png" alt="">
-      <!-- <img class="desc-bg" src="@/static/imgs/playing/desc-bg.png" alt=""> -->
       <img class="avatar" :src="report.thumb" alt="">
-      <div class="box">
+      <div class="box" id="box">
         <img class="desc-bg-top" src="@/static/imgs/playing/desc-bg-top.png" alt="">
         <img class="desc-bg-bottom" src="@/static/imgs/playing/desc-bg-bottom.png" alt="">
         <div class="con-wrapper">
           <p class="nickname">{{report.name}}</p>
+        </div>
+        <div class="text-wrapper">
           <div class="score"><span>{{report.score_final}}</span>分</div>
-          <p class="desc">我家宝贝弹奏的<span>《{{report.lesson_name}}》</span><br><i>超过<span>{{report.score_rank}}%</span>的用户</i></p>
+          <p class="desc">我家宝贝弹奏的<span>《{{report.lesson_name}}》</span><br><i v-show="report.score_rank > 0">超过<span>{{report.score_rank}}%</span>的用户</i></p>
+        </div>
+        <div class="audio-wrapper">
           <div class="wrapper">
             <div class="audio-bg" @click="toggleAudioPlay">
               <img id="animatedBg" class="animated-bg" :style="{animationPlayState: playState}" src="@/static/imgs/playing/audio-bg.png" alt="">
@@ -28,7 +31,9 @@
             </div>
           </div>
         </div>
-        <button class="report" @click="goReport">查看宝贝测评报告</button>
+        <div class="report-wrapper">
+          <button class="report" @click="goReport">查看宝贝测评报告</button>
+        </div>
       </div>
     </div>
     <div class="g-play-guides">
@@ -42,11 +47,11 @@
       <div class="img-wrapper">
         <div class="action" v-if="configData.mobile" @click="handleGetting('页底立即体验')">
           <img class="header" src="@/static/imgs/playing/btn-bottom.png" alt="">
-          <p class="text">仅剩{{remainNum}}个名额</p>
+          <p class="text" v-if="remainNum">仅剩{{remainNum}}个名额</p>
         </div>
         <button id="bottom-btn" class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="handleBtnClick" v-else>
           <img src="@/static/imgs/playing/btn-bottom.png" alt="">
-          <p class="text">仅剩{{remainNum}}个名额</p>
+          <p class="text" v-if="remainNum">仅剩{{remainNum}}个名额</p>
         </button>
       </div>
     </div>
@@ -70,6 +75,12 @@
     </alert>
   </div>
 </template>
+
+<config>
+{
+  "navigationBarTitleText": "演奏分享"
+}
+</config>
 
 <script>
 import { api } from '@/api'
@@ -201,7 +212,8 @@ export default {
       },
       isPlay: false,
       playState: '',
-      showCharts: false
+      showCharts: false,
+      headerHeight: ''
     }
   },
   onLoad(options) {
@@ -231,37 +243,60 @@ export default {
         this.handleNetError(res)
       }
     })
+    // 禁止分享
     wx.hideShareMenu({
       menus: ['shareAppMessage']
     })
+    // 隐藏左上角进入首页按钮
+    wx.hideHomeButton()
   },
   onHide() {
     this.form = {}
     this.store.country_code = ''
     this.showAlert = false
     this.hasBtnClicked = false
+    this.closeAudio()
+  },
+  onReady() {
+    this.getBoxInfo()
   },
   methods: {
+    getBoxInfo() {
+      // 添加节点的布局位置的查询请求 加定时是因为高度有时候计算的不准确
+      setTimeout(() => {
+        wx.createSelectorQuery().select('#box').boundingClientRect((rect) => {
+          this.headerHeight = rect.height + 'px'
+        }).exec()
+      }, 1000)
+    },
     createAudio() {
-      this.audioIns = wx.createInnerAudioContext()
-      this.audioIns.src = this.report.audio_url
-      this.audioIns.autoplay = true
+      if (!this.audioIns) {
+        this.audioIns = wx.createInnerAudioContext()
+        this.audioIns.src = this.report.audio_url
+        this.audioIns.autoplay = true
 
-      this.audioIns.onPlay(() => {
-        this.playState = 'running'
-        this.isPlay = true
-      })
-      this.audioIns.onPause(() => {
-        this.playState = 'paused'
+        this.audioIns.onPlay(() => {
+          this.playState = 'running'
+          this.isPlay = true
+        })
+        this.audioIns.onPause(() => {
+          this.playState = 'paused'
+          this.isPlay = false
+        })
+        this.audioIns.onEnded(() => {
+          this.isPlay = false
+          this.playState = 'paused'
+        })
+        this.audioIns.onError(() => {
+          console.log('audio error')
+        })
+      }
+    },
+    closeAudio() {
+      if (this.audioIns) {
+        this.audioIns.pause()
         this.isPlay = false
-      })
-      this.audioIns.onEnded(() => {
-        this.isPlay = false
-        this.playState = 'paused'
-      })
-      this.audioIns.onError(() => {
-        console.log('audio error')
-      })
+      }
     },
     toggleAudioPlay() {
       if (this.isPlay) {
@@ -271,6 +306,7 @@ export default {
       }
     },
     goReport() {
+      this.closeAudio()
       this.go(`/pages/playing/report?recordId=${this.report.record_id}&lessonId=${this.report.lesson_id}&replayToken=${this.report.replay_token}`)
     },
     catchTouchMove() {
@@ -315,6 +351,7 @@ export default {
     },
     // 获取手机号
     getPhoneNumber({ detail }) {
+      this.closeAudio()
       if (detail.encryptedData) {
         this.register({
           iv: detail.iv,
@@ -369,6 +406,7 @@ export default {
       });
     },
     handleGetting(content, isContinue) {
+      this.closeAudio()
       track('$WebClick', {
         $title: '演奏分享页',
         $url: 'pages/playing/index',
