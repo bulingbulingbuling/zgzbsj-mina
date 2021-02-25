@@ -7,11 +7,11 @@
       </swiper-item>
     </swiper>
     <div class="g-play-header" :style="{height: headerHeight}">
-      <img class="bg" src="@/static/imgs/playing/bg-top.png" alt="">
+      <img class="bg" :src="`${imgPath}/ai_mina/playing/bg-top.png`" alt="">
       <img class="avatar" :src="report.thumb" alt="">
       <div class="box" id="box">
-        <img class="desc-bg-top" src="@/static/imgs/playing/desc-bg-top.png" alt="">
-        <img class="desc-bg-bottom" src="@/static/imgs/playing/desc-bg-bottom.png" alt="">
+        <img class="desc-bg-top" :src="`${imgPath}/ai_mina/playing/desc-bg-top.png`" alt="">
+        <img class="desc-bg-bottom" :src="`${imgPath}/ai_mina/playing/desc-bg-bottom.png`" alt="">
         <div class="con-wrapper">
           <p class="nickname">{{report.name}}</p>
         </div>
@@ -22,9 +22,9 @@
         <div class="audio-wrapper">
           <div class="wrapper">
             <div class="audio-bg" @click="toggleAudioPlay">
-              <img id="animatedBg" class="animated-bg" :style="{animationPlayState: playState}" src="@/static/imgs/playing/audio-bg.png" alt="">
-              <img class="btn-pause" src="@/static/imgs/playing/pause.png" alt="" v-if="isPlay">
-              <img class="btn-play" src="@/static/imgs/playing/play.png" alt="" v-else>
+              <img id="animatedBg" :class="[lowerVersion && !isPlay ? 'unanimated-bg' : 'animated-bg']" :style="{animationPlayState: playState}" :src="`${imgPath}/ai_mina/playing/audio-bg.png`" alt="">
+              <img class="btn-pause" :src="`${imgPath}/ai_mina/playing/pause.png`" alt="" v-if="isPlay">
+              <img class="btn-play" :src="`${imgPath}/ai_mina/playing/play.png`" alt="" v-else>
             </div>
             <div class="radar-box" v-if="showCharts">
               <ec-canvas id="mychart-dom-graph" canvas-id="mychart-graph" :ec="ec"></ec-canvas>
@@ -37,8 +37,8 @@
       </div>
     </div>
     <div class="g-play-guides">
-      <img class="guide" src="@/static/imgs/playing/guide.png" alt="">
-      <img class="intro" src="@/static/imgs/playing/intro.png" alt="">
+      <img class="guide" :src="`${imgPath}/ai_mina/playing/guide.png`" alt="">
+      <img class="intro" :src="`${imgPath}/ai_mina/playing/intro.png`" alt="">
     </div>
     <div class="g-play-rule">
       <a class='rule-link' href='/pages/rules'>*智能陪练购买协议</a>
@@ -46,11 +46,11 @@
     <div class="g-play-bottom">
       <div class="img-wrapper">
         <div class="action" v-if="configData.mobile" @click="handleGetting('页底立即体验')">
-          <img class="header" src="@/static/imgs/playing/btn-bottom.png" alt="">
+          <img class="header" :src="`${imgPath}/ai_mina/playing/btn-bottom.png`" alt="">
           <p class="text" v-if="remainNum">仅剩{{remainNum}}个名额</p>
         </div>
         <button id="bottom-btn" class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="handleBtnClick" v-else>
-          <img src="@/static/imgs/playing/btn-bottom.png" alt="">
+          <img :src="`${imgPath}/ai_mina/playing/btn-bottom.png`" alt="">
           <p class="text" v-if="remainNum">仅剩{{remainNum}}个名额</p>
         </button>
       </div>
@@ -58,11 +58,11 @@
     <div class="stay" v-if="showStay">
       <div class="mask"></div>
       <div class="stay-playing">
-        <img class="alert-top" src="@/static/imgs/playing/alert-top.png" alt="">
+        <img class="alert-top" :src="`${imgPath}/ai_mina/playing/alert-top.png`" alt="">
         <h3 class="title">您确定要放弃优惠吗？</h3>
         <p class="desc">80元优惠券已到账，不用就没啦！</p>
         <div class="coupon">
-          <img class="coupon-cover" src="@/static/imgs/playing/coupon.png" alt="">
+          <img class="coupon-cover" :src="`${imgPath}/ai_mina/playing/coupon.png`" alt="">
           <p class="coupon-text"><span class="num">80</span><span>元优惠券</span></p>
         </div>
         <div class="stay-playing-btngroup">
@@ -87,9 +87,8 @@ import { api } from '@/api'
 import Alert from '@/components/alert'
 import { track } from '@/utils/util'
 
-// 分别代表 fontSize , nameGap, radius 大小
-const radarConfig = [12, 5, 30]
-let radarData
+// radarConfig里面的值分别代表 fontSize, nameGap, radius 大小
+let radarConfig, radarData
 
 function initChart(canvas, width, height, dpr, echarts) {
   const chart = echarts.init(canvas, null, {
@@ -213,7 +212,8 @@ export default {
       isPlay: false,
       playState: '',
       showCharts: false,
-      headerHeight: ''
+      headerHeight: '',
+      lowerVersion: false
     }
   },
   onLoad(options) {
@@ -249,6 +249,21 @@ export default {
     })
     // 隐藏左上角进入首页按钮
     wx.hideHomeButton()
+    // 获取系统信息
+    wx.getSystemInfo({
+      success: (res) => {
+        const w = res.safeArea.width
+        const rpx = w / 750
+        radarConfig = [rpx * 17, rpx * 8, rpx * 66]
+        if (res.platform === 'ios') {
+          const version = res.system.split(' ')[1]
+          const majorVerson = version.split('.')[0]
+          if (majorVerson < 12) {
+            this.lowerVersion = true
+          }
+        }
+      }
+    })
   },
   onHide() {
     this.form = {}
@@ -256,9 +271,6 @@ export default {
     this.showAlert = false
     this.hasBtnClicked = false
     this.closeAudio()
-  },
-  onReady() {
-    this.getBoxInfo()
   },
   methods: {
     getBoxInfo() {
@@ -376,6 +388,8 @@ export default {
       radarData = [this.report.score_pitch, this.report.score_speed_average, this.report.score_speed, this.report.score_complete, this.report.score_rhythm]
       this.showCharts = true
       this.createAudio()
+      // 获取头部高度信息
+      this.getBoxInfo()
       if (this.referrer_info.uuid) {
         this.sa.registerApp({
           referrer_uuid: this.referrer_info.uuid
@@ -389,6 +403,11 @@ export default {
       if (this.configData.scene_data.a) {
         this.sa.registerApp({
           activity_id: this.configData.scene_data.a
+        });
+      }
+      if (this.configData.scene_data.p) {
+        this.sa.registerApp({
+          poster_id: this.configData.scene_data.p
         });
       }
       this.sa.registerApp({

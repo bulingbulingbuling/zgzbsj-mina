@@ -949,6 +949,9 @@
             .animated-bg {
               animation: rotate 4s linear infinite;
             }
+            .unanimated-bg {
+              animation: none !important;
+            }
           }
           .radar-box {
             padding-top: 20px;
@@ -1043,7 +1046,7 @@
     position: absolute;
     top: 760px;
     left: 50%;
-    transform: translateX(-50%);
+    margin-left: -280px;
     width: 561px;
     height: 90px;
     line-height: 90px;
@@ -1055,6 +1058,7 @@
     border-radius: 50px;
     font-size: 30px;
     color: #ffffff;
+    animation: zoomingPlayingBottom 1.5s infinite;
   }
   .fail-top {
     width: 750px;
