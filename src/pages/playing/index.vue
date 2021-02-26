@@ -37,7 +37,7 @@
       </div>
     </div>
     <div class="g-play-guides">
-      <img class="guide" :src="`${imgPath}/ai_mina/playing/guide.png`" alt="">
+      <img class="guide" :src="showCents ? require('@/static/imgs/playing/guide-1cents.png') : `${imgPath}/ai_mina/playing/guide.png`" alt="">
       <img class="intro" :src="`${imgPath}/ai_mina/playing/intro.png`" alt="">
     </div>
     <div class="g-play-rule">
@@ -46,24 +46,24 @@
     <div class="g-play-bottom">
       <div class="img-wrapper">
         <div class="action" v-if="configData.mobile" @click="handleGetting('页底立即体验')">
-          <img class="header" :src="`${imgPath}/ai_mina/playing/btn-bottom.png`" alt="">
+          <img :src="btnUrl" alt="">
           <p class="text" v-if="remainNum">仅剩{{remainNum}}个名额</p>
         </div>
         <button id="bottom-btn" class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="handleBtnClick" v-else>
-          <img :src="`${imgPath}/ai_mina/playing/btn-bottom.png`" alt="">
+          <img :src="btnUrl" alt="">
           <p class="text" v-if="remainNum">仅剩{{remainNum}}个名额</p>
         </button>
       </div>
     </div>
     <div class="stay" v-if="showStay">
       <div class="mask"></div>
-      <div class="stay-playing">
+      <div class="stay-playing" :class="{'stay-playing-cents' : showCents}">
         <img class="alert-top" :src="`${imgPath}/ai_mina/playing/alert-top.png`" alt="">
         <h3 class="title">您确定要放弃优惠吗？</h3>
-        <p class="desc">80元优惠券已到账，不用就没啦！</p>
+        <p class="desc">{{showCents ? 89.89 : 80}}元优惠券已到账，不用就没啦！</p>
         <div class="coupon">
           <img class="coupon-cover" :src="`${imgPath}/ai_mina/playing/coupon.png`" alt="">
-          <p class="coupon-text"><span class="num">80</span><span>元优惠券</span></p>
+          <p class="coupon-text"><span class="num">{{showCents ? 89.89 : 80}}</span><span>元优惠券</span></p>
         </div>
         <div class="stay-playing-btngroup">
           <button class="btn" @click="closeStay('拒绝')">残忍拒绝</button>
@@ -214,7 +214,9 @@ export default {
       playState: '',
       showCharts: false,
       headerHeight: '',
-      lowerVersion: false
+      lowerVersion: false,
+      btnUrl: '',
+      showCents: false
     }
   },
   onLoad(options) {
@@ -387,6 +389,8 @@ export default {
         scene: this.scene
       })
       console.log('this.configData', this.configData);
+      this.showCents = this.configData.pkg === 3
+      this.btnUrl = this.showCents ? require('@/static/imgs/playing/btn-1cents.png') : `${this.imgPath}/ai_mina/playing/btn-bottom.png`
       this.report = this.configData.report
       this.referrer_info = this.configData.referrer_info
       this.recent_purchase = this.configData.recent_purchase
@@ -418,7 +422,7 @@ export default {
         });
       }
       this.sa.registerApp({
-        referrer_amount: 9.9
+        referrer_amount: this.showCents ? 0.01 : 9.9
       });
       this.sa.setProfile({
         ai_phoneNumber: this.configData.mobile,
