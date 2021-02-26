@@ -10,7 +10,7 @@
       <img class="bg" :src="`${imgPath}/ai_mina/playing/bg-top.png`" alt="">
       <img class="avatar" :src="report.thumb" alt="">
       <div class="box" id="box">
-        <img class="desc-bg-top" :src="`${imgPath}/ai_mina/playing/desc-bg-top.png`" alt="">
+        <img class="desc-bg-top" src="@/static/imgs/playing/desc-bg-top.png" alt="">
         <img class="desc-bg-bottom" :src="`${imgPath}/ai_mina/playing/desc-bg-bottom.png`" alt="">
         <div class="con-wrapper">
           <p class="nickname">{{report.name}}</p>
@@ -78,7 +78,8 @@
 
 <config>
 {
-  "navigationBarTitleText": "演奏分享"
+  "navigationBarTitleText": "演奏分享",
+  "restartStrategy": "homePageAndLatestPage"
 }
 </config>
 
@@ -222,7 +223,13 @@ export default {
       this.scene = options.scene
     }
   },
+  onSaveExitState: function() {
+    return {
+      expireTimeStamp: Date.now() + 24 * 60 * 60 * 1000 * 10 // 超时时刻
+    }
+  },
   onShow(options) {
+    console.log(options, 'onshow')
     console.log(this.scene, this.store.country_code, 'onshow')
     if (this.store.country_code) {
       this.form = {
