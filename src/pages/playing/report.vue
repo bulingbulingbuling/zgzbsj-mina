@@ -14,13 +14,13 @@
 export default {
   data () {
     return {
-      reportUrl: ''
+      reportUrl: '',
     }
   },
   onLoad(options) {
     console.log(options, 'options')
     if (options.replayToken) {
-      this.reportUrl = `https://musicscore-app-pre.xiaoyezi.com/#/reportNew?lessonId=${options.lessonId}&recordId=${options.recordId}&pageType=weixin&appToken=${options.replayToken}`
+      this.reportUrl = `${process.env.VUE_APP_MUSICSCORE_URL}/#/reportNew?lessonId=${options.lessonId}&recordId=${options.recordId}&pageType=weixin&appToken=${options.replayToken}`
     }
   }
 }
