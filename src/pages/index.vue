@@ -95,7 +95,7 @@
           </div>
           <div class='stay-content-body'>
             <img src="@/static/imgs/stay.png" alt="" class='_img'>
-            <p class='_test'><span>9.9元5天</span>不限次数体验</p>
+            <p class='_test'><span>5天</span>不限次数体验</p>
             <p class='_exp'>练1遍，顶10遍</p>
           </div>
           <div class="stay-content-btngroup">
