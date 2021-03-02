@@ -13,7 +13,7 @@
         <button class="btn" open-type="contact">点击并回复“1”获取助教微信</button>
       </div>
       <div class="fail-wrapper-bottom">
-        <img class="fail-bottom" :src="`${imgPath}/ai_mina/result-fail-bg.png`" alt="">
+        <img class="fail-bottom" src="@/static/imgs/result-fail-bg.png" alt="">
         <img class="poster" :src="posterUrl" alt="">
         <div class="share-wrapper">
           <div class="share-item">

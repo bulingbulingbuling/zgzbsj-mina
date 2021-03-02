@@ -14,7 +14,7 @@
 export default {
   data () {
     return {
-      reportUrl: '',
+      reportUrl: ''
     }
   },
   onLoad(options) {

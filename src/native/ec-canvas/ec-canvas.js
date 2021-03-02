@@ -1,5 +1,3 @@
-// import WxCanvas from './wx-canvas';
-// import * as echarts from './echarts';
 const WxCanvas = require('./wx-canvas')
 const echarts = require('./echarts')
 
