@@ -258,11 +258,11 @@ export default {
     wx.hideShareMenu({
       menus: ['shareAppMessage']
     })
-    
+
     // 隐藏左上角进入首页按钮
     wx.hideHomeButton()
 
-    //计算雷达尺寸
+    // 计算雷达尺寸
     this.handleRadarSize()
 
     // 获取系统信息
@@ -297,7 +297,7 @@ export default {
     handleRadarSize() {
       const SelectorQuery = wx.createSelectorQuery()
       SelectorQuery.selectViewport().scrollOffset()
-      SelectorQuery.exec(function (res) { 
+      SelectorQuery.exec(function (res) {
         const w = res[0].scrollWidth
         console.log(w, 'witdh')
         const rpx = w / 750
