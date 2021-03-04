@@ -261,7 +261,7 @@ export default {
     // 获取系统信息
     wx.getSystemInfo({
       success: (res) => {
-        const w = res.deviceOrientation === 'landscape' ? res.safeArea.height : res.safeArea.width
+        const w = res.deviceOrientation === 'landscape' && res.platform === 'ios' ? res.safeArea.height : res.safeArea.width
         console.log(w, 'witdh')
         const rpx = w / 750
         radarConfig = [rpx * 17, rpx * 8, rpx * 66]
@@ -281,6 +281,9 @@ export default {
     this.showAlert = false
     this.hasBtnClicked = false
     this.closeAudio()
+  },
+  onResize() {
+    this.getBoxInfo()
   },
   methods: {
     getBoxInfo() {
