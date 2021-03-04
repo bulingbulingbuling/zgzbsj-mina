@@ -241,6 +241,7 @@ export default {
       }
       this.handleShowAlert('phone')
     }
+
     // 监听网络状态变化
     wx.onNetworkStatusChange((res) => {
       if (res.networkType === 'none') {
@@ -252,18 +253,21 @@ export default {
         this.handleNetError(res)
       }
     })
+
     // 禁止分享
     wx.hideShareMenu({
       menus: ['shareAppMessage']
     })
+    
     // 隐藏左上角进入首页按钮
     wx.hideHomeButton()
+
+    //计算雷达尺寸
+    this.handleRadarSize()
+
     // 获取系统信息
     wx.getSystemInfo({
       success: (res) => {
-        const w = res.safeArea.width
-        const rpx = w / 750
-        radarConfig = [rpx * 17, rpx * 8, rpx * 66]
         if (res.platform === 'ios') {
           const version = res.system.split(' ')[1]
           const majorVerson = version.split('.')[0]
@@ -289,6 +293,16 @@ export default {
           this.headerHeight = rect.height + 'px'
         }).exec()
       }, 1000)
+    },
+    handleRadarSize() {
+      const SelectorQuery = wx.createSelectorQuery()
+      SelectorQuery.selectViewport().scrollOffset()
+      SelectorQuery.exec(function (res) { 
+        const w = res[0].scrollWidth
+        console.log(w, 'witdh')
+        const rpx = w / 750
+        radarConfig = [rpx * 17, rpx * 8, rpx * 66]
+      })
     },
     createAudio() {
       if (!this.audioIns) {
