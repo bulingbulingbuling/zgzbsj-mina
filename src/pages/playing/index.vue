@@ -306,6 +306,9 @@ export default {
     },
     createAudio() {
       if (!this.audioIns) {
+        wx.setInnerAudioOption({
+          obeyMuteSwitch: false
+        })
         this.audioIns = wx.createInnerAudioContext()
         this.audioIns.src = this.report.audio_url
         this.audioIns.autoplay = true
