@@ -1,30 +1,90 @@
 <template>
   <div class="container index-container">
     <div class="index-container-wrapper">
+      <div class="header-wrapper">
+        <img class="header" src="@/static/imgs/header.png" alt="">
+        <div class="avatar-wrapper">
+          <img class="avatar" :src="referrer_info.headimgurl" alt="">
+          <p><span class='limited'>{{referrer_info.nickname}}</span></p>
+          <!-- <p>{{referrer_info.nickname}}</p> -->
+        </div>
+        <p class="desc" v-html="referrer_info.text"></p>
+      </div>
       <div class="content">
-        <div class="con" v-if="packageOpened">
-          <img class="new-bg-img" src="@/static/imgs/newIndex/opened-new-bg.jpg" alt="" >
-          <img class="price-img" src="@/static/imgs/newIndex/0.01.png" alt="" v-if="configData.pkg === 3" >
-          <img class="price-img" src="@/static/imgs/newIndex/9.9.png" alt="" v-else >
-        </div>
-        <div class="con" v-else>
-          <img class="new-bg-img" src="@/static/imgs/newIndex/new-bg.jpeg" alt="" >
-          <img class="open-img" src="@/static/imgs/newIndex/open.png" alt="" v-if="configData.mobile" @click="handleGetting('页中立即体验')" id="mid-btn">
-          <button class="open-img" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" v-else id="mid-btn" :disabled="hasBtnClicked" @click="handleBtnClick">
-            <img src="@/static/imgs/newIndex/open.png" alt="">
+        <div class="con">
+          <img class="btn-img" :src="btnUrl" alt="" v-if="configData.mobile" @click="handleGetting('页中立即体验')" id="mid-btn">
+          <button class="btn-img" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" v-else id="mid-btn" :disabled="hasBtnClicked" @click="handleBtnClick">
+            <img :src="btnUrl" alt="">
           </button>
+          <div class="title">当前班次仅剩<span>{{remainNum}}</span>个名额，预购从速！</div>
+          <swiper class="list-swiper" :circular="true" :vertical="true" :autoplay="true" :interval="1500" v-if="recent_purchase.length > 0">
+            <swiper-item v-for="(item, key) in recent_purchase" :key="key" catchtouchmove="catchTouchMove">
+              <div class="item-wrapper" v-html="item">
+              </div>
+            </swiper-item>
+          </swiper>
+          <swiper v-show="showBottom" class="list-swiper fixed-list-swiper" :circular="true" :vertical="true" :autoplay="true" :interval="1500">
+            <swiper-item v-for="(item, key) in recent_purchase" :key="key" catchtouchmove="catchTouchMove">
+              <div class="item-wrapper" v-html="item">
+              </div>
+            </swiper-item>
+          </swiper>
+          <timer-comp :isBottom="showBottom" v-if="showTimer"/>
         </div>
-        <div class='btn'>
-          <img class="btn-img" src="@/static/imgs/newIndex/button.png" alt="" v-if="configData.mobile" @click="handleGetting('页底立即体验')">
-          <button class="btn-img" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" v-else :disabled="hasBtnClicked" @click="handleBtnClick">
-            <img src="@/static/imgs/newIndex/button.png" alt="">
-          </button>
+        <div class="common-sec girl-wrapper">
+          <h3>孩子练琴那些坎儿</h3>
+          <img :src="`${imgPath}/ai_mina/girl.png`" alt="">
+          <div class="video-sec">
+            <img class="btn-play" :src="`${imgPath}/ai_mina/btn-play.png`" alt="" @click="playGirlVideo">
+            <video id="girlVideo" class="girlVideo" :src="girlUrl" controls v-if="showGirlVideo" @play="pauseVideo('lang')" @fullscreenchange="handleFullscreenChange"></video>
+          </div>
+        </div>
+        <div class="common-sec feature-wrapper">
+          <h3>智能陪练三大核心</h3>
+          <img class="header" :src="`${imgPath}/ai_mina/feature.png`" alt="">
+        </div>
+        <div class="common-sec lang-wrapper">
+          <h3>郎朗亲测太准了</h3>
+          <div class="video-sec">
+            <img :src="`${imgPath}/ai_mina/lang.png`" alt="">
+            <img class="btn-play" :src="`${imgPath}/ai_mina/btn-play.png`" alt="" @click="playLangVideo">
+            <video id="langVideo" class="myVideo" :src="langUrl" controls v-if="showLangVideo" @play="pauseVideo('girl')" @fullscreenchange="handleFullscreenChange"></video>
+          </div>
+        </div>
+        <div class="common-sec swiper-sec">
+          <h3>看看大家怎么说</h3>
+          <swiper class="video-swiper" :circular="true" :indicator-dots="true" previous-margin="120rpx" indicator-color="#bfbfbf" indicator-active-color="#ff867e" :autoplay="true" :interval="3000">
+            <swiper-item v-for="item in 6" :key="item">
+              <div class="item-wrapper">
+                <img :src="`${imgPath}/ai_mina/s${item}.png`" alt="">
+              </div>
+            </swiper-item>
+          </swiper>
+        </div>
+        <div class="common-sec qustion-sec">
+          <h3>您最关注的问题</h3>
+          <img src="@/static/imgs/question.png" alt="">
+        </div>
+        <div class="common-sec intro-sec">
+          <h3>关于小叶子</h3>
+          <img src="@/static/imgs/intro.png" alt="">
         </div>
         <div class="common-sec rules-sec">
           <a class='rule-link' href='/pages/rules'>*智能陪练购买协议</a>
         </div>
       </div>
-      <!-- 支付失败弹窗 -->
+      <div class="bottom" v-show="showBottom">
+        <div class="img-wrapper">
+          <div class="action" v-if="configData.mobile" @click="handleGetting('页底立即体验')">
+            <img class="header" :src="btnUrl" alt="">
+            <p class="text">仅剩{{remainNum}}个名额</p>
+          </div>
+          <button id="bottom-btn" class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="handleBtnClick" v-else>
+            <img :src="btnUrl" alt="">
+            <p class="text">仅剩{{remainNum}}个名额</p>
+          </button>
+        </div>
+      </div>
       <div class='stay' v-show="showStay">
         <div class="mask"></div>
         <div class="stay-content">
@@ -44,10 +104,8 @@
           </div>
         </div>
       </div>
-      <!-- 客服提醒弹框 -->
       <alert :isShow="showAlert" @close="closeAlert" :type="alertType" :isLogin="isLogin" :form="form" @login="register">
       </alert>
-      <!-- 客服提示图标 -->
       <img class="contact" :src="`${imgPath}/ai_mina/contact.png`" alt="" @click="handleShowAlert('contact')">
     </div>
   </div>
@@ -64,11 +122,14 @@ export default {
       showAlert: false, // 是否显示弹窗
       showStay: false, // 支付失败挽留弹窗
       store: this.$mp.app.globalData,
+      langUrl: `${process.env.VUE_APP_IMG_PATH}/ai_mina/langngAIG.mp4`,
+      girlUrl: `${process.env.VUE_APP_IMG_PATH}/ai_mina/compare.mp4`,
       showBottom: false,
       alertType: 'phone',
       remainNum: Math.floor(Math.random() * (30 - 20) + 20),
       configData: {},
       referrer_info: {},
+      recent_purchase: [], // 滚动列表
       isLogin: false,
       scene: '', // 通过小程序码进来
       source: '', // 记录小程序的入口
@@ -82,8 +143,7 @@ export default {
       platform: '',
       btnUrl: '',
       imgPath: process.env.VUE_APP_IMG_PATH,
-      shareScene: '', // 分享给他人的scen
-      packageOpened: false
+      shareScene: '' // 分享给他人的scen
     }
   },
   onLoad(options) {
@@ -149,6 +209,8 @@ export default {
     this.getMidBtnInfo()
   },
   onHide() {
+    this.pauseVideo('girl')
+    this.pauseVideo('lang')
     this.form = {}
     this.store.country_code = ''
     this.showAlert = false
@@ -191,13 +253,49 @@ export default {
       this.alertType = type
       this.showAlert = true
     },
+    playLangVideo() {
+      track('$WebClick', {
+        $title: '首页',
+        $url: 'pages/index',
+        content: '郎朗视频播放',
+        visit_time: new Date().toLocaleDateString()
+      });
+      this.pauseVideo('girl')
+      this.showLangVideo = true
+      if (!this.langVideoCtx) {
+        this.langVideoCtx = wx.createVideoContext('langVideo')
+      }
+      this.langVideoCtx.play()
+    },
+    playGirlVideo() {
+      track('$WebClick', {
+        $title: '首页',
+        $url: 'pages/index',
+        content: '其他视频播放',
+        visit_time: new Date().toLocaleDateString()
+      });
+      this.pauseVideo('lang')
+      this.showGirlVideo = true
+      if (!this.girlVideoCtx) {
+        // 创建 video 上下文 VideoContext 对象
+        this.girlVideoCtx = wx.createVideoContext('girlVideo')
+      }
+      this.girlVideoCtx.play()
+    },
+    pauseVideo(type) {
+      if (this.girlVideoCtx && type === 'girl') {
+        this.girlVideoCtx.pause()
+      }
+      if (this.langVideoCtx && type === 'lang') {
+        this.langVideoCtx.pause()
+      }
+    },
     closeAlert() {
       this.hasBtnClicked = false
       this.showAlert = false
     },
     closeStay(content) {
       this.showStay = false;
-      this.packageOpened = false
       track('ai_applet_retain_click', {
         ai_tel: this.store.mobile,
         click_item: content
@@ -239,6 +337,7 @@ export default {
       console.log('this.configData', this.configData);
       this.btnUrl = this.configData.pkg === 3 ? require('@/static/imgs/btn-1cents.png') : require('@/static/imgs/btn.png')
       this.referrer_info = this.configData.referrer_info
+      this.recent_purchase = this.configData.recent_purchase
       this.shareScene = this.configData.share_scene
       this.store.mobile = this.configData.mobile
       if (this.referrer_info.uuid) {
@@ -293,7 +392,6 @@ export default {
         content,
         visit_time: new Date().toLocaleDateString()
       });
-      this.packageOpened = true
       if (this.configData.had_purchased || (this.store.had_purchased && this.configData.mobile)) {
         this.go('/pages/success')
       } else {
