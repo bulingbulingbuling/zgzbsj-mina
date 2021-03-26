@@ -8,14 +8,15 @@
           <img class="price-img" src="@/static/imgs/newIndex/9.9.png" alt="" v-else >
         </div>
         <div class="con" v-else>
-          <img class="new-bg-img" src="@/static/imgs/newIndex/new-bg.jpeg" alt="" >
-          <img class="open-img" src="@/static/imgs/newIndex/open.png" alt="" v-if="configData.mobile" @click="handleGetting('页中立即体验')" id="mid-btn">
-          <button class="open-img" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" v-else id="mid-btn" :disabled="hasBtnClicked" @click="handleBtnClick">
-            <img src="@/static/imgs/newIndex/open.png" alt="">
+          <img class="new-bg-img" src="@/static/imgs/newIndex/new-bg.jpg" alt="" >
+          <img class="open-img" src="@/static/imgs/newIndex/open.png" alt="">
+          <div class="open-box" v-if="configData.mobile" @click="handleGetting('拆礼包')" id="mid-btn"></div>
+          <button class="open-box" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" v-else id="mid-btn" :disabled="hasBtnClicked" @click="handleBtnClick">
+            <div class="open-box" ></div>
           </button>
         </div>
         <div class='btn'>
-          <img class="btn-img" src="@/static/imgs/newIndex/button.png" alt="" v-if="configData.mobile" @click="handleGetting('页底立即体验')">
+          <img class="btn-img" src="@/static/imgs/newIndex/button.png" alt="" v-if="configData.mobile" @click="handleGetting('礼包')">
           <button class="btn-img" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" v-else :disabled="hasBtnClicked" @click="handleBtnClick">
             <img src="@/static/imgs/newIndex/button.png" alt="">
           </button>
@@ -44,7 +45,6 @@
           </div>
         </div>
       </div>
-      <!-- 客服提醒弹框 -->
       <alert :isShow="showAlert" @close="closeAlert" :type="alertType" :isLogin="isLogin" :form="form" @login="register">
       </alert>
       <!-- 客服提示图标 -->
@@ -81,9 +81,19 @@ export default {
       top: '',
       platform: '',
       btnUrl: '',
+      share_type: '',
+      user_status: '',
+      usersignin_status: '',
       imgPath: process.env.VUE_APP_IMG_PATH,
       shareScene: '', // 分享给他人的scen
-      packageOpened: false
+      packageOpened: false, // 礼包已打开
+      user_status_map: {
+        0: '未付费',
+        2: '体验期',
+        21: '体验期过期',
+        3: '年卡',
+        31: '年卡过期'
+      }
     }
   },
   onLoad(options) {
@@ -140,6 +150,9 @@ export default {
         this.platform = res.platform
       }
     })
+    // 获取来源
+    const { scene } = wx.getLaunchOptionsSync()
+    this.share_type = scene
   },
   onPageScroll(e) {
     this.showBottom = e.scrollTop > this.btnDistance
@@ -207,10 +220,11 @@ export default {
       this.hasBtnClicked = true
       let content
       if (e.target.id === 'mid-btn') {
-        content = '页中立即体验'
+        content = '拆礼包'
       } else {
-        content = '页底立即体验'
+        content = '礼包'
       }
+      track('$ai_applet_shouquan_view');
       track('$WebClick', {
         $title: '首页',
         $url: 'pages/index',
@@ -267,12 +281,30 @@ export default {
         });
       }
       this.sa.registerApp({
+        share_type: this.share_type
+      });
+      // 0是注册用户即未付费，2是体验用户，3是年卡用户 根据sub_end_date(卡过期日期)判断是否过期
+      let user_status_num = this.configData.subscribe_status
+      let date = new Date()
+      let year = date.getFullYear()
+      let month = (date.getMonth() + 1).toString().padStart(2, '0')
+      let day = date.getDate().toString().padStart(2, '0')
+      let dateString = `${year}${month}${day}`
+      if (this.configData.subscribe_status === 2 && dateString / 1 > this.configData.sub_end_date / 1) {
+        user_status_num = '21'
+      }
+      if (this.configData.subscribe_status === 3 && dateString / 1 > this.configData.sub_end_date / 1) {
+        user_status_num = '31'
+      }
+      this.sa.registerApp({
         referrer_amount: this.configData.pkg === 3 ? 0.01 : 9.9
       });
       this.sa.setProfile({
         ai_phoneNumber: this.configData.mobile,
         ai_open_id: this.configData.openid,
-        ai_uuid: this.configData.uuid
+        ai_uuid: this.configData.uuid,
+        ai_applet_user_status: this.user_status_map[user_status_num],
+        ai_applet_usersignin_status: this.configData.mobile ? '已登录' : '未登录'
       });
       track('$pageview', {
         $title: '首页',
@@ -387,6 +419,7 @@ export default {
         }
         this.store.mobile = data.mobile
         this.shareScene = data.share_scene
+        this.packageOpened = true
         if (data.had_purchased) {
           return this.go('/pages/success')
         }

@@ -71,7 +71,7 @@
 
   .content {
     background-color: @new-bg-color;
-    padding-bottom: 180px;
+    padding-bottom: 230px;
     .con {
       position: relative;
       .new-bg-img{
@@ -95,49 +95,48 @@
         top: 615px;
         left: 50%;
         margin-left: -121px;
-        animation:move 3s 0s infinite;
-        -webkit-animation:move 3s 0s infinite;
+        animation:move 5s 0s infinite;
+        -webkit-animation:move 5s 0s infinite;
         transform-origin:top;
         -webkit-transform-origin:top;
+        background: transparent;
         ._img {
           width: 100%;
           height: 100%;
         }
       }
+      .open-box{
+        width: 550px;
+        height: 600px;
+        position: absolute;
+        top: 450px;
+        left: 50%;
+        margin-left: -275px;
+        background: transparent;
+        z-index: 1;
+      }
 
       @keyframes move
       {
-        0%, 65%{
-          -webkit-transform:rotate(0deg);
-          transform:rotate(0deg);
+        0%{
+          -webkit-transform:rotate(-16deg);
+          transform:rotate(-16deg);
         }
-        70% {  
-          -webkit-transform:rotate(6deg);
-          transform:rotate(6deg);
+        25% {  
+          -webkit-transform:rotate(16deg);
+          transform:rotate(16deg);
+        }
+        50% {  
+          -webkit-transform:rotate(-16deg);
+          transform:rotate(-16deg);
         }
         75% {  
-          -webkit-transform:rotate(-6deg);
-          transform:rotate(-6deg);
-        }
-        80% {  
-          -webkit-transform:rotate(6deg);
-          transform:rotate(6deg);
-        }
-        85% {  
-          -webkit-transform:rotate(-6deg);
-          transform:rotate(-6deg);
-        }
-        90% {  
-          -webkit-transform:rotate(6deg);
-          transform:rotate(6deg);
-        }
-        95% {  
-          -webkit-transform:rotate(-6deg);
-          transform:rotate(-6deg);
+          -webkit-transform:rotate(16deg);
+          transform:rotate(16deg);
         }
         100% {  
-          -webkit-transform:rotate(0deg);
-          transform:rotate(0deg);
+          -webkit-transform:rotate(-16deg);
+          transform:rotate(-16deg);
         }
       }
     }
@@ -147,7 +146,9 @@
       .btn-img {
         width: 586px;
         height: 167px;
-        background: @new-bg-color;
+        background: transparent;
+        margin-top: -40px;
+        position: relative;
         ._img {
           width: 100%;
           height: 100%;
