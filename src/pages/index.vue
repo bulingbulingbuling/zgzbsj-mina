@@ -280,6 +280,11 @@ export default {
           poster_id: this.configData.scene_data.p
         });
       }
+      if (this.configData.scene_data.user_current_status_zh) {
+        this.sa.registerApp({
+          user_code_status: this.configData.scene_data.user_current_status_zh
+        });
+      }
       this.sa.registerApp({
         share_type: this.share_type
       });
