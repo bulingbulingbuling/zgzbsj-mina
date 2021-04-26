@@ -1,5 +1,6 @@
-@primary-color: #ff935e;
+@primary-color: #f04a4e;
 @text-color: #444;
+@new-bg-color: #FFC524;
 
 .bground {
   background-repeat: no-repeat;
@@ -66,68 +67,148 @@
 
 /* 首页 */
 .index-container {
-  &-content {
-    text-align: center;
-    position: relative;
-    .header {
-      width: 100%;
-      height: 1448px;
-    }
-    .desc {
-      position: absolute;
-      top: 814px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 659px;
-      height: 376px;
-    }
-    .list-swiper {
-      // position: absolute;
-      // top: 74px;
-      // left: 0;
-      // width: 420px;
-      display: block;
-      height: 62px;
-      line-height: 62px;
-      background-color: #000000;
-      opacity: 0.6;
-      border-radius: 0 62px 62px 0;
-      padding: 0 22px;
-      .item-wrapper {
-        font-size: 24px;
-        color: #ffd800;
-        [data-tag="span"] {
-          color: #ffffff;
+  letter-spacing: 1px;
+
+  .content {
+    background-color: @new-bg-color;
+    padding-bottom: 230px;
+    .con {
+      position: relative;
+      .new-bg-img{
+        width: 750px;
+        height: 1116px;
+      }
+
+      .price-img{
+        width: 605px;
+        height: 209px;
+        position: absolute;
+        top: 140px;
+        left: 50%;
+        margin-left: -302px;
+      }
+
+      .open-img{
+        width: 242px;
+        height: 357px;
+        position: absolute;
+        top: 615px;
+        left: 50%;
+        margin-left: -121px;
+        animation:move 5s 0s infinite;
+        -webkit-animation:move 5s 0s infinite;
+        transform-origin:top;
+        -webkit-transform-origin:top;
+        background: transparent;
+        ._img {
+          width: 100%;
+          height: 100%;
+        }
+      }
+      .open-box{
+        width: 550px;
+        height: 600px;
+        position: absolute;
+        top: 450px;
+        left: 50%;
+        margin-left: -275px;
+        background: transparent;
+        z-index: 1;
+      }
+
+      @keyframes move
+      {
+        0%{
+          -webkit-transform:rotate(-16deg);
+          transform:rotate(-16deg);
+        }
+        25% {  
+          -webkit-transform:rotate(16deg);
+          transform:rotate(16deg);
+        }
+        50% {  
+          -webkit-transform:rotate(-16deg);
+          transform:rotate(-16deg);
+        }
+        75% {  
+          -webkit-transform:rotate(16deg);
+          transform:rotate(16deg);
+        }
+        100% {  
+          -webkit-transform:rotate(-16deg);
+          transform:rotate(-16deg);
         }
       }
     }
-    .rule-link {
-      position: absolute;
-      top: 1200px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 24px;
-      color: rgba(255, 255, 255, 0.7);
-      
+
+    .btn{
+      text-align: center;
+      .btn-img {
+        width: 586px;
+        height: 167px;
+        background: transparent;
+        margin-top: -40px;
+        position: relative;
+        ._img {
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+    
+
+    .rules-sec {
+      background: transparent;
+      .rule-link {
+        font-size: 24px;
+        line-height: 24px;
+        text-decoration: underline;
+        text-align: center;
+        color: #7c4a29;
+      }
     }
   }
-  &-bottom {
+
+  .video-box {
+    z-index: 101;
     position: fixed;
-    bottom: 30px;
     left: 0;
-    width: 100%;
-    height: 142px;
-    display: flex;
-    justify-content: center;
-    .action {
-      width: 622px;
-      height: 100%;
-      animation: zoomingBottom 1.5s infinite;
-      ._img {
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+
+    &-wrapper {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100%;
+      height: 422px;
+
+      .myVideo {
+        position: relative;
         width: 100%;
         height: 100%;
       }
+
+      .close {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 56px;
+        height: 56px;
+        z-index: 1;
+      }
     }
+  }
+
+  .contact {
+    position: fixed;
+    right: 0;
+    top: 456px;
+    width: 130px;
+    height: 142px;
   }
 }
 
