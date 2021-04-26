@@ -3,12 +3,12 @@
     <div class="index-container-wrapper">
       <div class="content">
         <div class="con" v-if="packageOpened">
-          <img class="new-bg-img" src="@/static/imgs/newIndex/opened-new-bg.jpg" alt="" >
+          <img class="new-bg-img" src="@/static/imgs/newIndex/opened-new-bg.jpeg" alt="" >
           <img class="price-img" src="@/static/imgs/newIndex/0.01.png" alt="" v-if="configData.pkg === 3" >
           <img class="price-img" src="@/static/imgs/newIndex/9.9.png" alt="" v-else >
         </div>
         <div class="con" v-else>
-          <img class="new-bg-img" src="@/static/imgs/newIndex/new-bg.jpg" alt="" >
+          <img class="new-bg-img" src="@/static/imgs/newIndex/new-bg.jpeg" alt="" >
           <img class="open-img" src="@/static/imgs/newIndex/open.png" alt="">
           <div class="open-box" v-if="configData.mobile" @click="handleGetting('拆礼包')" id="mid-btn"></div>
           <button class="open-box" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" v-else id="mid-btn" :disabled="hasBtnClicked" @click="handleBtnClick">
