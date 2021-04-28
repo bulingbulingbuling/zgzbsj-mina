@@ -1,5 +1,5 @@
 import apiFn from './api';
-export const baseApi = apiFn('question', process.env.VUE_APP_BASE_URL);
+export const baseApi = apiFn('op', process.env.VUE_APP_OP_URL);
 
 export const api = {
   // 获取首页数据
@@ -77,5 +77,8 @@ export const api = {
     return await baseApi.get('/referral_miniapp/landing/play_review', {
       scene
     });
+  },
+  async getBuyNames() {
+    return await baseApi.get('/referral_miniapp/landing/buy_name');
   }
 }

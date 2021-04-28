@@ -1,32 +1,26 @@
 <template>
   <div class="alert" v-if="isShow">
     <div class="mask"></div>
-    <div class="alert-contact" v-if="type === 'contact'">
-      <img class="alert-contact-close" :src="`${imgPath}/ai_mina/contact-close.png`" alt="" @click="close">
-      <img class="img-bg" :src="`${imgPath}/ai_mina/contact-help.png`">
-      <div class="call" @click="handleCall">现在拨打</div>
-    </div>
-    <div class="alert-form" v-else>
-      <div class='alert-form-tip' >
-        <div class="linkebg">
-          <p class='_p'> 小叶子温馨提示</p>
-          <h3 class="_title">注册后才能参与训练营哦！</h3>
+    <div class="alert-form">
+      <div class='alert-form-tip'>
+        <img :src="`${isFree ? require('@/static/imgs/newIndex2/login-top.png') : require('@/static/imgs/newIndex2/login-top-99.png')}`" alt="">
+      </div>
+      <div class="alert-form-wrapper">
+        <div class="alert-form-wrapper-item">
+          <div class="num item-left ft-32" @click="handleRedirect">+{{country_code}} <img class="arrow" src="@/static/imgs/newIndex2/triangle.png" alt=""></div>
+          <input class="phone ft-30" type="number" placeholder="手机号仅用于上课" @input="handleMobileInput">
         </div>
-        <img class="_logo" src="@/static/imgs/tip-logo.png" alt="">
+        <div class="alert-form-wrapper-item">
+          <input class="code ft-30" type="number" placeholder="请输入验证码" @input="handleCodeInput">
+          <div class="code-btn ft-30" :class="{disabled: code < 60 && code > 0}" @click="sendCode">{{smstext || code + 's'}}</div>
+        </div>
+        <p class="alert-form-wrapper-error ft-30">{{errorText}}</p>
+        <button class="alert-form-wrapper-btn" @click="login" :disabled="isLogin">
+          <img src="@/static/imgs/newIndex2/login-btn.png" alt="">
+        </button>
+        <p class="desc"><img src="@/static/imgs/newIndex2/icon-safe.png" alt=""><span>小叶子保护您的隐私</span></p>
       </div>
-      <div class="alert-form-item">
-        <div class="num item-left ft-26" @click="handleRedirect">+{{country_code}} <img class="arrow" :src="`${imgPath}/ai_mina/arrow.png`" alt=""></div>
-        <input class="phone ft-26" type="number" placeholder="请输入手机号号码" @input="handleMobileInput">
-      </div>
-      <div class="alert-form-item">
-        <div class="code-title ft-26 item-left">验证码</div>
-        <input class="code ft-26" type="number" placeholder="请输入验证码" @input="handleCodeInput">
-        <div class="code-btn ft-26" :class="{disabled: code < 60 && code > 0}" @click="sendCode">{{smstext || code + 's'}}</div>
-      </div>
-      <p class="alert-form-error ft-26">{{errorText}}</p>
-      <button class="alert-form-btn" @click="login" :disabled="isLogin">立即注册</button>
-      <p class="_decr">* 训练营期间打卡5天还可得<span class="_strong">19.8</span>元学费返现</p>
-      <img class="alert-form-close" src="@/static/imgs/close.png" alt="" @click="close">
+      <img class="alert-form-close" src="@/static/imgs/newIndex2/close.png" alt="" @click="close">
     </div>
   </div>
 </template>
@@ -49,6 +43,10 @@ export default {
     form: {
       type: Object,
       default: () => ({})
+    },
+    isFree: {
+      type: Boolean,
+      default: false
     }
   },
   watch: {
@@ -68,7 +66,7 @@ export default {
       mobile: '',
       sms_code: '',
       code: '',
-      smstext: '获取验证码',
+      smstext: '发送验证码',
       errorText: '',
       store: this.$mp.app.globalData,
       country_code: '86',
@@ -82,6 +80,9 @@ export default {
       clearTimeout(this.timer)
       this.timer = setTimeout(() => {
         this.mobile = e.detail.value
+        if (/\d{11}/.test(this.mobile)) {
+          this.sendCode()
+        }
       }, 200)
     },
     handleCodeInput(e) {
@@ -172,205 +173,124 @@ export default {
   .mask {
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-  }
-  .alert-contact {
-    position: fixed;
-    left: 50%;
-    top: 46%;
-    width: 630px;
-    height: 635px;
-    transform: translate(-50%, -50%);
-    border-radius: 20px;
-    text-align: center;
-    &-close {
-      position: absolute;
-      bottom: -89px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 56px;
-      height: 56px;
-    }
-    .img-bg {
-      width: 100%;
-      height: 100%;
-    }
-    .call {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 48px;
-      width: 382px;
-      height: 69px;
-      line-height: 69px;
-      background-image: linear-gradient(0deg, #fc5045 0%, #ff7859 100%), linear-gradient(#fc5045, #fc5045);
-      box-shadow: 2px 4px 16px 0px rgba(149, 52, 46, 0.4);
-      border-radius: 34px;
-      text-align: center;
-      letter-spacing: 3px;
-      color: #ffffff;
-      font-size: 28px;
-    }
+    background: rgba(0, 0, 0, 0.6);
   }
   .alert-form {
     position: fixed;
-    left: 50%;
-    top: 43%;
-    width: 630px;
-    height: 635px;
-    border-radius: 20px;
-    transform: translate(-50%, -50%);
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 682px;
     text-align: center;
-    padding: 0px 40px 43px;
-    background-color: #fff;
-    .linkebg {
-      width: 630px;
-      height: 174px;
-      position: relative;
-      overflow: hidden;
-      padding-top: 45px;
-      padding-left: 50px;
-      margin-left: -40px;
-      margin-right: -40px;
-      &::before{
-        content: "";
-        display: block;
-        position: absolute;
-        top: -535px;
-        left: -240px;
-        width: 1071px;
-        height: 1071px;
-        background: rgba(64,213,106,.15);
-        border-radius: 50%;
-        transform: scale(1, 0.322);
-      }
-    }
     &-close {
       position: absolute;
-      right: 50%;
-      width: 68px;
-      height: 68px;
-      transform: translate(50%, 90px);
+      top: 62px;
+      right: 29px;
+      width: 30px;
+      height: 30px;
     }
     &-tip {
-      color: #333333;
-      text-align: left;
-      position: relative;
-      margin-bottom: 63px;
-      ._p {
-        font-size: 28px;
-        line-height: 41px;
-      }
-      ._title {
-        font-size: 32px;
-      }
-      ._logo {
-        position: absolute;
-        width: 212px;
-        height: 226px;
-        top: -63px;
-        right: -51px;
+      width: 100%;
+      height: 224px;
+      ._img {
+        width: 100%;
+        height: 100%;
       }
     }
-    &-title {
-      letter-spacing: 1px;
-      color: #444444;
-      font-size: 36px;
-      margin-bottom: 40px;
-    }
-    &-item {
-      display: flex;
-      width: 469px;
-      align-items: center;
-      height: 52px;
-      border-bottom: solid 3px #ddd;
-      margin: 0 auto;
-      margin-bottom: 42px;
-      ::-webkit-input-placeholder {
-        color: #ccc;
-        font-size: 32px;
-      }
-      .item-left {
-        width: 105px;
-        text-align: left;
-        border-right: 3px solid #ccc;
-      }
-      .num {
-        letter-spacing: 1px;
-        color: #444444;
-        .arrow {
-          width: 16px;
-          height: 9px;
-          vertical-align: middle;
-          margin-right: 10px;
+    &-wrapper {
+      position: absolute;
+      left: 0;
+      top: 132px;
+      background: #fff;
+      width: 100%;
+      height: 550px;
+      border-radius: 30px 30px 0 0;
+      padding: 71px 34px 0;
+      &-item {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 100px;
+        margin-bottom: 26px;
+        background-color: #f7f7f7;
+        border-radius: 100px;
+        ::-webkit-input-placeholder {
+          color:  #c5c5c5;
+          font-size: 30px;
+        }
+        .item-left {
+          width: 159px;
+          padding-left: 41px;
+        }
+        .num {
+          color: #333;
+          font-weight: 500;
+          .arrow {
+            width: 19px;
+            height: 14px;
+            vertical-align: middle;
+            margin-right: 10px;
+          }
+        }
+        .phone {
+          padding-left: 26px;
+          color: #444;
+          text-align: left;
+          height: 100%;
+          flex: 1;
+          letter-spacing: 0;
+        }
+        .code {
+          box-sizing: border-box;
+          width: 483px;
+          text-align: left;
+          padding-left: 41px;
+          color: #444;
+          padding-right: 10px;
+          height: 100%;
+          letter-spacing: 0;
+        }
+        .code-btn {
+          flex: 1;
+          text-align: center;
+          color: #444;
+        }
+        .disabled {
+          color: #999999;
         }
       }
-      .phone {
-        padding-left: 26px;
-        color: #444;
+      &-error {
+        padding-left: 41px;
+        color: #ff0909;
+        padding-top: 2px;
         text-align: left;
-        height: 100%;
-        flex: 1;
-        letter-spacing: 0;
+        width: 469px;
+        position: relative;
+        top: -30px;
+        height: 24px;
+        font-size: 24px;
       }
-      .code-title {
-        letter-spacing: 1px;
-        color: #444444;
-        width: 100px;
+      &-btn {
+        width: 670px;
+        height: 110px;
+        margin-bottom: 23px;
+        ._img {
+          width: 100%;
+          height: 100%;
+        }
       }
-      .code {
-        box-sizing: border-box;
-        width: 230px;
-        text-align: left;
-        padding-left: 26px;
-        color: #444;
-        padding-right: 10px;
-        height: 100%;
-        letter-spacing: 0;
-      }
-      .code-btn {
-        flex: 1;
-        text-align: center;
-        color: #07ae00;
-      }
-      .disabled {
-        color: #999999;
-      }
-      .ft-26 {
+      .desc {
         font-size: 26px;
-      }
-    }
-    &-error {
-      // height: 46px;
-      color: #ff0909;
-      padding-top: 2px;
-      text-align: left;
-      margin: 0 auto;
-      width: 469px;
-      position: relative;
-      top: -30px;
-      height: 24px;
-      font-size: 24px;
-    }
-    &-btn {
-      width: 527px;
-      height: 83px;
-      font-size: 36px;
-      line-height: 83px;
-      color: #ffffff;
-      background-color: #40d56a;
-      border-radius: 41px;
-    }
-    ._decr {
-      font-size: 26px;
-      letter-spacing: -1px;
-      color: #808080;
-      margin-top: 30px;
-      ._strong {
-        font-size: 42px;
-        font-weight: bold;
-        letter-spacing: -4px;
-        color: #ff6a00;
+        color: #c5c5c5;
+        ._img {
+          width: 23px;
+          height: 27px;
+          vertical-align: middle;
+        }
+        ._span {
+          vertical-align: middle;
+          margin-left: 8px;
+        }
       }
     }
   }

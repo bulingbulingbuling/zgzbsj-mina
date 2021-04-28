@@ -1,16 +1,19 @@
 <template>
   <div class="container success-container">
     <template v-if="isSuccess">
-      <img class="img-top" src="@/static/imgs/newIndex2/success-bg.png" alt="">
-      <button class="btn" open-type="contact">点击并回复“1”获取助教微信</button>
+      <img class="img-top" :src="`${imgPath}/ai_mina/result-success.png`" alt="">
+      <div class="result-bottom">
+        <img :src="`${imgPath}/ai_mina/result-bottom.png`" alt="">
+        <button class="btn" open-type="contact">点击并回复“1”获取助教微信</button>
+      </div>
     </template>
     <template v-else>
       <div class="fail-wrapper-top">
-        <img class="fail-top" src="@/static/imgs/newIndex2/has-success.png" alt="">
+        <img class="fail-top" :src="`${imgPath}/ai_mina/result-fail.png`" alt="">
         <button class="btn" open-type="contact">点击并回复“1”获取助教微信</button>
       </div>
       <div class="fail-wrapper-bottom">
-        <img class="fail-bottom" src="@/static/imgs/newIndex2/success-share.png" alt="">
+        <img class="fail-bottom" src="@/static/imgs/result-fail-bg.png" alt="">
         <img class="poster" :src="posterUrl" alt="">
         <div class="share-wrapper">
           <div class="share-item">
@@ -75,7 +78,7 @@ export default {
       param = {
         title: '小叶子智能陪练体验营',
         path: `/pages/index?scene=${this.shareScene}`,
-        imageUrl: `${this.imgPath}/ai_mina/newIndex2/share-header.png`
+        imageUrl: `${this.imgPath}/ai_mina/share-header.png`
       }
       return param;
     }

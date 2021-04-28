@@ -1,18 +1,21 @@
 <template>
   <div class="container index-container">
     <div class="index-container-content">
-      <img class="header" src="@/static/imgs/newIndex2/bg0.jpg" alt="">
+      <img class="header" :src="bgUrl" alt="">
       <img class="desc" src="@/static/imgs/newIndex2/desc.png" alt="">
-      <swiper class="list-swiper" :circular="true" :vertical="true" :autoplay="true" :interval="1500" v-if="recent_purchase.length > 0">
-        <swiper-item v-for="(item, key) in recent_purchase" :key="key" catchtouchmove="catchTouchMove">
-          <div class="item-wrapper" v-html="item">
-          </div>
-        </swiper-item>
-      </swiper>
-       <a class='rule-link' href='/pages/rules'>*智能陪练购买协议</a>
+      <div class="swiper-wrapper" v-if="recent_purchase.length > 0">
+        <img class="voice" src="@/static/imgs/newIndex2/voice.png" alt="">
+        <swiper class="list-swiper" :circular="true" :vertical="true" :autoplay="true" :interval="1500">
+          <swiper-item v-for="(item, key) in recent_purchase" :key="key" catchtouchmove="catchTouchMove">
+            <div class="item-wrapper" v-html="item">
+            </div>
+          </swiper-item>
+        </swiper>
+      </div>
+      <a class='rule-link' href='/pages/rules'>*智能陪练购买协议</a>
     </div>
     <div class="index-container-bottom">
-      <div class="action" v-if="configData.mobile" @click="handleGetting('页底立即体验')">
+      <div class="action" v-if="configData.mobile" @click="handleGetting('立即抢')">
         <img class="header" src="@/static/imgs/newIndex2/btn-get.png" alt="">
       </div>
       <button id="bottom-btn" class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="handleBtnClick" v-else>
@@ -20,25 +23,19 @@
       </button>
     </div>
     <div class='stay' v-show="showStay">
-      <div class="mask"></div>
       <div class="stay-content">
-        <img class="_logo" src="@/static/imgs/sad-logo.png" alt="">
-        <div class='stay-content-title' >
-            <h3 class="_title">您确定要放弃吗？</h3>
-            <p class='_p'> 让孩子跟小叶子一起练琴，每天提高吧～</p>
-        </div>
-        <div class='stay-content-body'>
-          <img src="@/static/imgs/stay.png" alt="" class='_img'>
-          <p class='_test'><span>5天</span>不限次数体验</p>
-          <p class='_exp'>练1遍，顶10遍</p>
-        </div>
+        <img class="stay-content-retain" src="@/static/imgs/newIndex2/retain.png" alt="">
         <div class="stay-content-btngroup">
-          <button class="_close" @click="closeStay('拒绝')">残忍拒绝</button>
-          <button class="_pay"  @click="handleGetting('继续', true)">继续支付</button>
+          <button class="btn close" @click="closeStay('拒绝')">
+            <img src="@/static/imgs/newIndex2/btn-reject.png" alt="">
+          </button>
+          <button class="btn pay"  @click="handleContinue">
+            <img src="@/static/imgs/newIndex2/btn-continue.png" alt="">
+          </button>
         </div>
       </div>
     </div>
-    <alert :isShow="showAlert" @close="closeAlert" :type="alertType" :isLogin="isLogin" :form="form" @login="register">
+    <alert :isShow="showAlert" :isFree="showCents" @close="closeAlert" :type="alertType" :isLogin="isLogin" :form="form" @login="register">
     </alert>
   </div>
 </template>
@@ -54,28 +51,22 @@ export default {
       showAlert: false, // 是否显示弹窗
       showStay: false, // 支付失败挽留弹窗
       store: this.$mp.app.globalData,
-      langUrl: `${process.env.VUE_APP_IMG_PATH}/ai_mina/langngAIG.mp4`,
-      girlUrl: `${process.env.VUE_APP_IMG_PATH}/ai_mina/compare.mp4`,
-      showBottom: false,
-      alertType: 'phone',
-      remainNum: Math.floor(Math.random() * (30 - 20) + 20),
       configData: {},
       referrer_info: {},
       recent_purchase: [], // 滚动列表
       isLogin: false,
       scene: '', // 通过小程序码进来
       source: '', // 记录小程序的入口
-      btnDistance: '', // 购买按钮距离顶部的距离
       hasBtnClicked: false, // 购买是否已经点了。
       form: {},
-      showTimer: false,
-      showLangVideo: false,
-      showGirlVideo: false,
-      top: '',
       platform: '',
-      btnUrl: '',
+      bgUrl: '',
       imgPath: process.env.VUE_APP_IMG_PATH,
-      shareScene: '' // 分享给他人的scen
+      shareScene: '', // 分享给他人的scen
+      hasRejectLogin: false, // 是否拒绝登录过
+      hasRejectPay: false, // 是否拒绝支付过
+      rejectType: '',
+      showCents: ''
     }
   },
   onLoad(options) {
@@ -94,32 +85,27 @@ export default {
         mobile: this.store.form.mobile,
         sms_code: this.store.form.sms_code
       }
-      this.handleShowAlert('phone')
+      this.handleShowAlert()
     }
     // 监听网络状态变化
     wx.onNetworkStatusChange((res) => {
-      this.handleNetError(res)
+      if (res.networkType === 'none') {
+        this.toast('当前网络异常，请检查网络后再试')
+      }
     })
     wx.getNetworkType({
       success: (res) => {
         this.handleNetError(res)
       }
     })
-    // 获取系统信息
-    wx.getSystemInfo({
-      success: (res) => {
-        this.platform = res.platform
-      }
-    })
+    // 获取来源
+    const { scene } = wx.getLaunchOptionsSync()
+    this.share_type = scene
   },
   onHide() {
-    this.pauseVideo('girl')
-    this.pauseVideo('lang')
     this.form = {}
     this.store.country_code = ''
     this.showAlert = false
-    this.showTimer = false
-    this.remainNum = 1
     this.hasBtnClicked = false
   },
   // 设置自定义转发的内容
@@ -137,31 +123,47 @@ export default {
         this.toast('当前网络异常，请检查网络后再试')
       } else {
         this.getConfig()
+        this.getBuyNames()
       }
     },
-    handleShowAlert(type) {
-      this.alertType = type
+    handleShowAlert() {
       this.showAlert = true
     },
     closeAlert() {
       this.hasBtnClicked = false
       this.showAlert = false
+      if (!this.hasRejectLogin) {
+        this.showStay = true
+        this.rejectType = 'login'
+        track('ai_applet_retain_view', {
+          ai_tel: '',
+          retain_from: '未登陆挽留'
+        });
+        this.hasRejectLogin = true
+      } 
     },
-    closeStay(content) {
+    closeStay() {
       this.showStay = false;
-      track('ai_applet_retain_click', {
-        ai_tel: this.store.mobile,
-        click_item: content
-      });
+      track('ai_applet_retain_giveup_click');
+    },
+    handleContinue() {
+      if (this.rejectType === 'login') {
+        track('ai_applet_retain_giveup_click', {
+          retain_from: '未登陆挽留'
+        });
+        this.handleShowAlert()
+      } else {
+        track('ai_applet_retain_giveup_click', {
+          retain_from: '未支付挽留'
+        });
+        this.rejectType = 'pay'
+        // 发起支付
+        this.handleGetting('继续抢')
+      }
     },
     handleBtnClick(e) {
       this.hasBtnClicked = true
-      let content
-      if (e.target.id === 'mid-btn') {
-        content = '页中立即体验'
-      } else {
-        content = '页底立即体验'
-      }
+      let content = '立即抢'
       track('$WebClick', {
         $title: '首页',
         $url: 'pages/index',
@@ -178,7 +180,7 @@ export default {
         }, true)
       } else {
         track('$ai_applet_quxiao_click');
-        this.handleShowAlert('phone')
+        this.handleShowAlert()
       }
     },
     // 获取首页数据
@@ -188,9 +190,9 @@ export default {
         source: this.source
       })
       console.log('this.configData', this.configData);
-      this.btnUrl = this.configData.pkg === 3 ? require('@/static/imgs/btn-1cents.png') : require('@/static/imgs/btn.png')
+      this.showCents = this.configData.pkg === 6
+      this.bgUrl = this.showCents ? require('@/static/imgs/newIndex2/bg0.png') : require('@/static/imgs/newIndex2/bg99.png')
       this.referrer_info = this.configData.referrer_info
-      this.recent_purchase = this.configData.recent_purchase
       this.shareScene = this.configData.share_scene
       this.store.mobile = this.configData.mobile
       if (this.referrer_info.uuid) {
@@ -218,27 +220,48 @@ export default {
           poster_id: this.configData.scene_data.p
         });
       }
+      if (this.configData.scene_data.user_current_status_zh) {
+        this.sa.registerApp({
+          user_code_status: this.configData.scene_data.user_current_status_zh
+        });
+      }
       this.sa.registerApp({
-        referrer_amount: this.configData.pkg === 3 ? 0.01 : 9.9
+        share_type: this.share_type
+      });
+      // 0是注册用户即未付费，2是体验用户，3是年卡用户 根据sub_end_date(卡过期日期)判断是否过期
+      let user_status_num = this.configData.subscribe_status
+      let date = new Date()
+      let year = date.getFullYear()
+      let month = (date.getMonth() + 1).toString().padStart(2, '0')
+      let day = date.getDate().toString().padStart(2, '0')
+      let dateString = `${year}${month}${day}`
+      if (this.configData.subscribe_status === 2 && dateString / 1 > this.configData.sub_end_date / 1) {
+        user_status_num = '21'
+      }
+      if (this.configData.subscribe_status === 3 && dateString / 1 > this.configData.sub_end_date / 1) {
+        user_status_num = '31'
+      }
+      this.sa.registerApp({
+        referrer_amount: this.configData.pkg === 6 ? 0 : 9.9
       });
       this.sa.setProfile({
         ai_phoneNumber: this.configData.mobile,
         ai_open_id: this.configData.openid,
-        ai_uuid: this.configData.uuid
+        ai_uuid: this.configData.uuid,
+        ai_applet_user_status: user_status_num ? this.user_status_map[user_status_num] : '',
+        ai_applet_usersignin_status: this.configData.mobile ? '已登录' : '未登录'
       });
       track('$pageview', {
         $title: '首页',
         $url: 'pages/index',
         visit_time: new Date().toLocaleDateString()
       });
-      if (this.configData.first_flag) {
-        this.remainNum = Math.floor(Math.random() * (30 - 20) + 20)
-        this.showTimer = true
-      } else {
-        this.remainNum = 1
-      }
     },
-    handleGetting(content, isContinue) {
+    // 获取首页数据
+    async getBuyNames() {
+      this.recent_purchase = await api.getBuyNames()
+    },
+    handleGetting(content) {
       track('$WebClick', {
         $title: '首页',
         $url: 'pages/index',
@@ -249,12 +272,6 @@ export default {
         this.go('/pages/success')
       } else {
         this.showStay = false;
-        if (isContinue) {
-          track('ai_applet_retain_click', {
-            ai_tel: this.store.mobile,
-            click_item: content
-          })
-        }
         this.createBill()
       }
     },
@@ -272,6 +289,11 @@ export default {
           scene: this.scene,
           source: this.source
         })
+        if (this.showCents) {
+          this.store.had_purchased = true;
+          this.go('/pages/success?success=true')
+          return
+        }
         let { timeStamp, nonceStr, package: p, signType, paySign } = res.data.credential.wx_lite
         wx.requestPayment({
           timeStamp,
@@ -280,6 +302,7 @@ export default {
           signType,
           paySign,
           success: () => {
+            track('ai_applet_99pay_queren_click');
             this.store.had_purchased = true;
             this.go('/pages/success?success=true')
           },
@@ -292,10 +315,18 @@ export default {
           },
           cancel: () => {
             console.log('stay')
-            track('ai_applet_retain_view', {
+            track('ai_applet_99pay_x_click', {
               ai_tel: this.store.mobile
             });
-            this.showStay = true;
+            if (!this.hasRejectPay) {
+              this.showStay = true
+              this.rejectType = 'pay'
+              track('ai_applet_retain_view', {
+                ai_tel: this.store.mobile,
+                retain_from: '未支付挽留'
+              });
+              this.hasRejectPay = true
+            }
           }
         })
       } catch (e) {

@@ -397,7 +397,7 @@ export default {
       })
       console.log('this.configData', this.configData);
       this.showCents = this.configData.pkg === 3
-      this.btnUrl = this.showCents ? require('@/static/imgs/playing/btn-1cents.png') : `${this.imgPath}/ai_mina/playing/btn-bottom.png`
+      this.btnUrl = this.showCents ? `${this.imgPath}/ai_mina/playing/btn-1cents.png` : `${this.imgPath}/ai_mina/playing/btn-bottom.png`
       this.report = this.configData.report
       this.referrer_info = this.configData.referrer_info
       this.recent_purchase = this.configData.recent_purchase
@@ -500,7 +500,7 @@ export default {
             track('ai_applet_retain_view', {
               ai_tel: this.store.mobile
             });
-            this.showStay = true;
+            // this.showStay = true;
           }
         })
       } catch (e) {

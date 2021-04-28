@@ -22,15 +22,16 @@ const request = (url, params, method, header) => {
       method: method,
       header: header,
       success: async (res) => {
+        console.log(res, 'res...')
         wx.hideLoading();
         if (res.data.code !== 0) {
           if (res.data.errors[0] && res.data.errors[0].err_no === 401) {
             const code = await getCode()
-            const res = await request(url, { code }, method, { token: '' })
+            const res = await request(url, { wx_code: code }, method, { token: '' })
             wx.setStorageSync('token', res.token);
             wx.setStorageSync('openid', res.open_id);
             // 设置下一次请求的header
-            const baseApi = buildIns('question')
+            const baseApi = buildIns('op')
             baseApi.setHeader('token', res.token);
             const result = await request(url, lastParam, method, { token: res.token })
             resolve(result)
