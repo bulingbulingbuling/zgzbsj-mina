@@ -48,7 +48,7 @@ import { track } from '@/utils/util'
 export default {
   data () {
     return {
-      showAlert: false, // 是否显示弹窗
+      showAlert: true, // 是否显示弹窗
       showStay: false, // 支付失败挽留弹窗
       store: this.$mp.app.globalData,
       configData: {},
@@ -66,7 +66,14 @@ export default {
       hasRejectLogin: false, // 是否拒绝登录过
       hasRejectPay: false, // 是否拒绝支付过
       rejectType: '',
-      showCents: ''
+      showCents: '',
+      user_status_map: {
+        0: '未付费',
+        2: '体验期',
+        21: '体验期过期',
+        3: '年卡',
+        31: '年卡过期'
+      }
     }
   },
   onLoad(options) {
@@ -111,7 +118,9 @@ export default {
   // 设置自定义转发的内容
   onShareAppMessage() {
     return {
-      path: `/pages/index?scene=${this.shareScene}`
+      title: '小叶子智能陪练体验营',
+      path: `/pages/index?scene=${this.shareScene}`,
+      imageUrl: `${this.imgPath}/ai_mina/newIndex2/share-header.png`
     }
   },
   methods: {
@@ -147,6 +156,7 @@ export default {
       track('ai_applet_retain_giveup_click');
     },
     handleContinue() {
+      this.showStay = false
       if (this.rejectType === 'login') {
         track('ai_applet_retain_giveup_click', {
           retain_from: '未登陆挽留'
@@ -268,7 +278,9 @@ export default {
         content,
         visit_time: new Date().toLocaleDateString()
       });
-      if (this.configData.had_purchased || (this.store.had_purchased && this.configData.mobile)) {
+      if (this.configData.had_purchased === 1 || (this.store.had_purchased === 1 && this.configData.mobile)) {
+        this.go('/pages/success?success=true')
+      } else if (this.configData.had_purchased === 2 || (this.store.had_purchased === 2 && this.configData.mobile)) {
         this.go('/pages/success')
       } else {
         this.showStay = false;
@@ -290,7 +302,7 @@ export default {
           source: this.source
         })
         if (this.showCents) {
-          this.store.had_purchased = true;
+          this.store.had_purchased = 1;
           this.go('/pages/success?success=true')
           return
         }
@@ -303,7 +315,7 @@ export default {
           paySign,
           success: () => {
             track('ai_applet_99pay_queren_click');
-            this.store.had_purchased = true;
+            this.store.had_purchased = 1;
             this.go('/pages/success?success=true')
           },
           fail: () => {
@@ -311,7 +323,7 @@ export default {
             this.store.country_code = ''
             this.showAlert = false
             this.getConfig()
-            this.store.had_purchased = false;
+            this.store.had_purchased = 0;
           },
           cancel: () => {
             console.log('stay')
@@ -360,7 +372,9 @@ export default {
         }
         this.store.mobile = data.mobile
         this.shareScene = data.share_scene
-        if (data.had_purchased) {
+        if (data.had_purchased === 1) {
+          return this.go('/pages/success?success=true')
+        } else if (data.had_purchased === 2) {
           return this.go('/pages/success')
         }
         if (data.uuid) {
