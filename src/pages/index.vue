@@ -48,7 +48,7 @@ import { track } from '@/utils/util'
 export default {
   data () {
     return {
-      showAlert: true, // 是否显示弹窗
+      showAlert: false, // 是否显示弹窗
       showStay: false, // 支付失败挽留弹窗
       store: this.$mp.app.globalData,
       configData: {},
