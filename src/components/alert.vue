@@ -177,21 +177,22 @@ export default {
   }
   .alert-form {
     position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -70%);
+    width: 662px;
     height: 682px;
     text-align: center;
     &-close {
       position: absolute;
-      top: 62px;
+      top: 54px;
       right: 29px;
       width: 30px;
       height: 30px;
     }
     &-tip {
       width: 100%;
-      height: 224px;
+      height: 172px;
       ._img {
         width: 100%;
         height: 100%;
@@ -204,8 +205,8 @@ export default {
       background: #fff;
       width: 100%;
       height: 550px;
-      border-radius: 30px 30px 0 0;
-      padding: 71px 34px 0;
+      border-radius: 30px;
+      padding: 71px 20px 0;
       &-item {
         display: flex;
         align-items: center;
@@ -242,7 +243,7 @@ export default {
         }
         .code {
           box-sizing: border-box;
-          width: 483px;
+          width: 422px;
           text-align: left;
           padding-left: 41px;
           color: #444;
@@ -271,7 +272,7 @@ export default {
         font-size: 24px;
       }
       &-btn {
-        width: 670px;
+        width: 622px;
         height: 110px;
         margin-bottom: 23px;
         ._img {

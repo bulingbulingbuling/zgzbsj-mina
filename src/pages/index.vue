@@ -73,7 +73,8 @@ export default {
         21: '体验期过期',
         3: '年卡',
         31: '年卡过期'
-      }
+      },
+      isNetError: false
     }
   },
   onLoad(options) {
@@ -118,7 +119,7 @@ export default {
   // 设置自定义转发的内容
   onShareAppMessage() {
     return {
-      title: '小叶子智能陪练体验营',
+      title: '5天智能陪练体验营，打卡返19.8元现金红包',
       path: `/pages/index?scene=${this.shareScene}`,
       imageUrl: `${this.imgPath}/ai_mina/newIndex2/share-header.png`
     }
@@ -129,6 +130,7 @@ export default {
     },
     handleNetError(res) {
       if (res.networkType === 'none') {
+        this.isNetError = true
         this.toast('当前网络异常，请检查网络后再试')
       } else {
         this.getConfig()
@@ -172,6 +174,10 @@ export default {
       }
     },
     handleBtnClick(e) {
+      if (this.isNetError) {
+        this.toast('网络异常，请检查网络后重试')
+        return
+      }
       this.hasBtnClicked = true
       let content = '立即抢'
       track('$WebClick', {
@@ -272,6 +278,10 @@ export default {
       this.recent_purchase = await api.getBuyNames()
     },
     handleGetting(content) {
+      if (this.isNetError) {
+        this.toast('网络异常，请检查网络后重试')
+        return
+      }
       track('$WebClick', {
         $title: '首页',
         $url: 'pages/index',

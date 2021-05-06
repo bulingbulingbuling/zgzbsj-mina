@@ -73,7 +73,7 @@ export default {
     if (res.from === 'button') {
       // 来自页面内转发按钮
       param = {
-        title: '小叶子智能陪练体验营',
+        title: '5天智能陪练体验营，打卡返19.8元现金红包',
         path: `/pages/index?scene=${this.shareScene}`,
         imageUrl: `${this.imgPath}/ai_mina/newIndex2/share-header.png`
       }
