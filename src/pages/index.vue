@@ -2,9 +2,9 @@
   <div class="container index-container">
     <div class="index-container-content">
       <img class="header" :src="bgUrl" alt="">
-      <img class="desc" src="@/static/imgs/newIndex2/desc.png" alt="">
+      <img class="desc" :src="`${imgPath}/ai_mina/newIndex2/desc.png?v=1`" alt="">
       <div class="swiper-wrapper" v-if="recent_purchase.length > 0">
-        <img class="voice" src="@/static/imgs/newIndex2/voice.png" alt="">
+        <img class="voice" :src="`${imgPath}/ai_mina/newIndex2/voice.png`" alt="">
         <swiper class="list-swiper" :circular="true" :vertical="true" :autoplay="true" :interval="1500">
           <swiper-item v-for="(item, key) in recent_purchase" :key="key" catchtouchmove="catchTouchMove">
             <div class="item-wrapper" v-html="item">
@@ -16,21 +16,21 @@
     </div>
     <div class="index-container-bottom">
       <div class="action" v-if="configData.mobile" @click="handleGetting('立即抢')">
-        <img class="header" src="@/static/imgs/newIndex2/btn-get.png" alt="">
+        <img class="header" :src="`${imgPath}/ai_mina/newIndex2/btn-get.png`" alt="">
       </div>
       <button id="bottom-btn" class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="handleBtnClick" v-else>
-        <img src="@/static/imgs/newIndex2/btn-get.png" alt="">
+        <img :src="`${imgPath}/ai_mina/newIndex2/btn-get.png`" alt="">
       </button>
     </div>
     <div class='stay' v-show="showStay">
       <div class="stay-content">
-        <img class="stay-content-retain" src="@/static/imgs/newIndex2/retain.png" alt="">
+        <img class="stay-content-retain" :src="`${imgPath}/ai_mina/newIndex2/retain.png`" alt="">
         <div class="stay-content-btngroup">
           <button class="btn close" @click="closeStay('拒绝')">
-            <img src="@/static/imgs/newIndex2/btn-reject.png" alt="">
+            <img :src="`${imgPath}/ai_mina/newIndex2/btn-reject.png`" alt="">
           </button>
           <button class="btn pay"  @click="handleContinue">
-            <img src="@/static/imgs/newIndex2/btn-continue.png" alt="">
+            <img :src="`${imgPath}/ai_mina/newIndex2/btn-continue.png`" alt="">
           </button>
         </div>
       </div>
@@ -160,12 +160,12 @@ export default {
     handleContinue() {
       this.showStay = false
       if (this.rejectType === 'login') {
-        track('ai_applet_retain_giveup_click', {
+        track('ai_applet_retain_gon_click', {
           retain_from: '未登陆挽留'
         });
         this.handleShowAlert()
       } else {
-        track('ai_applet_retain_giveup_click', {
+        track('ai_applet_retain_gon_click', {
           retain_from: '未支付挽留'
         });
         this.rejectType = 'pay'
@@ -186,6 +186,7 @@ export default {
         content,
         visit_time: new Date().toLocaleDateString()
       });
+      track('ai_applet_shouquan_view');
     },
     // 获取手机号
     getPhoneNumber({ detail }) {
@@ -207,7 +208,7 @@ export default {
       })
       console.log('this.configData', this.configData);
       this.showCents = this.configData.pkg === 6
-      this.bgUrl = this.showCents ? require('@/static/imgs/newIndex2/bg0.png') : require('@/static/imgs/newIndex2/bg99.png')
+      this.bgUrl = this.showCents ? `${this.imgPath}/ai_mina/newIndex2/bg0.png` : `${this.imgPath}/ai_mina/newIndex2/bg99.png`
       this.referrer_info = this.configData.referrer_info
       this.shareScene = this.configData.share_scene
       this.store.mobile = this.configData.mobile

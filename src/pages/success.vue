@@ -1,16 +1,16 @@
 <template>
   <div class="container success-container">
     <template v-if="isSuccess">
-      <img class="img-top" src="@/static/imgs/newIndex2/success-bg.png" alt="">
+      <img class="img-top" :src="`${imgPath}/ai_mina/newIndex2/success-bg.png`" alt="">
       <button class="btn" open-type="contact">点击并回复“1”获取助教微信</button>
     </template>
     <template v-else>
       <div class="fail-wrapper-top">
-        <img class="fail-top" src="@/static/imgs/newIndex2/has-success.png" alt="">
+        <img class="fail-top" :src="`${imgPath}/ai_mina/newIndex2/has-success.png`" alt="">
         <button class="btn" open-type="contact">点击并回复“1”获取助教微信</button>
       </div>
       <div class="fail-wrapper-bottom">
-        <img class="fail-bottom" src="@/static/imgs/newIndex2/success-share.png" alt="">
+        <img class="fail-bottom" :src="`${imgPath}/ai_mina/newIndex2/success-share.png?v=1`" alt="">
         <img class="poster" :src="posterUrl" alt="">
         <div class="share-wrapper">
           <div class="share-item">
