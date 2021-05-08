@@ -78,7 +78,13 @@ export const api = {
       scene
     });
   },
-  async getBuyNames() {
-    return await baseApi.get('/referral_miniapp/landing/buy_name');
+  async getBuyNames({
+    scene,
+    source
+  } = {}) {
+    return await baseApi.get('/referral_miniapp/landing/buy_name', {
+      scene,
+      source
+    });
   }
 }

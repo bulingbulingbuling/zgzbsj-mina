@@ -276,7 +276,10 @@ export default {
     },
     // 获取首页数据
     async getBuyNames() {
-      this.recent_purchase = await api.getBuyNames()
+      this.recent_purchase = await api.getBuyNames({
+        scene: this.scene,
+        source: this.source
+      })
     },
     handleGetting(content) {
       if (this.isNetError) {
