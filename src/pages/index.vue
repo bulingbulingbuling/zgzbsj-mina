@@ -155,7 +155,15 @@ export default {
     },
     closeStay() {
       this.showStay = false;
-      track('ai_applet_retain_giveup_click');
+      if (this.rejectType === 'login') {
+        track('ai_applet_retain_giveup_click', {
+          retain_from: '未登陆挽留'
+        });
+      } else {
+        track('ai_applet_retain_giveup_click', {
+          retain_from: '未支付挽留'
+        });
+      }
     },
     handleContinue() {
       this.showStay = false
@@ -168,7 +176,6 @@ export default {
         track('ai_applet_retain_gon_click', {
           retain_from: '未支付挽留'
         });
-        this.rejectType = 'pay'
         // 发起支付
         this.handleGetting('继续抢')
       }
@@ -196,7 +203,7 @@ export default {
           encrypted_data: detail.encryptedData
         }, true)
       } else {
-        track('$ai_applet_quxiao_click');
+        track('ai_applet_quxiao_click');
         this.handleShowAlert()
       }
     },
