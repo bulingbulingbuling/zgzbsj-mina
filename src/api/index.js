@@ -21,8 +21,7 @@ export const api = {
     sms_code,
     referrer,
     scene,
-    source,
-    wx_code
+    source
   */
   async register(param) {
     return await baseApi.post('/referral_miniapp/landing/register', param);
