@@ -43,7 +43,7 @@
 <script>
 import { api } from '@/api'
 import Alert from '@/components/alert'
-import { track } from '@/utils/util'
+import { track, getWxCode } from '@/utils/util'
 
 export default {
   data () {
@@ -375,6 +375,10 @@ export default {
       param.scene = this.scene
       param.source = this.source
       // this.isLogin = true
+      if (isAuth) {
+        const code = await getWxCode()
+        param.wx_code = code
+      }
       try {
         const data = await api.register(param)
         this.sa.setProfile({
