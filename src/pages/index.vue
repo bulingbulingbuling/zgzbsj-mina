@@ -74,7 +74,8 @@ export default {
         3: '年卡',
         31: '年卡过期'
       },
-      isNetError: false
+      isNetError: false,
+      wxCode: ''
     }
   },
   onLoad(options) {
@@ -180,7 +181,7 @@ export default {
         this.handleGetting('继续抢')
       }
     },
-    handleBtnClick(e) {
+    async handleBtnClick(e) {
       if (this.isNetError) {
         this.toast('网络异常，请检查网络后重试')
         return
@@ -194,6 +195,7 @@ export default {
         visit_time: new Date().toLocaleDateString()
       });
       track('ai_applet_shouquan_view');
+      this.wxCode = await getWxCode()
     },
     // 获取手机号
     getPhoneNumber({ detail }) {
@@ -376,8 +378,7 @@ export default {
       param.source = this.source
       // this.isLogin = true
       if (isAuth) {
-        const code = await getWxCode()
-        param.wx_code = code
+        param.wx_code = this.wxCode
       }
       try {
         const data = await api.register(param)
