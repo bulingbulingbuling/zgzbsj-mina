@@ -1,46 +1,20 @@
 <template>
-  <div class="container success-container">
-    <template v-if="isSuccess">
-      <img class="img-top" :src="`${imgPath}/ai_mina/newIndex2/success-bg.png`" alt="">
-      <button class="btn" open-type="contact">点击并回复“1”获取助教微信</button>
-    </template>
-    <template v-else>
-      <div class="fail-wrapper-top">
-        <img class="fail-top" :src="`${imgPath}/ai_mina/newIndex2/has-success.png`" alt="">
-        <button class="btn" open-type="contact">点击并回复“1”获取助教微信</button>
-      </div>
-      <div class="fail-wrapper-bottom">
-        <img class="fail-bottom" :src="`${imgPath}/ai_mina/newIndex2/success-share.png?v=1`" alt="">
-        <img class="poster" :src="posterUrl" alt="">
-        <div class="share-wrapper">
-          <div class="share-item">
-            <button open-type="share" @click="sendFriends">
-              <img class="fail-top" :src="`${imgPath}/ai_mina/weixin.png`" alt="">
-            </button>
-            <p>分享给朋友</p>
-          </div>
-          <div class="share-item">
-            <img class="fail-top" :src="`${imgPath}/ai_mina/download.png`" alt="" @click="savePoster">
-            <p>分享到朋友圈</p>
-          </div>
-        </div>
-      </div>
-    </template>
-  </div>
+  <web-view :src="viewUrl"></web-view>
 </template>
 
 <script>
-import { api } from '@/api'
 import { track } from '@/utils/util'
+import {
+  Base64
+} from 'js-base64'
 export default {
   data () {
     return {
       isSuccess: this.$mp.query.success,
+      referrerAmount: this.$mp.query.referrer_amount,
+      channelId: this.$mp.query.channel_id,
       store: this.$mp.app.globalData,
-      posterUrl: '',
-      isDownloading: false,
-      imgPath: process.env.VUE_APP_IMG_PATH,
-      shareScene: ''
+      viewUrl: ''
     }
   },
   onShow() {
@@ -66,96 +40,22 @@ export default {
     wx.hideShareMenu({
       menus: ['shareAppMessage']
     })
-    this.getPoster()
-  },
-  onShareAppMessage(res) {
-    let param = {};
-    if (res.from === 'button') {
-      // 来自页面内转发按钮
-      param = {
-        title: '5天智能陪练体验营，打卡返19.8元现金红包',
-        path: `/pages/index?scene=${this.shareScene}`,
-        imageUrl: `${this.imgPath}/ai_mina/newIndex2/share-header.png`
-      }
-      return param;
-    }
+    this.Init()
   },
   methods: {
-    sendFriends() {
-      track('ai_applet_had_buy_share_click', {
-        ai_tel: this.store.mobile,
-        share_type: '微信'
-      });
-    },
-    async getPoster() {
-      const data = await api.getPoster()
-      this.posterUrl = data.poster
-      this.shareScene = data.share_scene
-    },
-    savePoster() {
-      if (this.isDownloading) return
-      this.isDownloading = true
-      wx.showLoading({
-        mask: true
-      });
-      wx.downloadFile({
-        url: this.posterUrl,
-        success: (res) => {
-          wx.saveImageToPhotosAlbum({
-            filePath: res.tempFilePath,
-            success: () => {
-              console.log('save success')
-              track('ai_applet_had_buy_share_click', {
-                ai_tel: this.store.mobile,
-                share_type: '朋友圈'
-              });
-              wx.hideLoading({
-                success: () => {
-                  this.toast('海报已保存到本地，请到朋友圈分享此海报')
-                }
-              });
-            },
-            fail: (err) => {
-              console.log(err, 'save fail')
-              if (err.errMsg === 'saveImageToPhotosAlbum:fail auth deny' || err.errMsg === 'saveImageToPhotosAlbum:fail:auth denied') {
-                wx.showModal({
-                  title: '获取授权失败',
-                  content: '请打开“保存到相册”选项开关',
-                  cancelText: '取消',
-                  confirmText: '去设置',
-                  confirmColor: '#8ecd7e',
-                  success: (res) => {
-                    if (res.confirm) {
-                      wx.openSetting({
-                        success: (data) => {
-                          if (data.authSetting['scope.writePhotosAlbum']) {
-                            this.savePoster();
-                          }
-                        }
-                      })
-                    }
-                  }
-                })
-              } else if (err.errMsg === 'saveImageToPhotosAlbum:fail system deny' || err.errMsg === 'saveImageToPhotosAlbum:fail:system denied') {
-                wx.showModal({
-                  title: '无法保存',
-                  content: '请在手机的“设置-隐私-照片”选项中，允许微信访问照片。',
-                  showCancel: false
-                })
-              }
-            },
-            complete: () => {
-              this.isDownloading = false
-              wx.hideLoading();
-            }
-          })
-        },
-        fail: () => {
-          console.log('download fail')
-          wx.hideLoading();
-          this.isDownloading = false
-        }
-      })
+    async Init() {
+      const params = {
+        success: this.isSuccess,
+        token: wx.getStorageSync('token'),
+        referrerAmount: this.referrerAmount,
+        channelId: this.channelId
+      }
+      console.log('referrer_amount', this.$mp.query.referrer_amount)
+      let paramsStr = JSON.stringify(params)
+      console.log(paramsStr)
+      paramsStr = encodeURIComponent(Base64.encode(paramsStr))
+      console.log(paramsStr)
+      this.viewUrl = `${process.env.VUE_APP_REFERRAL_URL}/market/success/${paramsStr}`
     }
   }
 }

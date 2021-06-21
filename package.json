@@ -28,6 +28,7 @@
   "dependencies": {
     "@megalo/api": "latest",
     "@megalo/vhtml-plugin": "latest",
+    "js-base64": "^3.6.1",
     "megalo": "latest",
     "octoparse": "^0.4.2",
     "sa-sdk-miniprogram": "^1.13.32"

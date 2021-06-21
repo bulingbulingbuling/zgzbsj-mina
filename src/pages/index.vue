@@ -301,10 +301,11 @@ export default {
         content,
         visit_time: new Date().toLocaleDateString()
       });
+      const ssQuery = `referrer_amount=${this.configData.pkg === 6 ? 0 : 9.9}&channel_id=${this.configData.scene_data.c}`
       if (this.configData.had_purchased === 1 || (this.store.had_purchased === 1 && this.configData.mobile)) {
-        this.go('/pages/success?success=true')
+        this.go(`/pages/success?success=true&${ssQuery}`)
       } else if (this.configData.had_purchased === 2 || (this.store.had_purchased === 2 && this.configData.mobile)) {
-        this.go('/pages/success')
+        this.go(`/pages/success?${ssQuery}`)
       } else {
         this.showStay = false;
         this.createBill()
@@ -316,6 +317,7 @@ export default {
       });
       uuid = uuid || this.configData.uuid
       open_id = open_id || this.configData.openid
+      const ssQuery = `referrer_amount=${this.configData.pkg === 6 ? 0 : 9.9}&channel_id=${this.configData.scene_data.c}`
       try {
         let res = await api.createBill({
           uuid,
@@ -326,7 +328,7 @@ export default {
         })
         if (this.showCents) {
           this.store.had_purchased = 1;
-          this.go('/pages/success?success=true')
+          this.go(`/pages/success?success=true&${ssQuery}`)
           return
         }
         let { timeStamp, nonceStr, package: p, signType, paySign } = res.data.credential.wx_lite
@@ -339,7 +341,7 @@ export default {
           success: () => {
             track('ai_applet_99pay_queren_click');
             this.store.had_purchased = 1;
-            this.go('/pages/success?success=true')
+            this.go(`/pages/success?success=true&${ssQuery}`)
           },
           fail: () => {
             this.form = {}
@@ -398,10 +400,11 @@ export default {
         }
         this.store.mobile = data.mobile
         this.shareScene = data.share_scene
+        const ssQuery = `referrer_amount=${this.configData.pkg === 6 ? 0 : 9.9}&channel_id=${this.configData.scene_data.c}`
         if (data.had_purchased === 1) {
-          return this.go('/pages/success?success=true')
+          return this.go(`/pages/success?success=true&${ssQuery}`)
         } else if (data.had_purchased === 2) {
-          return this.go('/pages/success')
+          return this.go(`/pages/success?${ssQuery}`)
         }
         if (data.uuid) {
           await this.createBill(data.uuid, data.openid)
