@@ -8,9 +8,11 @@ export default {
     if (token) {
       baseApi.setHeader('token', token);
     }
+    this.globalData.launchOptions = options
   },
   globalData () {
     return {
+      launchOptions: {},
       country_code: '',
       form: {},
       mobile: '',
