@@ -1,26 +1,35 @@
 <template>
-  <div class="container index-container">
-    <div class="index-container-content">
-      <img class="header" :src="bgUrl" alt="">
-      <img class="desc" :src="`${imgPath}/ai_mina/newIndex2/desc.png?v=1`" alt="">
-      <div class="swiper-wrapper" v-if="recent_purchase.length > 0">
-        <img class="voice" :src="`${imgPath}/ai_mina/newIndex2/voice.png`" alt="">
-        <swiper class="list-swiper" :circular="true" :vertical="true" :autoplay="true" :interval="1500">
-          <swiper-item v-for="(item, key) in recent_purchase" :key="key" catchtouchmove="catchTouchMove">
-            <div class="item-wrapper" v-html="item">
-            </div>
-          </swiper-item>
-        </swiper>
+  <div>
+    <indexSys
+      v-if="isSys === 1"
+      :mobile="configData.mobile"
+      :disabled="hasBtnClicked"
+      @handleBtnClick="handleBtnClick"
+      @handleGetting="handleGetting"
+      @getphonenumber="getPhoneNumber" />
+    <div class="container index-container" v-else-if="isSys === 2">
+      <div class="index-container-content">
+        <img class="header" :src="bgUrl" alt="">
+        <img class="desc" :src="`${imgPath}/ai_mina/newIndex2/desc.png?v=1`" alt="">
+        <div class="swiper-wrapper" v-if="recent_purchase.length > 0">
+          <img class="voice" :src="`${imgPath}/ai_mina/newIndex2/voice.png`" alt="">
+          <swiper class="list-swiper" :circular="true" :vertical="true" :autoplay="true" :interval="1500">
+            <swiper-item v-for="(item, key) in recent_purchase" :key="key" catchtouchmove="catchTouchMove">
+              <div class="item-wrapper" v-html="item">
+              </div>
+            </swiper-item>
+          </swiper>
+        </div>
+        <a class='rule-link' href='/pages/rules'>*智能陪练购买协议</a>
       </div>
-      <a class='rule-link' href='/pages/rules'>*智能陪练购买协议</a>
-    </div>
-    <div class="index-container-bottom">
-      <div class="action" v-if="configData.mobile" @click="handleGetting('立即抢')">
-        <img class="header" :src="`${imgPath}/ai_mina/newIndex2/btn-get.png`" alt="">
+      <div class="index-container-bottom">
+        <div class="action" v-if="configData.mobile" @click="handleGetting('立即抢')">
+          <img class="header" :src="`${imgPath}/ai_mina/newIndex2/btn-get.png`" alt="">
+        </div>
+        <button id="bottom-btn" class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="handleBtnClick" v-else>
+          <img :src="`${imgPath}/ai_mina/newIndex2/btn-get.png`" alt="">
+        </button>
       </div>
-      <button id="bottom-btn" class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="handleBtnClick" v-else>
-        <img :src="`${imgPath}/ai_mina/newIndex2/btn-get.png`" alt="">
-      </button>
     </div>
     <div class='stay' v-show="showStay">
       <div class="stay-content">
@@ -43,6 +52,7 @@
 <script>
 import { api } from '@/api'
 import Alert from '@/components/alert'
+import indexSys from '@/components/indexSys'
 import { track, getWxCode } from '@/utils/util'
 
 export default {
@@ -75,7 +85,10 @@ export default {
         31: '年卡过期'
       },
       isNetError: false,
-      wxCode: ''
+      wxCode: '',
+      isSys: 0,   // 1 上音社  2 标准
+      channle_sys: process.env.VUE_APP_REFERRAL_MINA_SYS_CHANNEL_ID.split(','),
+      query: {}
     }
   },
   onLoad(options) {
@@ -87,7 +100,11 @@ export default {
     }
   },
   onShow(options) {
-    console.log(this.scene, this.store.country_code, 'onshow')
+    this.query = this.store.launchOptions.query || {}
+    if (this.channle_sys.includes(this.query.channel_id)) {
+      this.isSys = 1
+      this.scene = `0&${this.query.channel_id}`
+    }
     if (this.store.country_code) {
       this.form = {
         country_code: this.store.country_code,
@@ -107,11 +124,14 @@ export default {
         this.handleNetError(res)
       }
     })
+
     // 获取来源
     const { scene } = wx.getLaunchOptionsSync()
     this.share_type = scene
   },
   onHide() {
+    this.isSys = 0
+    this.store.launchOptions = {}
     this.form = {}
     this.store.country_code = ''
     this.showAlert = false
@@ -211,11 +231,21 @@ export default {
     },
     // 获取首页数据
     async getConfig() {
+      console.log(this.store.launchOptions)
       this.configData = await api.getIndexData({
         scene: this.scene,
         source: this.source
       })
       console.log('this.configData', this.configData);
+      const channel_id = this.configData.scene_data.c
+      if (!this.isSys) {
+        if (this.channle_sys.includes('' + channel_id)) {
+          this.isSys = 1
+        } else {
+          this.isSys = 2
+        }
+      }
+      
       this.showCents = this.configData.pkg === 6
       this.bgUrl = this.showCents ? `${this.imgPath}/ai_mina/newIndex2/bg0.png` : `${this.imgPath}/ai_mina/newIndex2/bg99.png`
       this.referrer_info = this.configData.referrer_info
@@ -415,7 +445,8 @@ export default {
     }
   },
   components: {
-    Alert
+    Alert,
+    indexSys
   }
 }
 </script>
