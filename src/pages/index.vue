@@ -95,7 +95,8 @@ export default {
       btnStyle: {
         bottom: '75rpx',
         height: '142rpx'
-      }
+      },
+      channelId: this.$mp.query.channel_id
     }
   },
   onLoad(options) {
@@ -106,10 +107,13 @@ export default {
     }
   },
   onShow(options) {
-    this.query = this.store.launchOptions.query || {}
-    if (this.channle_sys.includes(this.query.channel_id)) {
+    if (this.channelId) {
+      wx.setStorageSync('channel_id', this.channelId)
+    }
+    this.channelId = wx.getStorageSync('channel_id')
+    if (this.channle_sys.includes(this.channelId)) {
       this.isSys = 1
-      this.scene = `0&${this.query.channel_id}`
+      this.scene = `0&${this.channelId}`
     }
     if (this.store.country_code) {
       this.form = {
@@ -136,8 +140,6 @@ export default {
     this.share_type = scene
   },
   onHide() {
-    this.isSys = 0
-    this.store.launchOptions = {}
     this.form = {}
     this.store.country_code = ''
     this.showAlert = false
@@ -242,9 +244,9 @@ export default {
         source: this.source
       })
       console.log('this.configData', this.configData);
-      const channel_id = this.configData.scene_data.c
+      this.channelId = this.configData.scene_data.c
       if (!this.isSys) {
-        if (this.channle_sys.includes('' + channel_id)) {
+        if (this.channle_sys.includes('' + this.channelId)) {
           this.isSys = 1
         } else {
           this.isSys = 2
