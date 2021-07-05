@@ -1,4 +1,5 @@
 import sa from 'sa-sdk-miniprogram';
+import abtest from '@/utils/abtest.esm.min.js'
 import App from './App';
 import Vue from 'vue';
 import VHtmlPlugin from '@megalo/vhtml-plugin';
@@ -14,6 +15,9 @@ Vue.use(loading);
 Vue.use(store);
 
 const server_url = process.env.VUE_APP_SENSOR_URL;
+
+const url = process.env.VUE_APP_ABTEST_URL;
+
 sa.setPara({
   server_url,
   name: 'sensors',
@@ -30,7 +34,13 @@ sa.setPara({
 sa.registerApp({
   project_name: 'ai转介绍小程序'
 });
+sa.usePlugin(abtest, {
+  url
+})
 sa.init();
+
+Vue.prototype.abtest = abtest;
+
 Vue.prototype.sa = sa;
 
 Object.keys(filters).forEach((item) => {

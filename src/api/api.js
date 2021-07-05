@@ -22,7 +22,6 @@ const request = (url, params, method, header) => {
       method: method,
       header: header,
       success: async (res) => {
-        console.log(res, 'res...')
         wx.hideLoading();
         if (res.data.code !== 0) {
           if (res.data.errors[0] && res.data.errors[0].err_no === 401) {
