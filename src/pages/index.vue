@@ -7,10 +7,9 @@
       @handleBtnClick="handleBtnClick"
       @handleGetting="handleGetting"
       @getphonenumber="getPhoneNumber" />
-    <div class="container index-container" v-else-if="isSys === 2">
+    <div class="container index-container" v-else-if="isSys === 2" :style="bgStyle">
       <div class="index-container-content">
         <img class="header" :src="bgUrl" alt="">
-        <img class="desc" :src="`${imgPath}/ai_mina/newIndex2/desc.png?v=1`" alt="">
         <div class="swiper-wrapper" v-if="recent_purchase.length > 0">
           <img class="voice" :src="`${imgPath}/ai_mina/newIndex2/voice.png`" alt="">
           <swiper class="list-swiper" :circular="true" :vertical="true" :autoplay="true" :interval="1500">
@@ -22,12 +21,12 @@
         </div>
         <a class='rule-link' href='/pages/rules'>*智能陪练购买协议</a>
       </div>
-      <div class="index-container-bottom">
+      <div class="index-container-bottom" :style="btnStyle">
         <div class="action" v-if="configData.mobile" @click="handleGetting('立即抢')">
-          <img class="header" :src="`${imgPath}/ai_mina/newIndex2/btn-get.png`" alt="">
+          <img class="header" :src="btnUrl" alt="">
         </div>
         <button id="bottom-btn" class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="handleBtnClick" v-else>
-          <img :src="`${imgPath}/ai_mina/newIndex2/btn-get.png`" alt="">
+          <img :src="btnUrl" alt="">
         </button>
       </div>
     </div>
@@ -71,6 +70,9 @@ export default {
       form: {},
       platform: '',
       bgUrl: '',
+      bgStyle: {
+        background: '#ff935e'
+      },
       imgPath: process.env.VUE_APP_IMG_PATH,
       shareScene: '', // 分享给他人的scen
       hasRejectLogin: false, // 是否拒绝登录过
@@ -86,13 +88,17 @@ export default {
       },
       isNetError: false,
       wxCode: '',
-      isSys: 0,   // 1 上音社  2 标准
+      isSys: 0, // 1 上音社  2 标准
       channle_sys: process.env.VUE_APP_REFERRAL_MINA_SYS_CHANNEL_ID.split(','),
-      query: {}
+      query: {},
+      btnUrl: `${process.env.VUE_APP_IMG_PATH}/abtest/ai_referral_mina/default-btn.png`,
+      btnStyle: {
+        bottom: '75rpx',
+        height: '142rpx'
+      }
     }
   },
   onLoad(options) {
-    console.log(options, 'options')
     if (options.scene) {
       this.scene = options.scene
     } else if (options.source) {
@@ -172,7 +178,7 @@ export default {
           retain_from: '未登陆挽留'
         });
         this.hasRejectLogin = true
-      } 
+      }
     },
     closeStay() {
       this.showStay = false;
@@ -231,7 +237,6 @@ export default {
     },
     // 获取首页数据
     async getConfig() {
-      console.log(this.store.launchOptions)
       this.configData = await api.getIndexData({
         scene: this.scene,
         source: this.source
@@ -245,9 +250,50 @@ export default {
           this.isSys = 2
         }
       }
-      
       this.showCents = this.configData.pkg === 6
-      this.bgUrl = this.showCents ? `${this.imgPath}/ai_mina/newIndex2/bg0.png` : `${this.imgPath}/ai_mina/newIndex2/bg99.png`
+      this.bgUrl = this.showCents ? `${this.imgPath}/abtest/ai_referral_mina/default0.png` : `${this.imgPath}/ai_mina/newIndex2/default99.png`
+      // String 类型试验（第二个参数 ""，表示未命中试验时，会返回此默认值，请根据业务需要更改此处的值）
+      if (this.showCents) {
+        let that = this
+        this.abtest.fastFetchABTest({
+          param_name: 'vipmusic_mina_url',
+          default_value: '',
+          value_type: 'String',
+          callback: function(result) {
+            // TODO 请根据 result 进行自己的试验，当前试验对照组返回值为：https://oss-ai-peilian-app.xiaoyezi.com/dev/ai_mina/newIndex2/bg99.png，试验组依次返回：https://oss-ai-peilian-app.xiaoyezi.com/pre/img//AB_test/e9e06710a5ed586b04d0e80b99b1a148.png
+            if (result) {
+              console.log('vipmusic_mina_url', result);
+              that.bgUrl = result
+            }
+          }
+        });
+        this.abtest.fastFetchABTest({
+          param_name: 'ai_referral_mina_btn',
+          default_value: {},
+          value_type: 'Object',
+          callback: function(result) {
+            // TODO 请根据 result 进行自己的试验，当前试验对照组返回值为：{"url":"https://oss-ai-peilian-app.xiaoyezi.com/dev/img//AB_test/9a6fae216cef8d99e366a4c0e3d8cfe3.png", "bottom":"30px", "height":"142px"}，试验组依次返回：{"url":"https://oss-ai-peilian-app.xiaoyezi.com/dev/img//AB_test/9a6fae216cef8d99e366a4c0e3d8cfe3.png", "bottom":"30px", "height":"142px"}
+            if (Object.keys(result).length > 0) {
+              console.log('ai_referral_mina_btn', result);
+              that.btnUrl = result.url;
+              that.btnStyle.height = result.height;
+              that.btnStyle.bottom = result.bottom;
+            }
+          }
+        });
+        this.abtest.fastFetchABTest({
+          param_name: 'ai_referral_mina_bg',
+          default_value: '',
+          value_type: 'String',
+          callback: function(result) {
+            // TODO 请根据 result 进行自己的试验，当前试验对照组返回值为：ff935e，试验组依次返回：e9c95a
+            if (result) {
+              console.log('ai_referral_mina_bg', result);
+              that.bgStyle.background = result;
+            }
+          }
+        });
+      }
       this.referrer_info = this.configData.referrer_info
       this.shareScene = this.configData.share_scene
       this.store.mobile = this.configData.mobile
@@ -381,7 +427,6 @@ export default {
             this.store.had_purchased = 0;
           },
           cancel: () => {
-            console.log('stay')
             track('ai_applet_99pay_x_click', {
               ai_tel: this.store.mobile
             });
