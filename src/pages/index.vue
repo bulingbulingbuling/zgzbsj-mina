@@ -10,7 +10,6 @@
     <div class="container index-container" v-else-if="isSys === 2" :style="bgStyle">
       <div class="index-container-content">
         <img class="header" :src="bgUrl" alt="">
-        <!-- <img class="desc" :src="`${imgPath}/ai_mina/newIndex2/desc.png?v=1`" alt=""> -->
         <div class="swiper-wrapper" v-if="recent_purchase.length > 0">
           <img class="voice" :src="`${imgPath}/ai_mina/newIndex2/voice.png`" alt="">
           <swiper class="list-swiper" :circular="true" :vertical="true" :autoplay="true" :interval="1500">
@@ -72,7 +71,7 @@ export default {
       platform: '',
       bgUrl: '',
       bgStyle: {
-        background: 'ff935e'
+        background: '#ff935e'
       },
       imgPath: process.env.VUE_APP_IMG_PATH,
       shareScene: '', // 分享给他人的scen
@@ -92,7 +91,7 @@ export default {
       isSys: 0, // 1 上音社  2 标准
       channle_sys: process.env.VUE_APP_REFERRAL_MINA_SYS_CHANNEL_ID.split(','),
       query: {},
-      btnUrl: 'https://oss-ai-peilian-app.xiaoyezi.com/dev/img//AB_test/28d4d9e89d643404760e5c8e732c9a28.png',
+      btnUrl: `${process.env.VUE_APP_IMG_PATH}/abtest/ai_referral_mina/default-btn.png`,
       btnStyle: {
         bottom: '75rpx',
         height: '142rpx'
@@ -252,7 +251,7 @@ export default {
         }
       }
       this.showCents = this.configData.pkg === 6
-      this.bgUrl = this.showCents ? `https://oss-ai-peilian-app.xiaoyezi.com/pre/img//AB_test/131ef7107a7746b0e110a23247c954e4.png` : `${this.imgPath}/ai_mina/newIndex2/bg99.png`
+      this.bgUrl = this.showCents ? `${this.imgPath}/abtest/ai_referral_mina/default0.png` : `${this.imgPath}/ai_mina/newIndex2/default99.png`
       // String 类型试验（第二个参数 ""，表示未命中试验时，会返回此默认值，请根据业务需要更改此处的值）
       if (this.showCents) {
         let that = this
