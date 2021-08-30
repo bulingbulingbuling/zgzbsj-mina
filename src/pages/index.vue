@@ -71,7 +71,7 @@ export default {
       platform: '',
       bgUrl: '',
       bgStyle: {
-        background: '#ff935e'
+        background: '#fff'
       },
       imgPath: process.env.VUE_APP_IMG_PATH,
       shareScene: '', // 分享给他人的scen
@@ -91,9 +91,9 @@ export default {
       isSys: 0, // 1 上音社  2 标准
       channle_sys: process.env.VUE_APP_REFERRAL_MINA_SYS_CHANNEL_ID.split(','),
       query: {},
-      btnUrl: `${process.env.VUE_APP_IMG_PATH}/abtest/ai_referral_mina/default-btn.png`,
+      btnUrl: `${process.env.VUE_APP_IMG_PATH}/abtest/ai_referral_mina/default-btn1.png`,
       btnStyle: {
-        bottom: '75rpx',
+        bottom: '120rpx',
         height: '142rpx'
       },
       channelId: this.$mp.query.channel_id
@@ -253,7 +253,7 @@ export default {
         }
       }
       this.showCents = this.configData.pkg === 6
-      this.bgUrl = this.showCents ? `${this.imgPath}/abtest/ai_referral_mina/default0.png` : `${this.imgPath}/ai_mina/newIndex2/default99.png`
+      this.bgUrl = this.showCents ? `${this.imgPath}/abtest/ai_referral_mina/default0.png?v=1` : `${this.imgPath}/ai_mina/newIndex2/default99V1.png`
       // String 类型试验（第二个参数 ""，表示未命中试验时，会返回此默认值，请根据业务需要更改此处的值）
       if (this.showCents) {
         let that = this
