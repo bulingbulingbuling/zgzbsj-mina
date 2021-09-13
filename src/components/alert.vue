@@ -3,7 +3,7 @@
     <div class="mask"></div>
     <div class="alert-form">
       <div class='alert-form-tip'>
-        <img :src="`${isFree ? require('@/static/imgs/newIndex2/login-top.png') : require('@/static/imgs/newIndex2/login-top-99.png')}`" alt="">
+        <img :src="`${isFree ? require('@/static/imgs/newIndex2/login-top.png') : (pkg === 3 ? require('@/static/imgs/newIndex2/login-top-001.png') : require('@/static/imgs/newIndex2/login-top-99.png'))}`" alt="">
       </div>
       <div class="alert-form-wrapper">
         <div class="alert-form-wrapper-item">
@@ -47,6 +47,10 @@ export default {
     isFree: {
       type: Boolean,
       default: false
+    },
+    pkg: {
+      type: Number,
+      default: 2
     }
   },
   watch: {
