@@ -252,8 +252,9 @@ export default {
           this.isSys = 2
         }
       }
+      // 0 元对应pkg = 6  0.01 元对应pkg = 3  4.9 元对应pkg = 9
       this.showCents = this.configData.pkg === 6
-      this.bgUrl = this.showCents ? `${this.imgPath}/abtest/ai_referral_mina/default0.png?v=1` : (this.configData.pkg === 3 ? `${this.imgPath}/ai_mina/newIndex2/default001.png` : `${this.imgPath}/ai_mina/newIndex2/default99V1.png`)
+      this.bgUrl = this.showCents ? `${this.imgPath}/abtest/ai_referral_mina/default0.png?v=1` : (this.configData.pkg === 3 ? `${this.imgPath}/ai_mina/newIndex2/default001.png` : `${this.imgPath}/ai_mina/newIndex2/default99V1.png?123`)
       // String 类型试验（第二个参数 ""，表示未命中试验时，会返回此默认值，请根据业务需要更改此处的值）
       if (this.showCents) {
         let that = this
@@ -346,7 +347,7 @@ export default {
         user_status_num = '31'
       }
       this.sa.registerApp({
-        referrer_amount: this.configData.pkg === 6 ? 0 : 9.9
+        referrer_amount: this.configData.pkg === 6 ? 0 : (this.configData.pkg === 3 ? 0.01 : 4.9)
       });
       this.sa.setProfile({
         ai_phoneNumber: this.configData.mobile,
@@ -379,7 +380,7 @@ export default {
         content,
         visit_time: new Date().toLocaleDateString()
       });
-      const ssQuery = `referrer_amount=${this.configData.pkg === 6 ? 0 : (this.configData.pkg === 3 ? 0.01 : 9.9)}&channel_id=${this.configData.scene_data.c}`
+      const ssQuery = `referrer_amount=${this.configData.pkg === 6 ? 0 : (this.configData.pkg === 3 ? 0.01 : 4.9)}&channel_id=${this.configData.scene_data.c}`
       if (this.configData.had_purchased === 1 || (this.store.had_purchased === 1 && this.configData.mobile)) {
         this.go(`/pages/success?success=true&${ssQuery}`)
       } else if (this.configData.had_purchased === 2 || (this.store.had_purchased === 2 && this.configData.mobile)) {
@@ -395,7 +396,7 @@ export default {
       });
       uuid = uuid || this.configData.uuid
       open_id = open_id || this.configData.openid
-      const ssQuery = `referrer_amount=${this.configData.pkg === 6 ? 0 : 9.9}&channel_id=${this.configData.scene_data.c}`
+      const ssQuery = `referrer_amount=${this.configData.pkg === 6 ? 0 : (this.configData.pkg === 3 ? 0.01 : 4.9)}&channel_id=${this.configData.scene_data.c}`
       try {
         let res = await api.createBill({
           uuid,
@@ -477,7 +478,7 @@ export default {
         }
         this.store.mobile = data.mobile
         this.shareScene = data.share_scene
-        const ssQuery = `referrer_amount=${this.configData.pkg === 6 ? 0 : 9.9}&channel_id=${this.configData.scene_data.c}`
+        const ssQuery = `referrer_amount=${this.configData.pkg === 6 ? 0 : (this.configData.pkg === 3 ? 0.01 : 4.9)}&channel_id=${this.configData.scene_data.c}`
         if (data.had_purchased === 1) {
           return this.go(`/pages/success?success=true&${ssQuery}`)
         } else if (data.had_purchased === 2) {
