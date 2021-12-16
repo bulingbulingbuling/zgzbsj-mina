@@ -45,6 +45,17 @@
     </div>
     <alert :isShow="showAlert" :isFree="showCents" :pkg="configData.pkg" @close="closeAlert" :type="alertType" :isLogin="isLogin" :form="form" @login="register">
     </alert>
+    <div class="changePkg" v-show="showChangePkg">
+      <div class="mask"></div>
+      <div class="wrap">
+        <div class='wrap-p'>
+          <p>非常抱歉，该产品已售罄</p>
+          <p>可按产品原价继续购买使用</p>
+        </div>
+        <button class="wrap-btn" @click="createBill()" :disabled="payIng">¥99 继续购买</button>
+      </div>
+      <img class="wrap-close" src="@/static/imgs/c-close.png" alt="" @click="close()">
+    </div>
   </div>
 </template>
 
@@ -96,7 +107,11 @@ export default {
         bottom: '120rpx',
         height: '142rpx'
       },
-      channelId: this.$mp.query.channel_id
+      channelId: this.$mp.query.channel_id,
+      showChangePkg: false,
+      payIng: false,
+      uuid: '',
+      repeatPkg: ''
     }
   },
   onLoad(options) {
@@ -300,6 +315,7 @@ export default {
       this.referrer_info = this.configData.referrer_info
       this.shareScene = this.configData.share_scene
       this.store.mobile = this.configData.mobile
+      this.uuid = this.configData.uuid
       if (this.referrer_info.uuid) {
         this.sa.registerApp({
           referrer_uuid: this.referrer_info.uuid
@@ -387,25 +403,46 @@ export default {
         this.go(`/pages/success?${ssQuery}`)
       } else {
         this.showStay = false;
-        this.createBill()
+        // this.createBill()
+        this.TestBill()
+      }
+    },
+    async TestBill(uuid, open_id) {
+      try {
+        let res = await api.testBill({
+          uuid: this.uuid,
+          pkg: this.configData.pkg
+        })
+        if (res.is_repeat) {
+          this.showChangePkg = true
+          this.showAlert = false
+          this.repeatPkg = res.new_pkg
+        } else {
+          this.createBill(this.uuid, open_id)
+        }
+      } catch (e) {
+      } finally {
+        this.isLogin = false;
+        this.showStay = false;
       }
     },
     async createBill(uuid, open_id) {
+      this.payIng = true;
       track('ai_applet_weixin_pay', {
         ai_tel: this.store.mobile
       });
-      uuid = uuid || this.configData.uuid
+      uuid = uuid || this.configData.uuid || this.uuid
       open_id = open_id || this.configData.openid
       const ssQuery = `referrer_amount=${this.configData.pkg === 6 ? 0 : (this.configData.pkg === 3 ? 0.01 : 4.9)}&channel_id=${this.configData.scene_data.c}`
       try {
         let res = await api.createBill({
           uuid,
           open_id,
-          pkg: this.configData.pkg,
+          pkg: this.showChangePkg ? this.repeatPkg : this.configData.pkg,
           scene: this.scene,
           source: this.source
         })
-        if (this.showCents) {
+        if (this.showCents && !this.showChangePkg) {
           this.store.had_purchased = 1;
           this.go(`/pages/success?success=true&${ssQuery}`)
           return
@@ -428,11 +465,13 @@ export default {
             this.showAlert = false
             this.getConfig()
             this.store.had_purchased = 0;
+            this.payIng = false;
           },
           cancel: () => {
             track('ai_applet_99pay_x_click', {
               ai_tel: this.store.mobile
             });
+            this.payIng = false;
             if (!this.hasRejectPay) {
               this.showStay = true
               this.rejectType = 'pay'
@@ -446,6 +485,7 @@ export default {
         })
       } catch (e) {
       } finally {
+        this.payIng = false;
         this.isLogin = false;
         this.showStay = false;
       }
@@ -485,11 +525,18 @@ export default {
           return this.go(`/pages/success?${ssQuery}`)
         }
         if (data.uuid) {
-          await this.createBill(data.uuid, data.openid)
+          this.uuid = data.uuid
+          console.log(this.uuid);
+          this.TestBill(data.uuid, data.openid)
         }
       } catch (e) {
         this.isLogin = false
       }
+    },
+    close() {
+      this.showChangePkg = false
+      console.error('pkg', this.configData.pkg);
+      this.repeatPkg = this.configData.pkg
     }
   },
   components: {

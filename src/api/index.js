@@ -49,6 +49,16 @@ export const api = {
       source
     });
   },
+  // 购买下单
+  async testBill({
+    pkg,
+    uuid
+  } = {}) {
+    return await baseApi.get('/student_web/student/check_student_is_repeat', {
+      pkg,
+      uuid
+    });
+  },
   // 订单状态
   async getBillStatus({
     bill_id
