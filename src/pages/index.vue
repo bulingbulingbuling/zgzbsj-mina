@@ -258,7 +258,6 @@ export default {
         scene: this.scene,
         source: this.source
       })
-      console.log('this.configData', this.configData);
       this.channelId = this.configData.scene_data.c
       if (!this.isSys) {
         if (this.channle_sys.includes('' + this.channelId)) {
@@ -525,6 +524,7 @@ export default {
           return this.go(`/pages/success?${ssQuery}`)
         }
         if (data.uuid) {
+          this.getConfig()
           this.uuid = data.uuid
           console.log(this.uuid);
           this.TestBill(data.uuid, data.openid)
@@ -537,6 +537,7 @@ export default {
       this.showChangePkg = false
       console.error('pkg', this.configData.pkg);
       this.repeatPkg = this.configData.pkg
+      this.store.had_purchased = 0;
     }
   },
   components: {
