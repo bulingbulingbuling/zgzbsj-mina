@@ -9,6 +9,7 @@ import store from './utils/store';
 import filters from './utils/filters';
 import './assets/css/base.less';
 import './assets/css/index.less';
+import './assets/css/momentLanding.less';
 
 Vue.use(toast);
 Vue.use(loading);
@@ -71,6 +72,7 @@ export default {
       'pages/address',
       'pages/success',
       'pages/rules',
+      'pages/momentLanding',
       'pages/playing/index',
       'pages/playing/success',
       'pages/playing/report'

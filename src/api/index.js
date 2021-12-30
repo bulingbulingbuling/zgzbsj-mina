@@ -27,6 +27,9 @@ export const api = {
   async register(param) {
     return await baseApi.post('/referral_miniapp/landing/register', param);
   },
+  async momentRegister(param) {
+    return await baseApi.post('/referral_miniapp/landing/tf_register', param);
+  },
   // 国际区号列表
   async getCountryCode() {
     return await baseApi.get('/referral_miniapp/landing/country_code');
@@ -91,11 +94,13 @@ export const api = {
   },
   async getBuyNames({
     scene,
-    source
+    source,
+    type
   } = {}) {
     return await baseApi.get('/referral_miniapp/landing/buy_name', {
       scene,
-      source
+      source,
+      type
     });
   }
 }

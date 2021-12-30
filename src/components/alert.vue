@@ -2,10 +2,10 @@
   <div class="alert" v-if="isShow">
     <div class="mask"></div>
     <div class="alert-form">
-      <div class='alert-form-tip'>
+      <div class='alert-form-tip' v-if="from === 'index'">
         <img :src="`${isFree ? require('@/static/imgs/newIndex2/login-top.png') : (pkg === 3 ? require('@/static/imgs/newIndex2/login-top-001.png') : require('@/static/imgs/newIndex2/login-top-99.png'))}`" alt="">
       </div>
-      <div class="alert-form-wrapper">
+      <div class="alert-form-wrapper" :class="{top: from !== 'index'}" >
         <div class="alert-form-wrapper-item">
           <div class="num item-left ft-32" @click="handleRedirect">+{{country_code}} <img class="arrow" src="@/static/imgs/newIndex2/triangle.png" alt=""></div>
           <input class="phone ft-30" type="number" placeholder="手机号仅用于上课" @input="handleMobileInput">
@@ -20,7 +20,7 @@
         </button>
         <p class="desc"><img src="@/static/imgs/newIndex2/icon-safe.png" alt=""><span>小叶子保护您的隐私</span></p>
       </div>
-      <img class="alert-form-close" src="@/static/imgs/newIndex2/close.png" alt="" @click="close">
+      <img class="alert-form-close" :class="{bottom: from !== 'index'}" :src="`${from === 'index' ? require('@/static/imgs/newIndex2/close.png') : require('@/static/imgs/moments/close.png')}`" alt="" @click="close">
     </div>
   </div>
 </template>
@@ -51,6 +51,10 @@ export default {
     pkg: {
       type: Number,
       default: 2
+    },
+    from: {
+      type: String,
+      default: 'index'
     }
   },
   watch: {
@@ -194,6 +198,13 @@ export default {
       width: 30px;
       height: 30px;
     }
+    .bottom {
+      top: 157px;
+      margin-left: -15px;
+      right: 25px;
+      width: 35px;
+      height: 35px;
+    }
     &-tip {
       width: 100%;
       height: 172px;
@@ -297,6 +308,11 @@ export default {
           margin-left: 8px;
         }
       }
+    }
+    .top {
+      top: 132px;
+      padding-top: 90px;
+      height: 565px;
     }
   }
 }
