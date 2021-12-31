@@ -44,7 +44,7 @@
         <video
           id="video"
           :src="videoUrl"
-          :poster="`${imgPath}/mina/aiRefferralMina/momentsLanding/langlang_review_video.png?202112`"
+          :poster="`${imgPath}/mina/aiRefferralMina/momentsLanding/langlang_review_video.png?2022`"
           @play="bindPlayVideo"
           @ended="bindendedVideo"
         ></video>
@@ -248,6 +248,7 @@ export default {
     this.sa.registerApp({
       project_name: '4.9元0603小程序'
     });
+    wx.setStorageSync('project_name', '4.9元0603小程序')
     // 监听网络状态变化
     wx.onNetworkStatusChange((res) => {
       if (res.networkType === 'none') {
@@ -322,11 +323,6 @@ export default {
           ai_uuid: this.configData.uuid
         });
       }
-      track('$pageview', {
-        $title: '朋友圈投放',
-        $url: 'pages/momentLanding',
-        visit_time: new Date().toLocaleDateString()
-      });
     },
     // 已授权 或者已绑定公众号点击立即参团
     async handleBtnClick(e) {
@@ -420,7 +416,8 @@ export default {
         let res = await api.createBill({
           uuid,
           open_id,
-          pkg: 9
+          pkg: 9,
+          channel_id: this.$mp.query.channel_id
         })
         if (this.showCents) {
           this.store.had_purchased = 1;

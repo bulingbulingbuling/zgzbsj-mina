@@ -40,8 +40,9 @@ export const api = {
     uuid,
     pkg = 2,
     open_id,
-    scene,
-    source
+    scene = '',
+    source = '',
+    channel_id = ''
   } = {}) {
     return await baseApi.post('/referral_miniapp/landing/create_bill', {
       pay_channel,
@@ -49,7 +50,8 @@ export const api = {
       pkg,
       open_id,
       scene,
-      source
+      source,
+      channel_id
     });
   },
   // 购买下单
@@ -93,8 +95,8 @@ export const api = {
     });
   },
   async getBuyNames({
-    scene,
-    source,
+    scene = '',
+    source = '',
     type
   } = {}) {
     return await baseApi.get('/referral_miniapp/landing/buy_name', {

@@ -48,7 +48,8 @@ export default {
         success: this.isSuccess,
         token: wx.getStorageSync('token'),
         referrerAmount: this.referrerAmount,
-        channelId: this.channelId
+        channelId: this.channelId,
+        project_name: wx.getStorageSync('project_name')
       }
       console.log('referrer_amount', this.$mp.query.referrer_amount)
       let paramsStr = JSON.stringify(params)
