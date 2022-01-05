@@ -268,9 +268,10 @@ export default {
       }
       // 0 元对应pkg = 6  0.01 元对应pkg = 3  4.9 元对应pkg = 9
       this.showCents = this.configData.pkg === 6
-      this.bgUrl = this.showCents ? `${this.imgPath}/abtest/ai_referral_mina/default0.png?v=1` : (this.configData.pkg === 3 ? `${this.imgPath}/ai_mina/newIndex2/default001.png` : `${this.imgPath}/ai_mina/newIndex2/default99V1.png?123`)
+      this.bgUrl = this.showCents ? `${this.imgPath}/abtest/ai_referral_mina/default0.png?v=1` : (this.configData.pkg === 3 ? `${this.imgPath}/abtest/ai_referral_mina/cents/header.png` : `${this.imgPath}/ai_mina/newIndex2/default99V1.png?123`)
       // String 类型试验（第二个参数 ""，表示未命中试验时，会返回此默认值，请根据业务需要更改此处的值）
-      if (this.showCents) {
+      if (this.configData.pkg === 3) {
+        this.btnUrl = `${this.imgPath}/abtest/ai_referral_mina/cents/btn.png`
         let that = this
         this.abtest.fastFetchABTest({
           param_name: 'vipmusic_mina_url',

@@ -59,7 +59,7 @@ export const api = {
     pkg,
     uuid
   } = {}) {
-    return await baseApi.get('/student_web/student/check_student_is_repeat', {
+    return await baseApi.get('/referral_miniapp/student/check_student_is_repeat', {
       pkg,
       uuid
     });
