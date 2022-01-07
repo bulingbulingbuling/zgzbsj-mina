@@ -38,7 +38,6 @@ sa.registerApp({
 sa.usePlugin(abtest, {
   url
 })
-sa.init();
 
 Vue.prototype.abtest = abtest;
 
