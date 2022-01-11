@@ -440,7 +440,8 @@ export default {
           open_id,
           pkg: this.showChangePkg ? this.repeatPkg : this.configData.pkg,
           scene: this.scene,
-          source: this.source
+          source: this.source,
+          distinct_id: this.sa.getAnonymousID()
         })
         if (this.showCents && !this.showChangePkg) {
           this.store.had_purchased = 1;

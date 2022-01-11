@@ -417,7 +417,8 @@ export default {
           uuid,
           open_id,
           pkg: 9,
-          channel_id: this.$mp.query.channel_id
+          channel_id: this.$mp.query.channel_id,
+          distinct_id: this.sa.getAnonymousID()
         })
         if (this.showCents) {
           this.store.had_purchased = 1;

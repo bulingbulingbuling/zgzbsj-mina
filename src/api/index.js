@@ -4,8 +4,8 @@ export const baseApi = apiFn('op', process.env.VUE_APP_OP_URL);
 export const api = {
   // 获取首页数据
   async getIndexData({
-    scene,
-    source
+    scene = '',
+    source = ''
   } = {}) {
     return await baseApi.get('/referral_miniapp/landing/index', {
       scene,
@@ -42,7 +42,8 @@ export const api = {
     open_id,
     scene = '',
     source = '',
-    channel_id = ''
+    channel_id = '',
+    distinct_id = ''
   } = {}) {
     return await baseApi.post('/referral_miniapp/landing/create_bill', {
       pay_channel,
@@ -51,7 +52,8 @@ export const api = {
       open_id,
       scene,
       source,
-      channel_id
+      channel_id,
+      distinct_id
     });
   },
   // 购买下单
