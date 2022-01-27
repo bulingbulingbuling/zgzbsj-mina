@@ -149,7 +149,7 @@
       </div>
     </div>
     <!-- 登录弹窗 -->
-    <alert :isShow="showAlert" @close="closeAlert" from="moment" :isLogin="isLogin" :form="form" @login="register">
+    <alert :isShow="showAlert" @close="closeAlert" from="moment" :isLogin="isLogin" :channelId="channelId" :form="form" @login="register">
     </alert>
   </div>
 </template>
