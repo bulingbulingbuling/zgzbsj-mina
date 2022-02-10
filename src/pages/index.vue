@@ -43,7 +43,7 @@
         </div>
       </div>
     </div>
-    <alert :isShow="showAlert" :isFree="showCents" :pkg="configData.pkg" @close="closeAlert" :type="alertType" :isLogin="isLogin" :form="form" @login="register">
+    <alert :isShow="showAlert" :isFree="showCents" :pkg="configData.pkg" @close="closeAlert" :type="alertType" :isLogin="isLogin" :form="form" :scene="scene" @login="register">
     </alert>
     <div class="changePkg" v-show="showChangePkg">
       <div class="mask"></div>

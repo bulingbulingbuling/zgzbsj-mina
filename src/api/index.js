@@ -77,11 +77,15 @@ export const api = {
   // 发送验证码
   async sendCode({
     mobile,
-    country_code
+    country_code,
+    scene = '',
+    channel_id = ''
   } = {}) {
     return await baseApi.get('/referral_miniapp/landing/send_sms_code', {
       mobile,
-      country_code
+      country_code,
+      scene,
+      channel_id
     });
   },
   // 获取成功页海报

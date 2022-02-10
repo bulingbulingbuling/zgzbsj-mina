@@ -55,6 +55,14 @@ export default {
     from: {
       type: String,
       default: 'index'
+    },
+    scene: {
+      type: String,
+      default: ''
+    },
+    channelId: {
+      type: String,
+      default: ''
     }
   },
   watch: {
@@ -129,7 +137,9 @@ export default {
       try {
         await api.sendCode({
           mobile: this.mobile,
-          country_code: this.country_code
+          country_code: this.country_code,
+          scene: this.scene,
+          channel_id: this.channelId
         })
         this.setCountTime()
       } catch (e) {
