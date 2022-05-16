@@ -154,11 +154,11 @@
       <div class="feeRight">
         <button :disabled="disabled" v-if="mobile" :style="{
           backgroundImage: `url(${imgPath}/referral_0624/btn.png)`
-        }" class="foot_btn2" @click="apply()">立即抢</button>
+        }" class="feeRight-btn" @click="apply()">立即抢</button>
 
         <button :disabled="disabled" v-else  open-type="getPhoneNumber" @getphonenumber="getphonenumber"  :style="{
           backgroundImage: `url(${imgPath}/referral_0624/btn.png)`
-        }" class="foot_btn2" @click="apply()">立即抢</button>
+        }" class="feeRight-btn" @click="apply()">立即抢</button>
       </div>
     </div>
   </div>
@@ -337,7 +337,7 @@ export default {
       margin-top: 8px;
     }
   }
-  .foot_btn2{
+  .feeRight-btn{
     background-size: contain;
     margin-top: 9px;
     margin-right: 24px;
