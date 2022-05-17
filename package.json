@@ -31,6 +31,6 @@
     "js-base64": "^3.6.1",
     "megalo": "latest",
     "octoparse": "^0.4.2",
-    "sa-sdk-miniprogram": "^1.14.29"
+    "sa-sdk-miniprogram": "^1.17.7"
   }
 }
