@@ -74,7 +74,8 @@ export default {
       'pages/momentLanding',
       'pages/playing/index',
       'pages/playing/success',
-      'pages/playing/report'
+      'pages/playing/report',
+      'pages/paySuccess'
     ],
     usingComponents: {
       'timer-comp': './native/timer-comp/index',
