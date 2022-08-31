@@ -411,7 +411,8 @@ export default {
       try {
         let res = await api.testBill({
           uuid: this.uuid,
-          pkg: this.configData.pkg
+          pkg: this.configData.pkg,
+          scene: this.scene
         })
         if (res.is_repeat) {
           this.showChangePkg = true
