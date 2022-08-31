@@ -59,11 +59,13 @@ export const api = {
   // 购买下单
   async testBill({
     pkg,
-    uuid
+    uuid,
+    scene
   } = {}) {
     return await baseApi.get('/referral_miniapp/student/check_student_is_repeat', {
       pkg,
-      uuid
+      uuid,
+      scene
     });
   },
   // 订单状态
