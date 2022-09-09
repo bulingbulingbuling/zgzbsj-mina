@@ -84,7 +84,7 @@ export default {
     window: {
       backgroundTextStyle: 'dark',
       navigationBarBackgroundColor: '#ededed',
-      navigationBarTitleText: '小叶子智能陪练体验营',
+      navigationBarTitleText: '小叶子钢琴——练琴体验营',
       navigationBarTextStyle: 'black',
       backgroundColor: '#ededed'
     }
