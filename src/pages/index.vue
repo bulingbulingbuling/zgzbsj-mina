@@ -509,6 +509,7 @@ export default {
           ai_open_id: data.openid,
           ai_uuid: data.uuid
         });
+        this.sa.login(data.uuid)
         if (isAuth) {
           track('ai_applet_shouquan_click', {
             ai_tel: data.mobile
