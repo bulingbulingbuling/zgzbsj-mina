@@ -372,6 +372,7 @@ export default {
         ai_applet_user_status: user_status_num ? this.user_status_map[user_status_num] : '',
         ai_applet_usersignin_status: this.configData.mobile ? '已登录' : '未登录'
       });
+      this.sa.login(this.configData.uuid)
       track('$pageview', {
         $title: '首页',
         $url: 'pages/index',
