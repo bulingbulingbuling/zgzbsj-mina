@@ -44,7 +44,7 @@ export default {
         referrerAmount: this.referrerAmount,
         channelId: this.channelId,
         projectName: wx.getStorageSync('project_name') || 'ai转介绍小程序',
-        distinctID: this.sa.getAnonymousID()
+        distinctID: this.store.uuid
       }
       let paramsStr = JSON.stringify(params)
       paramsStr = encodeURIComponent(Base64.encode(paramsStr))
