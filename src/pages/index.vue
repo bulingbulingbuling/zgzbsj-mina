@@ -316,6 +316,7 @@ export default {
       this.shareScene = this.configData.share_scene
       this.store.mobile = this.configData.mobile
       this.uuid = this.configData.uuid
+      this.store.uuid = this.uuid
       if (this.referrer_info.uuid) {
         this.sa.registerApp({
           referrer_uuid: this.referrer_info.uuid
@@ -520,6 +521,7 @@ export default {
             ai_tel: data.mobile
           });
         }
+        this.store.uuid = data.uuid
         this.store.mobile = data.mobile
         this.shareScene = data.share_scene
         const ssQuery = `referrer_amount=${this.configData.pkg === 6 ? 0 : (this.configData.pkg === 3 ? 0.01 : 4.9)}&channel_id=${this.configData.scene_data.c}`
