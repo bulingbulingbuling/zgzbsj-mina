@@ -98,21 +98,25 @@
     }
     .swiper-wrapper {
       position: fixed;
-      top: 74px;
+      top: 0;
+      right: 0;
       left: 0;
-      width: 520px;
-      background: #661312;
-      border-radius: 0 62px 62px 0;
-      padding-left: 69px;
+      height: 70px;
+      line-height: 70px;
+      background-color: rgba(0, 0, 0, 0.6);
+      z-index: 9;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       .voice {
-        position: absolute;
         width: 44px;
         height: 34px;
-        left: 17px;
-        top: 50%;
-        transform: translateY(-50%);
+        margin-right: 11px;
+        margin-left: 11px;
       }
       .list-swiper {
+        flex: 1;
         height: 62px;
         line-height: 62px;
         text-align: left;
