@@ -207,6 +207,67 @@
   }
 }
 
+.chooseModal {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background: rgba(0, 0, 0, 0.72);
+  .container {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    bottom: 0;
+    width: 78vw;
+    height: 104vw;
+    transform: translate(-50%, -50%);
+    margin-top: -14vw;
+    padding: 43vw 6vw 9vw;
+    .modal-bg {
+      width: 78vw;
+      height: 104vw;
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: -1;
+    }
+    .btn-item {
+      display: flex;
+      align-items: center;
+      width: 64.3vw;
+      height: 24vw;
+      padding: 5vw 6vw;
+      background-color: #ffffff;
+      border-radius: 3vw;
+      border: solid 1px #ffdabf;
+      margin-bottom: 5vw;
+      &.active {
+        background-repeat: no-repeat;
+        background-size: auto 100%;
+        border: none;
+      }
+      .icon {
+        width: 16vw;
+        height: 14vw;
+        margin-right: 4vw;
+      }
+      .text {
+        font-family: PingFangSC-Medium;
+        font-size: 5vw;
+        line-height: 5vw;
+        color: #333333;
+        margin-right: 4vw;
+      }
+      .arrow {
+        width: 2vw;
+        height: 3vw;
+      }
+    }
+  }
+}
+
 /* 区号页 */
 .address-container {
   background: #fff;

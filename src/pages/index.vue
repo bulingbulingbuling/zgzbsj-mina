@@ -56,6 +56,25 @@
       </div>
       <img class="wrap-close" src="@/static/imgs/c-close.png" alt="" @click="close()">
     </div>
+    <div class='chooseModal' v-show="showChooseModal">
+      <div class="container">
+        <img class="modal-bg" src="@/static/imgs/chooseModal/modal-bg.png" alt="" />
+        <div :style="{
+            backgroundImage: `${active === 1 ? `url(${imgPath}/aiRefferralMina/chooseModal/active-bg.png)` : ''}`
+          }" :class="`btn-item ${active === 1 ? 'active' : ''}`" @click="handleChoose(1)">
+          <img class="icon" src="@/static/imgs/chooseModal/ai-icon.png" alt="" />
+          <span class="text">正在学钢琴</span>
+          <img class="arrow" src="@/static/imgs/chooseModal/arrow.png" alt="" />
+        </div>
+        <div :style="{
+            backgroundImage: `${active === 0 ? `url(${imgPath}/aiRefferralMina/chooseModal/active-bg.png)` : ''}`
+          }" :class="`btn-item ${active === 0 ? 'active' : ''}`" @click="handleChoose(0)">
+          <img class="icon" src="@/static/imgs/chooseModal/morning-icon.png" alt="" />
+          <span class="text">没学过钢琴</span>
+          <img class="arrow" src="@/static/imgs/chooseModal/arrow.png" alt="" />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -111,7 +130,9 @@ export default {
       showChangePkg: false,
       payIng: false,
       uuid: '',
-      repeatPkg: ''
+      repeatPkg: '',
+      showChooseModal: false,
+      active: ''
     }
   },
   onLoad(options) {
@@ -169,6 +190,18 @@ export default {
     }
   },
   methods: {
+    handleChoose(val) {
+      this.active = val
+      try {
+        wx.setStorageSync('choiceResult', val)
+        this.showChooseModal = false
+      } catch (e) {
+        console.log(e)
+      }
+      track('ai_applet_infor_click', {
+        option: val === 1 ? '正在学' : '没学过'
+      })
+    },
     catchTouchMove() {
       return false
     },
@@ -266,7 +299,7 @@ export default {
           this.isSys = 2
         }
       }
-      // 0 元对应pkg = 6  0.01 元对应pkg = 3  4.9 元对应pkg = 9
+      // 0元对应pkg = 6  0.01元对应pkg = 3  4.9元对应pkg = 9
       this.showCents = this.configData.pkg === 6
       this.bgUrl = this.showCents ? `${this.imgPath}/abtest/ai_referral_mina/default0.png?123` : (this.configData.pkg === 3 ? `${this.imgPath}/abtest/ai_referral_mina/cents/header.png?123` : `${this.imgPath}/ai_mina/newIndex2/default99V1.png?456`)
       // String 类型试验（第二个参数 ""，表示未命中试验时，会返回此默认值，请根据业务需要更改此处的值）
@@ -308,6 +341,27 @@ export default {
             if (result) {
               console.log('ai_referral_mina_bg', result);
               that.bgStyle.background = result;
+            }
+          }
+        });
+        // Number 类型试验（第二个参数 0，表示未命中试验时，会返回此默认值，请根据业务需要更改此处的值）
+        this.abtest.fastFetchABTest({
+          param_name: 'pop',
+          default_value: 0,
+          value_type: 'Number',
+          callback: function(result) {
+            // TODO 请根据 result 进行自己的试验，当前试验对照组返回值为：0，试验组依次返回：1
+            if (result) {
+              console.log('pop', result);
+              track('ai_applet_infor_view')
+              try {
+                var value = wx.getStorageSync('choiceResult')
+                if (value === '') {
+                  that.showChooseModal = result
+                }
+              } catch (e) {
+                console.log(e)
+              }
             }
           }
         });
