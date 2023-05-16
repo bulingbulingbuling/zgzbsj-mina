@@ -32,7 +32,7 @@
             <img class="icon" v-show="!isAgreeProtocol" src="@/static/imgs/chooseModal/default.png" alt="" />
             <img class="icon" v-show="isAgreeProtocol" src="@/static/imgs/chooseModal/on-agree.png" alt="" />
           </span>
-          <span>我已阅读同意</span>
+          <span @click="checkAgree">我已阅读同意</span>
           <span class="protocol-link" @click="goProtocol()">《智能陪练购买协议》</span>
         </div>
       </div>
@@ -130,7 +130,7 @@ export default {
       query: {},
       btnUrl: `${process.env.VUE_APP_IMG_PATH}/abtest/ai_referral_mina/default-btn1.png`,
       btnStyle: {
-        height: '182rpx',
+        height: '192rpx',
         bottom: '100rpx'
       },
       channelId: this.$mp.query.channel_id,
@@ -275,10 +275,6 @@ export default {
     async handleBtnClick(e) {
       if (this.isNetError) {
         this.toast('网络异常，请检查网络后重试')
-        return
-      }
-      if (!this.isAgreeProtocol) {
-        this.toast('请勾选协议')
         return
       }
       this.hasBtnClicked = true
@@ -508,6 +504,10 @@ export default {
       }
     },
     async createBill(uuid, open_id) {
+      if (!this.isAgreeProtocol) {
+        this.toast('请勾选协议')
+        return
+      }
       this.payIng = true;
       track('ai_applet_weixin_pay', {
         ai_tel: this.store.mobile
