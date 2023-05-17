@@ -19,15 +19,22 @@
             </swiper-item>
           </swiper>
         </div>
-        <a class='rule-link' href='/pages/rules'>*智能陪练购买协议</a>
       </div>
       <div class="index-container-bottom" :style="btnStyle">
         <div class="action" v-if="configData.mobile" @click="handleGetting('立即抢')">
-          <img class="header" :src="btnUrl" alt="">
+          <img :src="btnUrl" alt="">
         </div>
         <button id="bottom-btn" class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="handleBtnClick" v-else>
           <img :src="btnUrl" alt="">
         </button>
+        <div class="protocol-group">
+          <span class="checkBox" @click="checkAgree">
+            <img class="icon" v-show="!isAgreeProtocol" src="@/static/imgs/chooseModal/default.png" alt="" />
+            <img class="icon" v-show="isAgreeProtocol" src="@/static/imgs/chooseModal/on-agree.png" alt="" />
+          </span>
+          <span @click="checkAgree">我已阅读同意</span>
+          <span class="protocol-link" @click="goProtocol()">《智能陪练购买协议》</span>
+        </div>
       </div>
     </div>
     <div class='stay' v-show="showStay">
@@ -55,6 +62,25 @@
         <button class="wrap-btn" @click="createBill()" :disabled="payIng">¥99 继续购买</button>
       </div>
       <img class="wrap-close" src="@/static/imgs/c-close.png" alt="" @click="close()">
+    </div>
+    <div class='chooseModal' v-show="showChooseModal">
+      <div class="container">
+        <img class="modal-bg" src="@/static/imgs/chooseModal/modal-bg.png" alt="" />
+        <div :style="{
+            backgroundImage: `${active === 1 ? `url(${imgPath}/aiRefferralMina/chooseModal/active-bg.png)` : ''}`
+          }" :class="`btn-item ${active === 1 ? 'active' : ''}`" @click="handleChoose(1)">
+          <img class="icon" src="@/static/imgs/chooseModal/ai-icon.png" alt="" />
+          <span class="text">正在学钢琴</span>
+          <img class="arrow" src="@/static/imgs/chooseModal/arrow.png" alt="" />
+        </div>
+        <div :style="{
+            backgroundImage: `${active === 0 ? `url(${imgPath}/aiRefferralMina/chooseModal/active-bg.png)` : ''}`
+          }" :class="`btn-item ${active === 0 ? 'active' : ''}`" @click="handleChoose(0)">
+          <img class="icon" src="@/static/imgs/chooseModal/morning-icon.png" alt="" />
+          <span class="text">没学过钢琴</span>
+          <img class="arrow" src="@/static/imgs/chooseModal/arrow.png" alt="" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -104,14 +130,17 @@ export default {
       query: {},
       btnUrl: `${process.env.VUE_APP_IMG_PATH}/abtest/ai_referral_mina/default-btn1.png`,
       btnStyle: {
-        bottom: '120rpx',
-        height: '142rpx'
+        height: '192rpx',
+        bottom: '100rpx'
       },
       channelId: this.$mp.query.channel_id,
       showChangePkg: false,
       payIng: false,
       uuid: '',
-      repeatPkg: ''
+      repeatPkg: '',
+      showChooseModal: false,
+      active: '',
+      isAgreeProtocol: true
     }
   },
   onLoad(options) {
@@ -169,6 +198,25 @@ export default {
     }
   },
   methods: {
+    checkAgree() {
+      this.isAgreeProtocol = !this.isAgreeProtocol
+    },
+    goProtocol() {
+      let url = '/pages/rules'
+      this.go(url)
+    },
+    handleChoose(val) {
+      this.active = val
+      try {
+        wx.setStorageSync('choiceResult', val)
+        this.showChooseModal = false
+      } catch (e) {
+        console.log(e)
+      }
+      track('ai_applet_infor_click', {
+        option: val === 1 ? '正在学' : '没学过'
+      })
+    },
     catchTouchMove() {
       return false
     },
@@ -235,7 +283,8 @@ export default {
         $title: '首页',
         $url: 'pages/index',
         content,
-        visit_time: new Date().toLocaleDateString()
+        visit_time: new Date().toLocaleDateString(),
+        agreement: this.isAgreeProtocol ? 1 : 2
       });
       track('ai_applet_shouquan_view');
       this.wxCode = await getWxCode()
@@ -266,7 +315,7 @@ export default {
           this.isSys = 2
         }
       }
-      // 0 元对应pkg = 6  0.01 元对应pkg = 3  4.9 元对应pkg = 9
+      // 0元对应pkg = 6  0.01元对应pkg = 3  4.9元对应pkg = 9
       this.showCents = this.configData.pkg === 6
       this.bgUrl = this.showCents ? `${this.imgPath}/abtest/ai_referral_mina/default0.png?123` : (this.configData.pkg === 3 ? `${this.imgPath}/abtest/ai_referral_mina/cents/header.png?123` : `${this.imgPath}/ai_mina/newIndex2/default99V1.png?456`)
       // String 类型试验（第二个参数 ""，表示未命中试验时，会返回此默认值，请根据业务需要更改此处的值）
@@ -278,7 +327,7 @@ export default {
           default_value: '',
           value_type: 'String',
           callback: function(result) {
-            // TODO 请根据 result 进行自己的试验，当前试验对照组返回值为：https://oss-ai-peilian-app.xiaoyezi.com/dev/ai_mina/newIndex2/bg99.png，试验组依次返回：https://oss-ai-peilian-app.xiaoyezi.com/pre/img//AB_test/e9e06710a5ed586b04d0e80b99b1a148.png
+            // 请根据 result 进行自己的试验，当前试验对照组返回值为：https://oss-ai-peilian-app.xiaoyezi.com/dev/ai_mina/newIndex2/bg99.png，试验组依次返回：https://oss-ai-peilian-app.xiaoyezi.com/pre/img//AB_test/e9e06710a5ed586b04d0e80b99b1a148.png
             if (result) {
               console.log('vipmusic_mina_url', result);
               that.bgUrl = result
@@ -290,7 +339,7 @@ export default {
           default_value: {},
           value_type: 'Object',
           callback: function(result) {
-            // TODO 请根据 result 进行自己的试验，当前试验对照组返回值为：{"url":"https://oss-ai-peilian-app.xiaoyezi.com/dev/img//AB_test/9a6fae216cef8d99e366a4c0e3d8cfe3.png", "bottom":"30px", "height":"142px"}，试验组依次返回：{"url":"https://oss-ai-peilian-app.xiaoyezi.com/dev/img//AB_test/9a6fae216cef8d99e366a4c0e3d8cfe3.png", "bottom":"30px", "height":"142px"}
+            // 请根据 result 进行自己的试验，当前试验对照组返回值为：{"url":"https://oss-ai-peilian-app.xiaoyezi.com/dev/img//AB_test/9a6fae216cef8d99e366a4c0e3d8cfe3.png", "bottom":"30px", "height":"142px"}，试验组依次返回：{"url":"https://oss-ai-peilian-app.xiaoyezi.com/dev/img//AB_test/9a6fae216cef8d99e366a4c0e3d8cfe3.png", "bottom":"30px", "height":"142px"}
             if (Object.keys(result).length > 0) {
               console.log('ai_referral_mina_btn', result);
               that.btnUrl = result.url;
@@ -304,10 +353,30 @@ export default {
           default_value: '',
           value_type: 'String',
           callback: function(result) {
-            // TODO 请根据 result 进行自己的试验，当前试验对照组返回值为：ff935e，试验组依次返回：e9c95a
+            // pre实验名称: 转介绍小程序1分落地页实验测试test 请根据 result 进行自己的试验，当前试验对照组返回值为：ff935e，试验组依次返回：e9c95a
             if (result) {
               console.log('ai_referral_mina_bg', result);
               that.bgStyle.background = result;
+            }
+          }
+        });
+        this.abtest.fastFetchABTest({
+          param_name: 'pop',
+          default_value: 0,
+          value_type: 'Number',
+          callback: function(result) {
+            // pre实验名称: 智能转介绍_分流1期 请根据 result 进行自己的试验，当前试验对照组返回值为：0，试验组依次返回：1
+            if (result) {
+              console.log('pop', result);
+              track('ai_applet_infor_view')
+              try {
+                var value = wx.getStorageSync('choiceResult')
+                if (value === '') {
+                  that.showChooseModal = result
+                }
+              } catch (e) {
+                console.log(e)
+              }
             }
           }
         });
@@ -392,11 +461,16 @@ export default {
         this.toast('网络异常，请检查网络后重试')
         return
       }
+      if (!this.isAgreeProtocol) {
+        this.toast('请勾选协议')
+        return
+      }
       track('$WebClick', {
         $title: '首页',
         $url: 'pages/index',
         content,
-        visit_time: new Date().toLocaleDateString()
+        visit_time: new Date().toLocaleDateString(),
+        agreement: this.isAgreeProtocol ? 1 : 2
       });
       const ssQuery = `referrer_amount=${this.configData.pkg === 6 ? 0 : (this.configData.pkg === 3 ? 0.01 : 4.9)}&channel_id=${this.configData.scene_data.c}`
       if (this.configData.had_purchased === 1 || (this.store.had_purchased === 1 && this.configData.mobile)) {
@@ -430,6 +504,10 @@ export default {
       }
     },
     async createBill(uuid, open_id) {
+      if (!this.isAgreeProtocol) {
+        this.toast('请勾选协议')
+        return
+      }
       this.payIng = true;
       track('ai_applet_weixin_pay', {
         ai_tel: this.store.mobile
