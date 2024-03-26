@@ -114,7 +114,6 @@
 <script>
 import { api } from '@/api'
 import Alert from '@/components/alert'
-import { track } from '@/utils/util'
 
 export default {
   data () {
@@ -154,23 +153,6 @@ export default {
       // options.scene = '%26r%3DzkR2HDs%3D%26c%3D1220'
       // 第二版二维码参数格式
       // options.scene = 'UUX2WKF3Q%3D%3D%3D%261351%2611084'
-
-      // 改用从接口获取埋点数据
-      // let scene = decodeURIComponent(options.scene)
-      // const match = scene.match(/c=(\d+)/)
-      // if (match) {
-      //   this.sa.registerApp({
-      //     channel_id: match[1]
-      //   });
-      // } else {
-      //   const params = scene.split('&')
-      //   if (params.length > 0) {
-      //     this.sa.registerApp({
-      //       channel_id: params[1],
-      //       activity_id: params[2]
-      //     });
-      //   }
-      // }
     } else if (options.source) {
       this.source = options.source
     }
@@ -254,12 +236,6 @@ export default {
       this.showAlert = true
     },
     playLangVideo() {
-      track('$WebClick', {
-        $title: '首页',
-        $url: 'pages/index',
-        content: '郎朗视频播放',
-        visit_time: new Date().toLocaleDateString()
-      });
       this.pauseVideo('girl')
       this.showLangVideo = true
       if (!this.langVideoCtx) {
@@ -268,12 +244,6 @@ export default {
       this.langVideoCtx.play()
     },
     playGirlVideo() {
-      track('$WebClick', {
-        $title: '首页',
-        $url: 'pages/index',
-        content: '其他视频播放',
-        visit_time: new Date().toLocaleDateString()
-      });
       this.pauseVideo('lang')
       this.showGirlVideo = true
       if (!this.girlVideoCtx) {
@@ -296,10 +266,6 @@ export default {
     },
     closeStay(content) {
       this.showStay = false;
-      track('ai_applet_retain_click', {
-        ai_tel: this.store.mobile,
-        click_item: content
-      });
     },
     handleBtnClick(e) {
       this.hasBtnClicked = true
@@ -309,12 +275,6 @@ export default {
       } else {
         content = '页底立即体验'
       }
-      track('$WebClick', {
-        $title: '首页',
-        $url: 'pages/index',
-        content,
-        visit_time: new Date().toLocaleDateString()
-      });
     },
     // 获取手机号
     getPhoneNumber({ detail }) {
@@ -323,9 +283,6 @@ export default {
           iv: detail.iv,
           encrypted_data: detail.encryptedData
         }, true)
-      } else {
-        track('$ai_applet_quxiao_click');
-        this.handleShowAlert('phone')
       }
     },
     // 获取首页数据
@@ -340,44 +297,6 @@ export default {
       this.recent_purchase = this.configData.recent_purchase
       this.shareScene = this.configData.share_scene
       this.store.mobile = this.configData.mobile
-      if (this.referrer_info.uuid) {
-        this.sa.registerApp({
-          referrer_uuid: this.referrer_info.uuid
-        });
-      }
-      if (this.configData.staff) {
-        this.sa.registerApp({
-          staff_uuid: this.configData.staff.uuid
-        });
-      }
-      if (this.configData.scene_data.c) {
-        this.sa.registerApp({
-          channel_id: this.configData.scene_data.c
-        });
-      }
-      if (this.configData.scene_data.a) {
-        this.sa.registerApp({
-          activity_id: this.configData.scene_data.a
-        });
-      }
-      if (this.configData.scene_data.p) {
-        this.sa.registerApp({
-          poster_id: this.configData.scene_data.p
-        });
-      }
-      this.sa.registerApp({
-        referrer_amount: this.configData.pkg === 3 ? 0.01 : 9.9
-      });
-      this.sa.setProfile({
-        ai_phoneNumber: this.configData.mobile,
-        ai_open_id: this.configData.openid,
-        ai_uuid: this.configData.uuid
-      });
-      track('$pageview', {
-        $title: '首页',
-        $url: 'pages/index',
-        visit_time: new Date().toLocaleDateString()
-      });
       if (this.configData.first_flag) {
         this.remainNum = Math.floor(Math.random() * (30 - 20) + 20)
         this.showTimer = true
@@ -386,29 +305,14 @@ export default {
       }
     },
     handleGetting(content, isContinue) {
-      track('$WebClick', {
-        $title: '首页',
-        $url: 'pages/index',
-        content,
-        visit_time: new Date().toLocaleDateString()
-      });
       if (this.configData.had_purchased || (this.store.had_purchased && this.configData.mobile)) {
         this.go('/pages/success')
       } else {
         this.showStay = false;
-        if (isContinue) {
-          track('ai_applet_retain_click', {
-            ai_tel: this.store.mobile,
-            click_item: content
-          })
-        }
         this.createBill()
       }
     },
     async createBill(uuid, open_id) {
-      track('ai_applet_weixin_pay', {
-        ai_tel: this.store.mobile
-      });
       uuid = uuid || this.configData.uuid
       open_id = open_id || this.configData.openid
       try {
@@ -440,9 +344,6 @@ export default {
           },
           cancel: () => {
             console.log('stay')
-            track('ai_applet_retain_view', {
-              ai_tel: this.store.mobile
-            });
             this.showStay = true;
           }
         })
@@ -469,20 +370,6 @@ export default {
       // this.isLogin = true
       try {
         const data = await api.register(param)
-        this.sa.setProfile({
-          ai_phoneNumber: data.mobile,
-          ai_open_id: data.openid,
-          ai_uuid: data.uuid
-        });
-        if (isAuth) {
-          track('ai_applet_shouquan_click', {
-            ai_tel: data.mobile
-          });
-        } else {
-          track('ai_applet_phone_fill', {
-            ai_tel: data.mobile
-          });
-        }
         this.store.mobile = data.mobile
         this.shareScene = data.share_scene
         if (data.had_purchased) {

@@ -34,7 +34,6 @@
 
 <script>
 import { api } from '@/api'
-import { track } from '@/utils/util'
 export default {
   data () {
     return {
@@ -47,25 +46,6 @@ export default {
     }
   },
   onShow() {
-    if (this.isSuccess) {
-      track('$pageview', {
-        $title: '购买成功页',
-        $url: 'pages/success',
-        visit_time: new Date().toLocaleDateString()
-      });
-      track('ai_applet_suc_buy_view', {
-        ai_tel: this.store.mobile
-      });
-    } else {
-      track('$pageview', {
-        $title: '已经购买页',
-        $url: 'pages/success',
-        visit_time: new Date().toLocaleDateString()
-      });
-      track('ai_applet_had_buy_view', {
-        ai_tel: this.store.mobile
-      });
-    }
     wx.hideShareMenu({
       menus: ['shareAppMessage']
     })
@@ -85,10 +65,6 @@ export default {
   },
   methods: {
     sendFriends() {
-      track('ai_applet_had_buy_share_click', {
-        ai_tel: this.store.mobile,
-        share_type: '微信'
-      });
     },
     async getPoster() {
       const data = await api.getPoster()
@@ -108,10 +84,6 @@ export default {
             filePath: res.tempFilePath,
             success: () => {
               console.log('save success')
-              track('ai_applet_had_buy_share_click', {
-                ai_tel: this.store.mobile,
-                share_type: '朋友圈'
-              });
               wx.hideLoading({
                 success: () => {
                   this.toast('海报已保存到本地，请到朋友圈分享此海报')

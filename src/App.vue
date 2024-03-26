@@ -13,11 +13,8 @@ export default {
     let res = await api.getIndexData()
     if (res.openid) {
       console.log('second_id openid');
-      this.sa.setOpenid(res.openid)
-      this.sa.init();
     } else {
       // 如果获取 openid 失败，SDK 会以 UUID 作为匿名 ID 发数据
-      this.sa.init();
     }
   },
   globalData () {

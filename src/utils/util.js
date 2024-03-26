@@ -42,11 +42,6 @@ export const throttle = (fn, delay, isDebounce) => {
   };
 };
 
-const app = getApp()
-export function track(event, attr = {}) {
-  app.sensors.track(event, attr);
-}
-
 export const getWxCode = () => {
   return new Promise(resolve => {
     wx.login({

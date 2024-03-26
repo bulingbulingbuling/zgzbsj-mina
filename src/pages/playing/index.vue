@@ -86,7 +86,6 @@
 <script>
 import { api } from '@/api'
 import Alert from '@/components/alert'
-import { track } from '@/utils/util'
 
 // radarConfig里面的值分别代表 fontSize, nameGap, radius 大小
 let radarConfig, radarData
@@ -357,25 +356,9 @@ export default {
     },
     closeStay(content) {
       this.showStay = false;
-      track('ai_applet_retain_click', {
-        ai_tel: this.store.mobile,
-        click_item: content
-      });
     },
     handleBtnClick(e) {
       this.hasBtnClicked = true
-      let content
-      if (e.target.id === 'mid-btn') {
-        content = '页中立即体验'
-      } else {
-        content = '页底立即体验'
-      }
-      track('$WebClick', {
-        $title: '演奏分享页',
-        $url: 'pages/playing/index',
-        content,
-        visit_time: new Date().toLocaleDateString()
-      });
     },
     // 获取手机号
     getPhoneNumber({ detail }) {
@@ -386,7 +369,6 @@ export default {
           encrypted_data: detail.encryptedData
         }, true)
       } else {
-        track('$ai_applet_quxiao_click');
         this.handleShowAlert('phone')
       }
     },
@@ -408,65 +390,17 @@ export default {
       this.createAudio()
       // 获取头部高度信息
       this.getBoxInfo()
-      if (this.referrer_info.uuid) {
-        this.sa.registerApp({
-          referrer_uuid: this.referrer_info.uuid
-        });
-      }
-      if (this.configData.scene_data.c) {
-        this.sa.registerApp({
-          channel_id: this.configData.scene_data.c
-        });
-      }
-      if (this.configData.scene_data.a) {
-        this.sa.registerApp({
-          activity_id: this.configData.scene_data.a
-        });
-      }
-      if (this.configData.scene_data.p) {
-        this.sa.registerApp({
-          poster_id: this.configData.scene_data.p
-        });
-      }
-      this.sa.registerApp({
-        referrer_amount: this.showCents ? 0.01 : 9.9
-      });
-      this.sa.setProfile({
-        ai_phoneNumber: this.configData.mobile,
-        ai_open_id: this.configData.openid,
-        ai_uuid: this.configData.uuid
-      });
-      track('$pageview', {
-        $title: '演奏分享页',
-        $url: 'pages/playing/index',
-        visit_time: new Date().toLocaleDateString()
-      });
     },
     handleGetting(content, isContinue) {
       this.closeAudio()
-      track('$WebClick', {
-        $title: '演奏分享页',
-        $url: 'pages/playing/index',
-        content,
-        visit_time: new Date().toLocaleDateString()
-      });
       if (this.configData.had_purchased || (this.store.had_purchased && this.configData.mobile)) {
         this.go('/pages/playing/success')
       } else {
         this.showStay = false;
-        if (isContinue) {
-          track('ai_applet_retain_click', {
-            ai_tel: this.store.mobile,
-            click_item: content
-          })
-        }
         this.createBill()
       }
     },
     async createBill(uuid, open_id) {
-      track('ai_applet_weixin_pay', {
-        ai_tel: this.store.mobile
-      });
       uuid = uuid || this.configData.uuid
       open_id = open_id || this.configData.openid
       try {
@@ -494,13 +428,6 @@ export default {
             this.showAlert = false
             this.getConfig()
             this.store.had_purchased = false;
-          },
-          cancel: () => {
-            console.log('stay')
-            track('ai_applet_retain_view', {
-              ai_tel: this.store.mobile
-            });
-            // this.showStay = true;
           }
         })
       } catch (e) {
@@ -518,20 +445,6 @@ export default {
       // this.isLogin = true
       try {
         const data = await api.register(param)
-        this.sa.setProfile({
-          ai_phoneNumber: data.mobile,
-          ai_open_id: data.openid,
-          ai_uuid: data.uuid
-        });
-        if (isAuth) {
-          track('ai_applet_shouquan_click', {
-            ai_tel: data.mobile
-          });
-        } else {
-          track('ai_applet_phone_fill', {
-            ai_tel: data.mobile
-          });
-        }
         this.store.mobile = data.mobile
         if (data.had_purchased) {
           return this.go('/pages/playing/success')

@@ -89,7 +89,7 @@
 import { api } from '@/api'
 import Alert from '@/components/alert'
 import indexSys from '@/components/indexSys'
-import { track, getWxCode } from '@/utils/util'
+import { getWxCode } from '@/utils/util'
 
 export default {
   data () {
@@ -213,9 +213,6 @@ export default {
       } catch (e) {
         console.log(e)
       }
-      track('ai_applet_infor_click', {
-        option: val === 1 ? '正在学' : '没学过'
-      })
     },
     catchTouchMove() {
       return false
@@ -238,36 +235,17 @@ export default {
       if (!this.hasRejectLogin) {
         this.showStay = true
         this.rejectType = 'login'
-        track('ai_applet_retain_view', {
-          ai_tel: '',
-          retain_from: '未登陆挽留'
-        });
         this.hasRejectLogin = true
       }
     },
     closeStay() {
       this.showStay = false;
-      if (this.rejectType === 'login') {
-        track('ai_applet_retain_giveup_click', {
-          retain_from: '未登陆挽留'
-        });
-      } else {
-        track('ai_applet_retain_giveup_click', {
-          retain_from: '未支付挽留'
-        });
-      }
     },
     handleContinue() {
       this.showStay = false
       if (this.rejectType === 'login') {
-        track('ai_applet_retain_gon_click', {
-          retain_from: '未登陆挽留'
-        });
         this.handleShowAlert()
       } else {
-        track('ai_applet_retain_gon_click', {
-          retain_from: '未支付挽留'
-        });
         // 发起支付
         this.handleGetting('继续抢')
       }
@@ -278,15 +256,6 @@ export default {
         return
       }
       this.hasBtnClicked = true
-      let content = '立即抢'
-      track('$WebClick', {
-        $title: '首页',
-        $url: 'pages/index',
-        content,
-        visit_time: new Date().toLocaleDateString(),
-        agreement: this.isAgreeProtocol ? 1 : 2
-      });
-      track('ai_applet_shouquan_view');
       this.wxCode = await getWxCode()
     },
     // 获取手机号
@@ -297,7 +266,6 @@ export default {
           encrypted_data: detail.encryptedData
         }, true)
       } else {
-        track('ai_applet_quxiao_click');
         this.handleShowAlert()
       }
     },
@@ -368,7 +336,6 @@ export default {
             // pre实验名称: 智能转介绍_分流1期 请根据 result 进行自己的试验，当前试验对照组返回值为：0，试验组依次返回：1
             if (result) {
               console.log('pop', result);
-              track('ai_applet_infor_view')
               try {
                 var value = wx.getStorageSync('choiceResult')
                 if (value === '') {
@@ -386,39 +353,6 @@ export default {
       this.store.mobile = this.configData.mobile
       this.uuid = this.configData.uuid
       this.store.uuid = this.uuid
-      if (this.referrer_info.uuid) {
-        this.sa.registerApp({
-          referrer_uuid: this.referrer_info.uuid
-        });
-      }
-      if (this.configData.staff) {
-        this.sa.registerApp({
-          staff_uuid: this.configData.staff.uuid
-        });
-      }
-      if (this.configData.scene_data.c) {
-        this.sa.registerApp({
-          channel_id: this.configData.scene_data.c
-        });
-      }
-      if (this.configData.scene_data.a) {
-        this.sa.registerApp({
-          activity_id: this.configData.scene_data.a
-        });
-      }
-      if (this.configData.scene_data.p) {
-        this.sa.registerApp({
-          poster_id: this.configData.scene_data.p
-        });
-      }
-      if (this.configData.scene_data.user_current_status_zh) {
-        this.sa.registerApp({
-          user_code_status: this.configData.scene_data.user_current_status_zh
-        });
-      }
-      this.sa.registerApp({
-        share_type: this.share_type
-      });
       // 0是注册用户即未付费，2是体验用户，3是年卡用户 根据sub_end_date(卡过期日期)判断是否过期
       let user_status_num = this.configData.subscribe_status
       let date = new Date()
@@ -432,22 +366,6 @@ export default {
       if (this.configData.subscribe_status === 3 && dateString / 1 > this.configData.sub_end_date / 1) {
         user_status_num = '31'
       }
-      this.sa.registerApp({
-        referrer_amount: this.configData.pkg === 6 ? 0 : (this.configData.pkg === 3 ? 0.01 : 4.9)
-      });
-      this.sa.setProfile({
-        ai_phoneNumber: this.configData.mobile,
-        ai_open_id: this.configData.openid,
-        ai_uuid: this.configData.uuid,
-        ai_applet_user_status: user_status_num ? this.user_status_map[user_status_num] : '',
-        ai_applet_usersignin_status: this.configData.mobile ? '已登录' : '未登录'
-      });
-      this.sa.login(this.configData.uuid)
-      track('$pageview', {
-        $title: '首页',
-        $url: 'pages/index',
-        visit_time: new Date().toLocaleDateString()
-      });
     },
     // 获取首页数据
     async getBuyNames() {
@@ -465,13 +383,6 @@ export default {
         this.toast('请勾选协议')
         return
       }
-      track('$WebClick', {
-        $title: '首页',
-        $url: 'pages/index',
-        content,
-        visit_time: new Date().toLocaleDateString(),
-        agreement: this.isAgreeProtocol ? 1 : 2
-      });
       const ssQuery = `referrer_amount=${this.configData.pkg === 6 ? 0 : (this.configData.pkg === 3 ? 0.01 : 4.9)}&channel_id=${this.configData.scene_data.c}`
       if (this.configData.had_purchased === 1 || (this.store.had_purchased === 1 && this.configData.mobile)) {
         this.go(`/pages/success?success=true&${ssQuery}`)
@@ -509,9 +420,6 @@ export default {
         return
       }
       this.payIng = true;
-      track('ai_applet_weixin_pay', {
-        ai_tel: this.store.mobile
-      });
       uuid = uuid || this.configData.uuid || this.uuid
       open_id = open_id || this.configData.openid
       const ssQuery = `referrer_amount=${this.configData.pkg === 6 ? 0 : (this.configData.pkg === 3 ? 0.01 : 4.9)}&channel_id=${this.configData.scene_data.c}`
@@ -521,8 +429,7 @@ export default {
           open_id,
           pkg: this.showChangePkg ? this.repeatPkg : this.configData.pkg,
           scene: this.scene,
-          source: this.source,
-          distinct_id: this.sa.getAnonymousID()
+          source: this.source
         })
         if (this.showCents && !this.showChangePkg) {
           this.store.had_purchased = 1;
@@ -537,7 +444,6 @@ export default {
           signType,
           paySign,
           success: () => {
-            track('ai_applet_99pay_queren_click');
             this.store.had_purchased = 1;
             this.go(`/pages/success?success=true&${ssQuery}`)
           },
@@ -550,17 +456,10 @@ export default {
             this.payIng = false;
           },
           cancel: () => {
-            track('ai_applet_99pay_x_click', {
-              ai_tel: this.store.mobile
-            });
             this.payIng = false;
             if (!this.hasRejectPay) {
               this.showStay = true
               this.rejectType = 'pay'
-              track('ai_applet_retain_view', {
-                ai_tel: this.store.mobile,
-                retain_from: '未支付挽留'
-              });
               this.hasRejectPay = true
             }
           }
@@ -584,21 +483,6 @@ export default {
       }
       try {
         const data = await api.register(param)
-        this.sa.setProfile({
-          ai_phoneNumber: data.mobile,
-          ai_open_id: data.openid,
-          ai_uuid: data.uuid
-        });
-        this.sa.login(data.uuid)
-        if (isAuth) {
-          track('ai_applet_shouquan_click', {
-            ai_tel: data.mobile
-          });
-        } else {
-          track('ai_applet_phone_fill', {
-            ai_tel: data.mobile
-          });
-        }
         this.store.uuid = data.uuid
         this.store.mobile = data.mobile
         this.shareScene = data.share_scene

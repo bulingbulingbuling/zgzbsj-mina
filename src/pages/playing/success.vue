@@ -21,7 +21,6 @@
 </config>
 
 <script>
-import { track } from '@/utils/util'
 export default {
   data () {
     return {
@@ -31,25 +30,6 @@ export default {
     }
   },
   onShow() {
-    if (this.isSuccess) {
-      track('$pageview', {
-        $title: '购买成功页',
-        $url: 'pages/playing/success',
-        visit_time: new Date().toLocaleDateString()
-      });
-      track('ai_applet_suc_buy_view', {
-        ai_tel: this.store.mobile
-      });
-    } else {
-      track('$pageview', {
-        $title: '已经购买页',
-        $url: 'pages/playing/success',
-        visit_time: new Date().toLocaleDateString()
-      });
-      track('ai_applet_had_buy_view', {
-        ai_tel: this.store.mobile
-      });
-    }
     wx.hideShareMenu({
       menus: ['shareAppMessage']
     })

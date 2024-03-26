@@ -56,7 +56,6 @@
 <script>
 import { api } from '@/api'
 import Alert from '@/components/alert'
-import { track } from '@/utils/util'
 
 export default {
   data () {
@@ -104,23 +103,6 @@ export default {
       // options.scene = '%26r%3DzkR2HDs%3D%26c%3D1220'
       // 第二版二维码参数格式
       // options.scene = 'UUX2WKF3Q%3D%3D%3D%261351%2611084'
-
-      // 改用从接口获取埋点数据
-      // let scene = decodeURIComponent(options.scene)
-      // const match = scene.match(/c=(\d+)/)
-      // if (match) {
-      //   this.sa.registerApp({
-      //     channel_id: match[1]
-      //   });
-      // } else {
-      //   const params = scene.split('&')
-      //   if (params.length > 0) {
-      //     this.sa.registerApp({
-      //       channel_id: params[1],
-      //       activity_id: params[2]
-      //     });
-      //   }
-      // }
     } else if (options.source) {
       this.source = options.source
     }
@@ -211,10 +193,6 @@ export default {
     closeStay(content) {
       this.showStay = false;
       this.packageOpened = false
-      track('ai_applet_retain_click', {
-        ai_tel: this.store.mobile,
-        click_item: content
-      });
     },
     handleBtnClick(e) {
       this.hasBtnClicked = true
@@ -224,13 +202,6 @@ export default {
       } else {
         content = '礼包'
       }
-      track('$ai_applet_shouquan_view');
-      track('$WebClick', {
-        $title: '首页',
-        $url: 'pages/index',
-        content,
-        visit_time: new Date().toLocaleDateString()
-      });
     },
     // 获取手机号
     getPhoneNumber({ detail }) {
@@ -240,7 +211,6 @@ export default {
           encrypted_data: detail.encryptedData
         }, true)
       } else {
-        track('$ai_applet_quxiao_click');
         this.handleShowAlert('phone')
       }
     },
@@ -255,39 +225,6 @@ export default {
       this.referrer_info = this.configData.referrer_info
       this.shareScene = this.configData.share_scene
       this.store.mobile = this.configData.mobile
-      if (this.referrer_info.uuid) {
-        this.sa.registerApp({
-          referrer_uuid: this.referrer_info.uuid
-        });
-      }
-      if (this.configData.staff) {
-        this.sa.registerApp({
-          staff_uuid: this.configData.staff.uuid
-        });
-      }
-      if (this.configData.scene_data.c) {
-        this.sa.registerApp({
-          channel_id: this.configData.scene_data.c
-        });
-      }
-      if (this.configData.scene_data.a) {
-        this.sa.registerApp({
-          activity_id: this.configData.scene_data.a
-        });
-      }
-      if (this.configData.scene_data.p) {
-        this.sa.registerApp({
-          poster_id: this.configData.scene_data.p
-        });
-      }
-      if (this.configData.scene_data.user_current_status_zh) {
-        this.sa.registerApp({
-          user_code_status: this.configData.scene_data.user_current_status_zh
-        });
-      }
-      this.sa.registerApp({
-        share_type: this.share_type
-      });
       // 0是注册用户即未付费，2是体验用户，3是年卡用户 根据sub_end_date(卡过期日期)判断是否过期
       let user_status_num = this.configData.subscribe_status
       let date = new Date()
@@ -301,21 +238,6 @@ export default {
       if (this.configData.subscribe_status === 3 && dateString / 1 > this.configData.sub_end_date / 1) {
         user_status_num = '31'
       }
-      this.sa.registerApp({
-        referrer_amount: this.configData.pkg === 3 ? 0.01 : 9.9
-      });
-      this.sa.setProfile({
-        ai_phoneNumber: this.configData.mobile,
-        ai_open_id: this.configData.openid,
-        ai_uuid: this.configData.uuid,
-        ai_applet_user_status: this.user_status_map[user_status_num],
-        ai_applet_usersignin_status: this.configData.mobile ? '已登录' : '未登录'
-      });
-      track('$pageview', {
-        $title: '首页',
-        $url: 'pages/index',
-        visit_time: new Date().toLocaleDateString()
-      });
       if (this.configData.first_flag) {
         this.remainNum = Math.floor(Math.random() * (30 - 20) + 20)
         this.showTimer = true
@@ -324,30 +246,15 @@ export default {
       }
     },
     handleGetting(content, isContinue) {
-      track('$WebClick', {
-        $title: '首页',
-        $url: 'pages/index',
-        content,
-        visit_time: new Date().toLocaleDateString()
-      });
       this.packageOpened = true
       if (this.configData.had_purchased || (this.store.had_purchased && this.configData.mobile)) {
         this.go('/pages/success')
       } else {
         this.showStay = false;
-        if (isContinue) {
-          track('ai_applet_retain_click', {
-            ai_tel: this.store.mobile,
-            click_item: content
-          })
-        }
         this.createBill()
       }
     },
     async createBill(uuid, open_id) {
-      track('ai_applet_weixin_pay', {
-        ai_tel: this.store.mobile
-      });
       uuid = uuid || this.configData.uuid
       open_id = open_id || this.configData.openid
       try {
@@ -378,10 +285,6 @@ export default {
             this.store.had_purchased = false;
           },
           cancel: () => {
-            console.log('stay')
-            track('ai_applet_retain_view', {
-              ai_tel: this.store.mobile
-            });
             this.showStay = true;
           }
         })
@@ -408,20 +311,6 @@ export default {
       // this.isLogin = true
       try {
         const data = await api.register(param)
-        this.sa.setProfile({
-          ai_phoneNumber: data.mobile,
-          ai_open_id: data.openid,
-          ai_uuid: data.uuid
-        });
-        if (isAuth) {
-          track('ai_applet_shouquan_click', {
-            ai_tel: data.mobile
-          });
-        } else {
-          track('ai_applet_phone_fill', {
-            ai_tel: data.mobile
-          });
-        }
         this.store.mobile = data.mobile
         this.shareScene = data.share_scene
         this.packageOpened = true

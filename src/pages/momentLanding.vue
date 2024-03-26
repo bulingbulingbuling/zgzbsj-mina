@@ -162,7 +162,7 @@
 <script>
 import Alert from '@/components/alert'
 import { api } from '@/api'
-import { track, getWxCode } from '@/utils/util'
+import { getWxCode } from '@/utils/util'
 
 export default {
   data () {
@@ -244,10 +244,6 @@ export default {
       }
       this.handleShowAlert()
     }
-    this.sa.registerApp(this.$mp.query);
-    this.sa.registerApp({
-      project_name: '4.9元0603小程序'
-    });
     wx.setStorageSync('project_name', '4.9元0603小程序')
     // 监听网络状态变化
     wx.onNetworkStatusChange((res) => {
@@ -282,19 +278,14 @@ export default {
       this.curSlideRate = (this.windowHeight + res.scrollTop) / this.scrollHeight
       console.log('curSlideRate', this.curSlideRate);
       if (res.scrollTop > this.scrollTop) {
-        track('ai_shouyelanding_slide', {
-          slide_max_rate: this.curSlideRate
-        })
       }
       this.scrollTop = res.scrollTop
     }, 1000)
   },
   methods: {
     bindPlayVideo() {
-      track('ai_shouyelanding_clk_view')
     },
     bindendedVideo() {
-      track('ai_shouyelanding_overplay_view')
     },
     handleNetError(res) {
       if (res.networkType === 'none') {
@@ -317,12 +308,6 @@ export default {
       this.store.mobile = this.configData.mobile
       this.store.uuid = this.configData.uuid
       // 0是注册用户即未付费，2是体验用户，3是年卡用户 根据sub_end_date(卡过期日期)判断是否过期
-      if (this.configData.uuid) {
-        track('ai_buy_soon_login_suc_view')
-        this.sa.setProfile({
-          ai_uuid: this.configData.uuid
-        });
-      }
     },
     // 已授权 或者已绑定公众号点击立即参团
     async handleBtnClick(e) {
@@ -331,29 +316,22 @@ export default {
         return
       }
       this.hasBtnClicked = true
-      track('ai_applet_empower_view')
-      track('ai_shouyelanding_join_group_click', {
-        slide_rate: this.curSlideRate
-      })
       this.wxCode = await getWxCode()
     },
     // 获取手机号
     getPhoneNumber({ detail }) {
       console.log('detail', detail);
       if (detail.encryptedData) {
-        track('ai_applet_shouquan_click')
         this.register({
           iv: detail.iv,
           encrypted_data: detail.encryptedData
         }, true)
       } else {
-        track('ai_applet_quxiao_click')
         this.handleShowAlert()
       }
     },
     // 弹出登录弹窗
     handleShowAlert() {
-      track('ai_buy_soon_login_view')
       this.showAlert = true
     },
     // 手机号注册
@@ -372,10 +350,6 @@ export default {
       param.param_arr = str.slice(1)
       try {
         const data = await api.momentRegister(param)
-        track('ai_buy_soon_login_suc_view')
-        this.sa.setProfile({
-          ai_uuid: data.uuid
-        });
         this.store.mobile = data.mobile
         const ssQuery = `referrer_amount=4.9&channel_id=${this.$mp.query.channel_id}`
         if (data.had_purchased === 1) {
@@ -395,9 +369,6 @@ export default {
         this.toast('网络异常，请检查网络后重试')
         return
       }
-      track('ai_shouyelanding_join_group_click', {
-        slide_rate: this.curSlideRate
-      })
       const ssQuery = `referrer_amount=4.9&channel_id=${this.$mp.query.channel_id}`
       if (this.configData.had_purchased === 1 || (this.store.had_purchased === 1 && this.configData.mobile)) {
         this.go(`/pages/success?success=true&${ssQuery}`)
@@ -417,8 +388,7 @@ export default {
           uuid,
           open_id,
           pkg: 9,
-          channel_id: this.$mp.query.channel_id,
-          distinct_id: this.sa.getAnonymousID()
+          channel_id: this.$mp.query.channel_id
         })
         if (this.showCents) {
           this.store.had_purchased = 1;
@@ -433,7 +403,6 @@ export default {
           signType,
           paySign,
           success: () => {
-            // track('ai_applet_99pay_queren_click');
             this.store.had_purchased = 1;
             this.go(`/pages/success?success=true&${ssQuery}`)
           },
@@ -445,13 +414,9 @@ export default {
             this.store.had_purchased = 0;
           },
           cancel: () => {
-            // track('ai_applet_99pay_x_click', {
-            //   ai_tel: this.store.mobile
-            // });
             if (!this.hasRejectPay) {
               this.showStay = true
               this.rejectType = 'pay'
-              track('ai_shouyelanding_detain_view');
               this.hasRejectPay = true
             }
           }
@@ -468,33 +433,17 @@ export default {
       if (!this.hasRejectLogin) {
         this.showStay = true
         this.rejectType = 'login'
-        track('ai_shouyelanding_detain_view');
         this.hasRejectLogin = true
       }
     },
     closeStay() {
       this.showStay = false;
-      if (this.rejectType === 'login') {
-        // track('ai_applet_retain_giveup_click', {
-        //   retain_from: '未登陆挽留'
-        // });
-      } else {
-        // track('ai_applet_retain_giveup_click', {
-        //   retain_from: '未支付挽留'
-        // });
-      }
     },
     handleContinue() {
       this.showStay = false
       if (this.rejectType === 'login') {
-        // track('ai_applet_retain_gon_click', {
-        //   retain_from: '未登陆挽留'
-        // });
         this.handleShowAlert()
       } else {
-        // track('ai_applet_retain_gon_click', {
-        //   retain_from: '未支付挽留'
-        // });
         // 发起支付
         this.handleGetting('继续抢')
       }

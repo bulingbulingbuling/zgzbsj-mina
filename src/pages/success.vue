@@ -3,7 +3,6 @@
 </template>
 
 <script>
-import { track } from '@/utils/util'
 import {
   Base64
 } from 'js-base64'
@@ -18,19 +17,6 @@ export default {
     }
   },
   onShow() {
-    this.sa.registerApp({
-      $url: 'pages/success',
-      $title: this.isSuccess ? '购买成功页' : '已经购买页'
-    });
-    if (this.isSuccess) {
-      track('ai_applet_suc_buy_view', {
-        ai_tel: this.store.mobile
-      });
-    } else {
-      track('ai_applet_had_buy_view', {
-        ai_tel: this.store.mobile
-      });
-    }
     wx.hideShareMenu({
       menus: ['shareAppMessage']
     })
