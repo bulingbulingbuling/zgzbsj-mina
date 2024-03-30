@@ -23,27 +23,28 @@ const request = (url, params, method, header) => {
       header: header,
       success: async (res) => {
         wx.hideLoading();
+        debugger
         if (res.data.code !== 0) {
-          if (res.data.errors[0] && res.data.errors[0].err_no === 401) {
+          if (res.data.data.errors[0] && res.data.data.errors[0].err_no === 401) {
             const code = await getCode()
             const res = await request(url, { wx_code: code }, method, { token: '' })
             wx.setStorageSync('token', res.token);
             wx.setStorageSync('openid', res.open_id);
             // 设置下一次请求的header
-            const baseApi = buildIns('op')
+            const baseApi = buildIns('base')
             baseApi.setHeader('token', res.token);
             const result = await request(url, lastParam, method, { token: res.token })
             resolve(result)
             return
           }
           let errMsg
-          if (!res.data.errors[0]) {
-            Object.keys(res.data.errors).forEach(errKey => {
-              errMsg = res.data.errors[errKey][0].err_msg
+          if (!res.data.data.errors[0]) {
+            Object.keys(res.data.data.errors).forEach(errKey => {
+              errMsg = res.data.data.errors[errKey][0].err_msg
             })
           }
           wx.showToast({
-            title: errMsg || res.data.errors[0].err_msg + '',
+            title: errMsg || res.data.data.errors[0].err_msg + '',
             icon: 'none',
             duration: 2000
           });
@@ -55,12 +56,6 @@ const request = (url, params, method, header) => {
       fail(res) {
         wx.hideLoading();
         reject(res)
-        // 请求失败这种错误提示就不展示给用户了。
-        // wx.showToast({
-        //   title: res.toString(),
-        //   icon: 'none',
-        //   duration: 2000
-        // });
       }
     });
   });
@@ -77,6 +72,12 @@ class Api {
     const url = this.url + baseUrl;
     lastParam = params
     this.header['Content-Type'] = 'application/x-www-form-urlencoded'
+    return request(url, params, 'post', this.header)
+  }
+  postOss(baseUrl, params) {
+    const url = this.url + baseUrl;
+    lastParam = params
+    this.header['Accept'] = '*'
     return request(url, params, 'post', this.header)
   }
   get(baseUrl, params) {

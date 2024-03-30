@@ -1,5 +1,6 @@
 import apiFn from './api';
-export const baseApi = apiFn('op', process.env.VUE_APP_OP_URL);
+export const baseApi = apiFn('base', process.env.VUE_APP_BASE_URL);
+export const ossApi = apiFn('oss', process.env.VUE_APP_OSS_URL);
 
 export const api = {
   // 获取首页数据
@@ -111,6 +112,21 @@ export const api = {
       scene,
       source,
       type
+    });
+  },
+  // 转介绍 获取oss配置
+  async getOssConfig(type = 'referral', upload_prefix) {
+    return await ossApi.get(`/api/oss/signature`, {
+      upload_prefix,
+      type
+    })
+  },
+  async uploadToOss({
+    url,
+    formData
+  }) {
+    return await ossApi.postOss(url, {
+      data: formData
     });
   }
 }

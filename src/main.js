@@ -37,15 +37,7 @@ export default {
   config: {
     // pages 的首个页面会被编译成首页
     pages: [
-      'pages/index',
-      'pages/address',
-      'pages/success',
-      'pages/rules',
-      'pages/momentLanding',
-      'pages/playing/index',
-      'pages/playing/success',
-      'pages/playing/report',
-      'pages/paySuccess'
+      'pages/index'
     ],
     usingComponents: {
       'timer-comp': './native/timer-comp/index',

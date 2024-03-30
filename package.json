@@ -29,6 +29,7 @@
     "@megalo/api": "latest",
     "@megalo/vhtml-plugin": "latest",
     "js-base64": "^3.6.1",
+    "md5": "^2.3.0",
     "megalo": "latest",
     "octoparse": "^0.4.2",
     "sa-sdk-miniprogram": "^1.17.7"
