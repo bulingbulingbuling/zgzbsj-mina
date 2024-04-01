@@ -37,7 +37,8 @@ export default {
   config: {
     // pages 的首个页面会被编译成首页
     pages: [
-      'pages/index'
+      'pages/index',
+      'pages/testPro'
     ],
     usingComponents: {
       'timer-comp': './native/timer-comp/index',
@@ -46,7 +47,7 @@ export default {
     window: {
       backgroundTextStyle: 'dark',
       navigationBarBackgroundColor: '#ededed',
-      navigationBarTitleText: '小叶子钢琴——练琴体验营',
+      navigationBarTitleText: '中国珠宝官方合作平台',
       navigationBarTextStyle: 'black',
       backgroundColor: '#ededed'
     }

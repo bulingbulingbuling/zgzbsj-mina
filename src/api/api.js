@@ -11,6 +11,7 @@ const getCode = () => {
   })
 }
 let lastParam;
+const delTokenUrlList = ['register']
 const request = (url, params, method, header) => {
   return new Promise((resolve, reject) => {
     wx.showLoading({
@@ -23,9 +24,8 @@ const request = (url, params, method, header) => {
       header: header,
       success: async (res) => {
         wx.hideLoading();
-        debugger
         if (res.data.code !== 0) {
-          if (res.data.data.errors[0] && res.data.data.errors[0].err_no === 401) {
+          if (res.data.errors[0] && res.data.errors[0].err_no === 401) {
             const code = await getCode()
             const res = await request(url, { wx_code: code }, method, { token: '' })
             wx.setStorageSync('token', res.token);
@@ -38,18 +38,24 @@ const request = (url, params, method, header) => {
             return
           }
           let errMsg
-          if (!res.data.data.errors[0]) {
-            Object.keys(res.data.data.errors).forEach(errKey => {
-              errMsg = res.data.data.errors[errKey][0].err_msg
+          if (!res.data.errors[0]) {
+            Object.keys(res.data.errors).forEach(errKey => {
+              errMsg = res.data.errors[errKey][0].err_msg
             })
           }
           wx.showToast({
-            title: errMsg || res.data.data.errors[0].err_msg + '',
+            title: errMsg || res.data.errors[0].err_msg + '',
             icon: 'none',
             duration: 2000
           });
           reject(new Error())
         } else {
+          const length = url.split('/').length
+          const lastPath = url.split('/')[length - 1]
+          const baseApi = buildIns('base')
+          if (delTokenUrlList.includes(lastPath)) {
+            baseApi.setHeader('token', '');
+          }
           resolve(res.data.data);
         }
       },

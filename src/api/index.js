@@ -28,55 +28,6 @@ export const api = {
   async register(param) {
     return await baseApi.post('/referral_miniapp/landing/register', param);
   },
-  async momentRegister(param) {
-    return await baseApi.post('/referral_miniapp/landing/tf_register', param);
-  },
-  // 国际区号列表
-  async getCountryCode() {
-    return await baseApi.get('/referral_miniapp/landing/country_code');
-  },
-  // 购买下单
-  async createBill({
-    pay_channel = 23,
-    uuid,
-    pkg = 2,
-    open_id,
-    scene = '',
-    source = '',
-    channel_id = '',
-    distinct_id = ''
-  } = {}) {
-    return await baseApi.post('/referral_miniapp/landing/create_bill', {
-      pay_channel,
-      uuid,
-      pkg,
-      open_id,
-      scene,
-      source,
-      channel_id,
-      distinct_id
-    });
-  },
-  // 购买下单
-  async testBill({
-    pkg,
-    uuid,
-    scene
-  } = {}) {
-    return await baseApi.get('/referral_miniapp/student/check_student_is_repeat', {
-      pkg,
-      uuid,
-      scene
-    });
-  },
-  // 订单状态
-  async getBillStatus({
-    bill_id
-  } = {}) {
-    return await baseApi.get('/referral_miniapp/landing/bill_status', {
-      bill_id
-    });
-  },
   // 发送验证码
   async sendCode({
     mobile,
@@ -89,29 +40,6 @@ export const api = {
       country_code,
       scene,
       channel_id
-    });
-  },
-  // 获取成功页海报
-  async getPoster() {
-    return await baseApi.get('/referral_miniapp/landing/buy_poster');
-  },
-  // 获取演奏分享数据
-  async getPlayingData({
-    scene
-  } = {}) {
-    return await baseApi.get('/referral_miniapp/landing/play_review', {
-      scene
-    });
-  },
-  async getBuyNames({
-    scene = '',
-    source = '',
-    type
-  } = {}) {
-    return await baseApi.get('/referral_miniapp/landing/buy_name', {
-      scene,
-      source,
-      type
     });
   },
   // 转介绍 获取oss配置
@@ -128,5 +56,12 @@ export const api = {
     return await ossApi.postOss(url, {
       data: formData
     });
+  },
+  // 获取模版列表
+  async getTemplate() {
+    return await baseApi.get('/referral_miniapp/template/list');
+  },
+  async aiFaceChange(param) {
+    return await baseApi.post('/referral_miniapp/aiface/change', param);
   }
 }

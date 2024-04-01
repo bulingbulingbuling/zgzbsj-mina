@@ -32,6 +32,7 @@
     "md5": "^2.3.0",
     "megalo": "latest",
     "octoparse": "^0.4.2",
-    "sa-sdk-miniprogram": "^1.17.7"
+    "sa-sdk-miniprogram": "^1.17.7",
+    "vant": "^2.13.2"
   }
 }

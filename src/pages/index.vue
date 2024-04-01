@@ -5,7 +5,7 @@
         <img class="header" :src="bgUrl" alt="">
       </div>
       <div class="index-container-bottom" :style="btnStyle">
-        <div class="action" v-if="configData.mobile" @click="handleGetting('立即抢')">
+        <div class="action" v-if="configData.mobile" @click="handleGetting()">
           <img :src="btnUrl" alt="">
         </div>
         <button id="bottom-btn" class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="handleBtnClick" v-else>
@@ -94,7 +94,7 @@ export default {
         this.isNetError = true
         this.toast('当前网络异常，请检查网络后再试')
       } else {
-        // this.getConfig()
+        this.getConfig()
       }
     },
     handleShowAlert() {
@@ -126,29 +126,16 @@ export default {
     },
     // 获取首页数据
     async getConfig() {
-      this.configData = await api.getIndexData({
-        scene: this.scene,
-        source: this.source
-      })
-      this.channelId = this.configData.scene_data.c
-      this.isSys = 2
-      // 0元对应pkg = 6  0.01元对应pkg = 3  4.9元对应pkg = 9
-      this.bgUrl = `${this.imgPath}/ai_mina/newIndex2/default99V1.png?456`
-      // String 类型试验（第二个参数 ""，表示未命中试验时，会返回此默认值，请根据业务需要更改此处的值）
-      if (this.configData.pkg === 3) {
-        this.btnUrl = `${this.imgPath}/abtest/ai_referral_mina/cents/btn.png`
-      }
-      this.shareScene = this.configData.share_scene
+      this.configData = await api.getIndexData()
+      this.bgUrl = `${this.imgPath}/ai_mina/newIndex2/default99V1.png`
       this.store.mobile = this.configData.mobile
-      this.uuid = this.configData.uuid
-      this.store.uuid = this.uuid
     },
-    handleGetting(content) {
+    handleGetting() {
       if (this.isNetError) {
         this.toast('网络异常，请检查网络后重试')
         return
       }
-      console.log('立即抢')
+      this.go(`/pages/testPro`)
     },
     // 手机号注册
     async register(param, isAuth) {
@@ -160,15 +147,9 @@ export default {
       }
       try {
         const data = await api.register(param)
-        debugger
-        this.store.uuid = data.uuid
         this.store.mobile = data.mobile
         this.shareScene = data.share_scene
-        if (data.uuid) {
-          this.getConfig()
-          this.uuid = data.uuid
-          console.log(this.uuid);
-        }
+        this.getConfig()
       } catch (e) {
         this.isLogin = false
       }

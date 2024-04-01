@@ -1,0 +1,19 @@
+<view style="padding-top: 60px; height: 100vh;">
+  <scroll-view type="list" scroll-y style="height: 100%; width: 100%;">
+    <view class="section center">
+      <swiper
+        circular
+        class="swiper-container"
+        layout-type="transformer"
+        transformer-type="scaleAndFade"
+        display-multiple-items="1.25"
+        previous-margin="30px"
+        >
+        <swiper-item wx:for="{{list}}" wx:key="*this">
+          <image class="img" src="{{item.url}}" mode="aspectFill" />
+        </swiper-item>
+      </swiper>
+    </view>
+  </scroll-view>
+</view>
+

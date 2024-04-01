@@ -1,14 +1,22 @@
 <template>
   <div>
-    <div class="container index-container">
+    <div class="container">
       <div class="index-container-content">
-        <img class="header" :src="bgUrl" alt="">
-      </div>
-      <div class="index-container-bottom" :style="btnStyle">
-        <div class="action" @click="chooseImg()">
-          <img :src="btnUrl" alt="">
-          AI互动
-        </div>
+        <swiper
+          circular
+          layout-type="transformer"
+          class="swiperWrap"
+          transformer-type="scaleAndFade"
+          display-multiple-items="1.25"
+          previous-margin="30px">
+          <swiper-item v-for="item in templateList" :key="item.id">
+            <image mode="aspectFit" class="template" :src="item.url" />
+          </swiper-item>
+        </swiper>
+        <button id="bottom-btn" @click="handleBtnClick">
+          <image mode="aspectFit" :src="btnUrl" alt="" />
+        </button>
+        <canvas id="mask" />
       </div>
     </div>
   </div>
@@ -22,11 +30,17 @@ export default {
   data () {
     return {
       store: this.$mp.app.globalData,
-      configData: {},
-      bgUrl: '',
-      imgPath: process.env.VUE_APP_IMG_PATH,
       isNetError: false,
-      btnUrl: `${process.env.VUE_APP_IMG_PATH}/abtest/ai_referral_mina/default-btn1.png`,
+      templateList: [],
+      currentIndex: 0,
+      currentFace: {},
+      background: ['demo-text-1', 'demo-text-2', 'demo-text-3'],
+      indicatorDots: false,
+      vertical: false,
+      autoplay: false,
+      interval: 2000,
+      duration: 500,
+      btnUrl: `https://oss-ai-peilian-app.xiaoyezi.com/dev/abtest/ai_referral_mina/default-btn1.png`
     }
   },
   onShow(options) {
@@ -44,11 +58,7 @@ export default {
   },
   // 设置自定义转发的内容
   onShareAppMessage() {
-    return {
-      title: '5天智能陪练体验营，打卡返19.8元现金红包',
-      path: `/pages/index?scene=${this.shareScene}`,
-      imageUrl: `${this.imgPath}/ai_mina/newIndex2/share-header.png`
-    }
+    // 分享设置
   },
   methods: {
     handleNetError(res) {
@@ -56,33 +66,60 @@ export default {
         this.isNetError = true
         this.toast('当前网络异常，请检查网络后再试')
       } else {
-        // this.getConfig()
+        this.getTemplateList()
       }
+    },
+    onPosterChange (index) {
+      console.log('onPosterChange to', index);
+      this.currentIndex = index
+      this.currentFace = this.templateList[index]
+    },
+    handleBtnClick() {
+
     },
     // 获取手机号
     async chooseImg() {
       const res = await uploadImage()
       // todo 上传阿里云 或者传给后端
+      // try {
+      //   // 调用chooseImage选择图片
+      //   const res = await this.$mp.chooseImage({
+      //     count: 1, // 默认9，设置图片的选择数量
+      //   });
+      //   // 获取文件的临时路径
+      //   const tempFilePaths = res.tempFilePaths;
+      //   // 调用uploadFile上传图片
+      //   const uploadRes = await this.$mp.uploadFile({
+      //     url: '你的上传接口地址', // 开发者服务器地址
+      //     filePath: tempFilePaths[0], // 要上传文件资源的路径
+      //     name: 'file', // 文件对应的key
+      //     // 可以添加更多的formData
+      //     formData: {
+      //       'user': 'test'
+      //     },
+      //   });
+      //   // 处理上传成功的结果
+      //   console.log('upload success:', uploadRes);
+      // } catch (error) {
+      //   // 处理错误
+      //   console.error('upload error:', error);
+      // }
     },
     // 获取初始化数据
-    async getConfig() {
-      this.configData = await api.getIndexData({
-        scene: this.scene,
-        source: this.source
-      })
-      this.channelId = this.configData.scene_data.c
-      this.isSys = 2
-      // 0元对应pkg = 6  0.01元对应pkg = 3  4.9元对应pkg = 9
-      this.bgUrl = `${this.imgPath}/ai_mina/newIndex2/default99V1.png?456`
-      // String 类型试验（第二个参数 ""，表示未命中试验时，会返回此默认值，请根据业务需要更改此处的值）
-      if (this.configData.pkg === 3) {
-        this.btnUrl = `${this.imgPath}/abtest/ai_referral_mina/cents/btn.png`
-      }
-      this.shareScene = this.configData.share_scene
-      this.store.mobile = this.configData.mobile
-      this.uuid = this.configData.uuid
-      this.store.uuid = this.uuid
+    async getTemplateList() {
+      const res = await api.getTemplate()
+      this.templateList = res.templates
     }
   }
 }
 </script>
+<style>
+.template {
+  width: 100%;
+  height: 100%;
+}
+.swiperWrap {
+  height: 59vh;
+  width: 100vw;
+}
+</style>
