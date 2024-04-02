@@ -24,7 +24,7 @@ const request = (url, params, method, header) => {
       header: header,
       success: async (res) => {
         wx.hideLoading();
-        if (res.data.code !== 0) {
+        if (!url.includes('oss') && res.data.code !== 0) {
           if (res.data.errors[0] && res.data.errors[0].err_no === 401) {
             const code = await getCode()
             const res = await request(url, { wx_code: code }, method, { token: '' })
@@ -50,6 +50,9 @@ const request = (url, params, method, header) => {
           });
           reject(new Error())
         } else {
+          if (url.includes('oss')) {
+            resolve(res.data)
+          }
           const length = url.split('/').length
           const lastPath = url.split('/')[length - 1]
           const baseApi = buildIns('base')
@@ -80,11 +83,10 @@ class Api {
     this.header['Content-Type'] = 'application/x-www-form-urlencoded'
     return request(url, params, 'post', this.header)
   }
-  postOss(baseUrl, params) {
-    const url = this.url + baseUrl;
+  postOss(url, params) {
     lastParam = params
     this.header['Accept'] = '*'
-    return request(url, params, 'post', this.header)
+    return request(url, params, 'get', this.header)
   }
   get(baseUrl, params) {
     const url = this.url + baseUrl;

@@ -7,24 +7,26 @@
           layout-type="transformer"
           class="swiperWrap"
           transformer-type="scaleAndFade"
-          display-multiple-items="1.25"
-          previous-margin="30px">
-          <swiper-item v-for="item in templateList" :key="item.id">
+          :current="currentIndex"
+          @change="swiperChange"
+          id="swiper">
+          <swiper-item v-for="item in templateList" :key="item.id" class="swiperItem">
             <image mode="aspectFit" class="template" :src="item.url" />
           </swiper-item>
         </swiper>
-        <button id="bottom-btn" @click="handleBtnClick">
-          <image mode="aspectFit" :src="btnUrl" alt="" />
-        </button>
-        <canvas id="mask" />
+        <canvas v-show="testing" type="2d" id="myCanvas" class="canvas" @tap="handleClick"></canvas>
       </div>
+      <button id="bottom-btn" @click="handleBtnClick">
+        <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
+        <h4>试用</h4>
+      </button>
     </div>
   </div>
 </template>
 
 <script>
 import { api } from '@/api'
-import { uploadImage } from '@/utils/util'
+import { uploadImage, submitToOss } from '@/utils/util'
 
 export default {
   data () {
@@ -40,6 +42,8 @@ export default {
       autoplay: false,
       interval: 2000,
       duration: 500,
+      testing: false,
+      TemplateFaceID: '',
       btnUrl: `https://oss-ai-peilian-app.xiaoyezi.com/dev/abtest/ai_referral_mina/default-btn1.png`
     }
   },
@@ -74,36 +78,70 @@ export default {
       this.currentIndex = index
       this.currentFace = this.templateList[index]
     },
+    swiperChange(event) {
+      this.currentIndex = event.detail.current
+    },
     handleBtnClick() {
-
+      var query = wx.createSelectorQuery();
+      this.testing = true
+      this.currentFace = this.templateList[this.currentIndex]
+      const { faces } = this.currentFace
+      if (faces.length) {
+        query.select('#myCanvas')
+          .fields({ node: true, size: true })
+          .exec((res) => {
+            const canvas = res[0].node
+            const ctx = canvas.getContext('2d')
+            const dpr = wx.getWindowInfo().pixelRatio
+            const width = res[0].width
+            const height = res[0].height
+            canvas.width = width * dpr
+            canvas.height = height * dpr
+            ctx.scale(dpr, dpr)
+            ctx.fillStyle = 'rgba(0, 0, 0, .5)'
+            ctx.fillRect(0, 0, width, height)
+            faces.forEach(element => {
+              const { X, Y, Height, Width } = element.FaceRect
+              const WScale = width / 1485
+              const HScale = height / 1980
+              element.range = {
+                XRange: [X * WScale, X * WScale + Width * WScale],
+                YRange: [Y * HScale, Y * HScale + Height * HScale]
+              }
+              ctx.clearRect(X * WScale, Y * HScale, Width * WScale, Height * HScale)
+            });
+          })
+      }
+    },
+    handleClick(event) {
+      let { x, y } = event.detail
+      x = x - 27.5
+      y = y - 20
+      const { faces } = this.currentFace
+      if (faces.length) {
+        faces.forEach(element => {
+          if (x > element.range.XRange[0] && x < element.range.XRange[1] && y > element.range.YRange[0] && y < element.range.YRange[1]) {
+            this.TemplateFaceID = element.TemplateFaceID
+            this.chooseImg()
+          }
+        });
+      }
     },
     // 获取手机号
     async chooseImg() {
       const res = await uploadImage()
-      // todo 上传阿里云 或者传给后端
-      // try {
-      //   // 调用chooseImage选择图片
-      //   const res = await this.$mp.chooseImage({
-      //     count: 1, // 默认9，设置图片的选择数量
-      //   });
-      //   // 获取文件的临时路径
-      //   const tempFilePaths = res.tempFilePaths;
-      //   // 调用uploadFile上传图片
-      //   const uploadRes = await this.$mp.uploadFile({
-      //     url: '你的上传接口地址', // 开发者服务器地址
-      //     filePath: tempFilePaths[0], // 要上传文件资源的路径
-      //     name: 'file', // 文件对应的key
-      //     // 可以添加更多的formData
-      //     formData: {
-      //       'user': 'test'
-      //     },
-      //   });
-      //   // 处理上传成功的结果
-      //   console.log('upload success:', uploadRes);
-      // } catch (error) {
-      //   // 处理错误
-      //   console.error('upload error:', error);
-      // }
+      if (res) {
+        const { faces } = this.currentFace
+        const facesDate = []
+        if (faces.length) {
+          faces.forEach(element => {
+            if (element.TemplateFaceID === this.TemplateFaceID) {
+              element.ImageURL = res.url
+              facesDate.push({ ...element })
+            }
+          });
+        }
+      }
     },
     // 获取初始化数据
     async getTemplateList() {
@@ -114,12 +152,29 @@ export default {
 }
 </script>
 <style>
-.template {
-  width: 100%;
-  height: 100%;
+.container {
+  padding-top: 30px;
+}
+.index-container-content {
+  position: relative;
+  height: 854rpx;
+  width: 640rpx;
+  margin: 0 auto;
 }
 .swiperWrap {
-  height: 59vh;
-  width: 100vw;
+  height: 854rpx;
+  width: 640rpx;
+  margin: 0 auto;
+}
+.template {
+  height: 854rpx;
+  width: 640rpx;
+}
+.canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 854rpx;
+  width: 640rpx;
 }
 </style>

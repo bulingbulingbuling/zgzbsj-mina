@@ -62,12 +62,42 @@ export const uploadImage = () => {
       count: 1,
       mediaType: ['image'],
       sourceType: ['album', 'camera'],
-      maxDuration: 30,
       camera: 'back',
       success(res) {
-        console.log(res.tempFiles.tempFilePath)
-        console.log(res.tempFiles.size)
-        resolve(res)
+        const tempFilePath = res.tempFiles[0].tempFilePath
+        // 获取阿里云签名信息
+        api.getOssConfig('source_pic').then((signatureRes) => {
+          let key = tempFilePath.split('/')[tempFilePath.split('/').length - 1]
+          const formData = {
+            key: signatureRes.dir + key,
+            policy: signatureRes.policy, // 包含失效时间和文件上传大小限制等信息
+            OSSAccessKeyId: signatureRes.accessid, // AccessKey ID用于标识用户（后台接口提供）
+            signature: signatureRes.signature, // AccessKey ID用于标识用户（后台接口提供）
+          }
+          debugger
+          const url = 'https://' + signatureRes.host
+          wx.uploadFile({
+            url: url, // 填写存储空间的访问域名，例如https://test.oss-cn-hangzhou.aliyuncs.com, 
+            filePath: tempFilePath, // 待上传的本地资源路径（wx.chooseMedia获取到的临时路径）
+            name: 'file', // 必须填file。
+            formData: formData,
+            success: (res) => {
+              if (res.statusCode === 204) {
+                debugger
+                resolve(url + '/' + signatureRes.dir + key)
+              } else {
+                return wx.showModal({
+                  title: '提示',
+                  content: '上传失败 请联系管理员',
+                  showCancel: false
+                })
+              }
+            },
+            fail: err => {
+              console.log(err);
+            }
+          });
+        })
       }
     })
   })
@@ -119,9 +149,10 @@ export function dataURL2ObjUrl(dataURL) {
   }
   return dataURL
 }
-export function submitToOss({ ofile, type = 'referral_activity' }) {
+export function submitToOss({ ofile, type = 'source_pic' }) {
   return api.getOssConfig(type).then((res) => {
-    let token = localStorage.getItem('token') || ''
+    debugger
+    let token = wx.getStorageSync('token') || ''
     const name = md5(`${ofile}${Date.now()}${token}`);
     const type = ofile.type.substring(ofile.type.indexOf('/') + 1)
     const folder = `/${name}.${type}`;
