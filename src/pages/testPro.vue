@@ -4,9 +4,8 @@
       <div class="index-container-content">
         <swiper
           circular
-          layout-type="transformer"
+          layout-type="stackLeft"
           class="swiperWrap"
-          transformer-type="scaleAndFade"
           :current="currentIndex"
           @change="swiperChange"
           id="swiper">
@@ -20,13 +19,21 @@
         <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
         <h4>试用</h4>
       </button>
+      <button id="bottom-btn" @click="handleQuitClick">
+        <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
+        <h4>取消试用</h4>
+      </button>
+      <button id="bottom-btn" @click="handleResetTimes">
+        <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
+        <h4>重置次数</h4>
+      </button>
     </div>
   </div>
 </template>
 
 <script>
 import { api } from '@/api'
-import { uploadImage, submitToOss } from '@/utils/util'
+import { uploadImage } from '@/utils/util'
 
 export default {
   data () {
@@ -44,6 +51,7 @@ export default {
       duration: 500,
       testing: false,
       TemplateFaceID: '',
+      type: 2, // type 1 是每日免费的换脸次数。2 是奖励换脸次数 每天3次免费，2次奖励。
       btnUrl: `https://oss-ai-peilian-app.xiaoyezi.com/dev/abtest/ai_referral_mina/default-btn1.png`
     }
   },
@@ -80,6 +88,10 @@ export default {
     },
     swiperChange(event) {
       this.currentIndex = event.detail.current
+    },
+    handleQuitClick() {
+      this.testing = false
+      this.currentFace = {}
     },
     handleBtnClick() {
       var query = wx.createSelectorQuery();
@@ -129,24 +141,60 @@ export default {
     },
     // 获取手机号
     async chooseImg() {
-      const res = await uploadImage()
-      if (res) {
+      const ImageURL = await uploadImage()
+      if (ImageURL) {
         const { faces } = this.currentFace
         const facesDate = []
         if (faces.length) {
           faces.forEach(element => {
             if (element.TemplateFaceID === this.TemplateFaceID) {
-              element.ImageURL = res.url
+              element.ImageURL = ImageURL
               facesDate.push({ ...element })
             }
           });
+          this.changeFace()
         }
+      }
+    },
+    async changeFace() {
+      let param = {}
+      const { template_id } = this.currentFace
+      param.template_id = template_id
+      param.type = this.type
+      const { faces } = this.currentFace
+      if (faces.length) {
+        param.faces = []
+        faces.forEach(element => {
+          if (element.ImageURL) {
+            const { TemplateFaceID, ImageURL } = element
+            param.faces.push({
+              TemplateFaceID,
+              ImageURL
+            })
+          }
+        });
+      }
+      try {
+        const res = await api.aiFaceChange(param)
+        const { template_id, url } = res
+        this.templateList = this.templateList.map(item => {
+          if (item.template_id === template_id) {
+            item.url = url
+          }
+          return item
+        })
+        this.handleQuitClick()
+      } catch (e) {
+        this.isLogin = false
       }
     },
     // 获取初始化数据
     async getTemplateList() {
       const res = await api.getTemplate()
       this.templateList = res.templates
+    },
+    async handleResetTimes() {
+      api.resetTimes()
     }
   }
 }

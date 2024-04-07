@@ -38,10 +38,14 @@ const request = (url, params, method, header) => {
             return
           }
           let errMsg
-          if (!res.data.errors[0]) {
-            Object.keys(res.data.errors).forEach(errKey => {
-              errMsg = res.data.errors[errKey][0].err_msg
-            })
+          if (Array.isArray(res.data.errors)) {
+            if (!res.data.errors[0]) {
+              Object.keys(res.data.errors).forEach(errKey => {
+                errMsg = res.data.errors[errKey][0].err_msg
+              })
+            }
+          } else {
+            errMsg = res.data.errors.err_msg
           }
           wx.showToast({
             title: errMsg || res.data.errors[0].err_msg + '',

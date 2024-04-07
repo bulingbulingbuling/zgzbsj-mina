@@ -1,4 +1,6 @@
 import apiFn from './api';
+import qs from 'qs'
+
 export const baseApi = apiFn('base', process.env.VUE_APP_BASE_URL);
 export const ossApi = apiFn('oss', process.env.VUE_APP_OSS_URL);
 
@@ -62,6 +64,9 @@ export const api = {
     return await baseApi.get('/referral_miniapp/template/list');
   },
   async aiFaceChange(param) {
-    return await baseApi.post('/referral_miniapp/aiface/change', param);
+    return await baseApi.post('/referral_miniapp/aiface/change', qs.stringify(param));
+  },
+  async resetTimes() {
+    return await baseApi.post('/referral_miniapp/aitime/del');
   }
 }
