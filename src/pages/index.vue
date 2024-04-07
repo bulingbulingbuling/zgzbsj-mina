@@ -1,18 +1,37 @@
 <template>
   <div>
     <div class="container index-container">
-      <div class="index-container-content">
+      <!-- <div class="index-container-content">
         <img class="header" :src="bgUrl" alt="">
-      </div>
-      <div class="index-container-bottom" :style="btnStyle">
-        <div class="action" v-if="configData.mobile" @click="handleGetting()">
+      </div> -->
+      <!-- <div class="index-container-bottom" :style="btnStyle">
+        <div class="action" v-if="configData.mobile" >
           <img :src="btnUrl" alt="">
         </div>
         <button id="bottom-btn" class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="handleBtnClick" v-else>
           <img :src="btnUrl" alt="">
         </button>
-      </div>
+      </div> -->
     </div>
+    <div class="index-btn" @click="handleGoPage(1)">
+      ai展馆
+    </div>
+    <div class="index-btn" @click="handleGoPage(2)">
+      新品展示馆
+    </div>
+    <div class="index-btn" @click="handleGoPage(3)">
+      我的奖品
+    </div>
+    <div class="index-btn" @click="handleGoPage(4)">
+      活动说明
+    </div>
+    <div class="index-btn" @click="handleGoPage(5)">
+      参与店铺
+    </div>
+    <div class="index-btn" @click="handleGoPage(6)">
+      测试
+    </div>
+
     <alert :isShow="showAlert" :isFree="false" :pkg="configData.pkg" @close="closeAlert" :type="alertType" :isLogin="isLogin" :form="form" :scene="scene" @login="register">
     </alert>
   </div>
@@ -153,6 +172,28 @@ export default {
       } catch (e) {
         this.isLogin = false
       }
+    },
+    handleGoPage(tag) {
+      switch (tag) {
+        case 1:
+          this.go(`/pages/aiHall`)
+          break;
+        case 2:
+          this.go(`/pages/productHall`)
+          break;
+        case 3:
+          this.go(`/pages/prize`)
+          break;
+        case 4:
+          this.go(`/pages/explain`)
+          break;
+        case 5:
+          this.go(`/pages/shop`)
+          break;
+        case 6:
+          this.go(`/pages/testPro`)
+          break;
+      }
     }
   },
   components: {
@@ -160,3 +201,12 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+.index-btn{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top:80rpx;
+}
+</style>
