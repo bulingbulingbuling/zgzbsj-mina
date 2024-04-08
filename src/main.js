@@ -8,6 +8,7 @@ import filters from './utils/filters';
 import './assets/css/base.less';
 import './assets/css/index.less';
 import './assets/css/momentLanding.less';
+import './assets/css/AI.less';
 
 Vue.use(toast);
 Vue.use(loading);

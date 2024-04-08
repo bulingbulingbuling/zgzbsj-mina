@@ -13,15 +13,33 @@
             <image mode="aspectFit" class="template" :src="item.url" />
           </swiper-item>
         </swiper>
-        <canvas v-show="testing" type="2d" id="myCanvas" class="canvas" @tap="handleClick"></canvas>
+        <canvas v-show="testing" type="2d" id="myCanvas" class="canvas " @tap="handleClick"></canvas>
+        <div class="loadingMask" v-show="loading">
+          <div class="wrap">
+            <h3 class="title">生成中...</h3>
+            <p>预计还有12秒</p>
+          </div>
+        </div>
       </div>
-      <button id="bottom-btn" @click="handleBtnClick">
+      <button id="bottom-btn" @click="handleBtnClick('album')">
         <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
-        <h4>试用</h4>
+        <h4>上传照片</h4>
+      </button>
+      <button id="bottom-btn" @click="handleBtnClick('camera')">
+        <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
+        <h4>拍摄</h4>
       </button>
       <button id="bottom-btn" @click="handleQuitClick">
         <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
         <h4>取消试用</h4>
+      </button>
+      <button id="bottom-btn" @click="handleDownClick">
+        <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
+        <h4>下载</h4>
+      </button>
+      <button id="bottom-btn" @click="handleQuitClick">
+        <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
+        <h4>分享</h4>
       </button>
       <button id="bottom-btn" @click="handleResetTimes">
         <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
@@ -43,15 +61,11 @@ export default {
       templateList: [],
       currentIndex: 0,
       currentFace: {},
-      background: ['demo-text-1', 'demo-text-2', 'demo-text-3'],
-      indicatorDots: false,
-      vertical: false,
-      autoplay: false,
-      interval: 2000,
-      duration: 500,
       testing: false,
+      sourceType: [],
       TemplateFaceID: '',
-      type: 2, // type 1 是每日免费的换脸次数。2 是奖励换脸次数 每天3次免费，2次奖励。
+      type: 1, // type 1 是每日免费的换脸次数。2 是奖励换脸次数 每天3次免费，2次奖励。
+      loading: false,
       btnUrl: `https://oss-ai-peilian-app.xiaoyezi.com/dev/abtest/ai_referral_mina/default-btn1.png`
     }
   },
@@ -93,36 +107,44 @@ export default {
       this.testing = false
       this.currentFace = {}
     },
-    handleBtnClick() {
+    handleBtnClick(sourceType) {
       var query = wx.createSelectorQuery();
-      this.testing = true
       this.currentFace = this.templateList[this.currentIndex]
-      const { faces } = this.currentFace
+      this.sourceType = [sourceType]
+      const { faces, height: templateHeight, width: templateWidth } = this.currentFace
       if (faces.length) {
-        query.select('#myCanvas')
-          .fields({ node: true, size: true })
-          .exec((res) => {
-            const canvas = res[0].node
-            const ctx = canvas.getContext('2d')
-            const dpr = wx.getWindowInfo().pixelRatio
-            const width = res[0].width
-            const height = res[0].height
-            canvas.width = width * dpr
-            canvas.height = height * dpr
-            ctx.scale(dpr, dpr)
-            ctx.fillStyle = 'rgba(0, 0, 0, .5)'
-            ctx.fillRect(0, 0, width, height)
-            faces.forEach(element => {
-              const { X, Y, Height, Width } = element.FaceRect
-              const WScale = width / 1485
-              const HScale = height / 1980
-              element.range = {
-                XRange: [X * WScale, X * WScale + Width * WScale],
-                YRange: [Y * HScale, Y * HScale + Height * HScale]
-              }
-              ctx.clearRect(X * WScale, Y * HScale, Width * WScale, Height * HScale)
-            });
-          })
+        this.testing = true
+        setTimeout(() => {
+          query.select('#myCanvas')
+            .fields({ node: true, size: true })
+            .exec((res) => {
+              const canvas = res[0].node
+              const ctx = canvas.getContext('2d')
+              const dpr = wx.getWindowInfo().pixelRatio
+              // Canvas 2D（新接口）需要显式设置画布宽高，默认：300*150，最大：1365*1365
+              const width = res[0].width
+              const height = res[0].height
+              canvas.width = width * dpr
+              canvas.height = height * dpr
+              ctx.scale(dpr, dpr)
+              ctx.fillStyle = 'rgba(0, 0, 0, .5)'
+              ctx.fillRect(0, 0, width, height)
+              faces.forEach(element => {
+                const { X, Y, Height, Width } = element.FaceRect
+                const WScale = width / templateWidth
+                const HScale = height / templateHeight
+                element.range = {
+                  XRange: [X * WScale, X * WScale + Width * WScale],
+                  YRange: [Y * HScale, Y * HScale + Height * HScale]
+                }
+                ctx.clearRect(X * WScale, Y * HScale, Width * WScale, Height * HScale)
+              });
+            })
+        }, 80)
+      } else {
+        this.loading = true
+        debugger
+        this.chooseImg()
       }
     },
     handleClick(event) {
@@ -133,6 +155,7 @@ export default {
       if (faces.length) {
         faces.forEach(element => {
           if (x > element.range.XRange[0] && x < element.range.XRange[1] && y > element.range.YRange[0] && y < element.range.YRange[1]) {
+            this.loading = true
             this.TemplateFaceID = element.TemplateFaceID
             this.chooseImg()
           }
@@ -141,8 +164,7 @@ export default {
     },
     // 获取手机号
     async chooseImg() {
-      const ImageURL = await uploadImage()
-      if (ImageURL) {
+      await uploadImage(this.sourceType).then(ImageURL => {
         const { faces } = this.currentFace
         const facesDate = []
         if (faces.length) {
@@ -153,8 +175,16 @@ export default {
             }
           });
           this.changeFace()
+        } else {
+          this.currentFace.ImageURL = ImageURL
+          this.changeFace()
         }
-      }
+      }).catch(err => {
+        if (err.errMsg.indexOf('cancel') > -1) {
+          this.toast('取消选择')
+        }
+        this.testing = false
+      })
     },
     async changeFace() {
       let param = {}
@@ -173,9 +203,16 @@ export default {
             })
           }
         });
+      } else {
+        const { ImageURL } = this.currentFace
+        param.url = ImageURL
       }
       try {
         const res = await api.aiFaceChange(param)
+        if (res.code === 0) {
+          this.testing = false
+          return
+        }
         const { template_id, url } = res
         this.templateList = this.templateList.map(item => {
           if (item.template_id === template_id) {
@@ -183,9 +220,10 @@ export default {
           }
           return item
         })
+        this.loading = false
         this.handleQuitClick()
       } catch (e) {
-        this.isLogin = false
+        this.loading = false
       }
     },
     // 获取初始化数据
@@ -199,30 +237,3 @@ export default {
   }
 }
 </script>
-<style>
-.container {
-  padding-top: 30px;
-}
-.index-container-content {
-  position: relative;
-  height: 854rpx;
-  width: 640rpx;
-  margin: 0 auto;
-}
-.swiperWrap {
-  height: 854rpx;
-  width: 640rpx;
-  margin: 0 auto;
-}
-.template {
-  height: 854rpx;
-  width: 640rpx;
-}
-.canvas {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 854rpx;
-  width: 640rpx;
-}
-</style>

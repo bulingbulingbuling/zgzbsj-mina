@@ -1,0 +1,49 @@
+.container {
+  padding-top: 30px;
+  .index-container-content {
+    position: relative;
+    height: 854rpx;
+    width: 640rpx;
+    margin: 0 auto;
+    .swiperWrap {
+      height: 854rpx;
+      width: 640rpx;
+      margin: 0 auto;
+      .template {
+        height: 854rpx;
+        width: 640rpx;
+        border-radius: 35px;
+      }
+    }
+    .canvas {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 854rpx;
+      width: 640rpx;
+      border-radius: 35px;
+      z-index: 0;
+    }
+    .loadingMask {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 854rpx;
+      width: 640rpx;
+      background-color: #fff;
+      border-radius: 35px;
+      .wrap {
+        margin: 350rpx auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        .title {
+          font-size: 40rpx;
+          line-height: 45rpx;
+          margin-top: 0;
+        }
+      }
+    }
+  }
+}

@@ -56,12 +56,12 @@ export const getWxCode = () => {
     })
   })
 }
-export const uploadImage = () => {
-  return new Promise(resolve => {
+export const uploadImage = (sourceType) => {
+  return new Promise((resolve, reject) => {
     wx.chooseMedia({
       count: 1,
       mediaType: ['image'],
-      sourceType: ['album', 'camera'],
+      sourceType,
       camera: 'back',
       success(res) {
         const tempFilePath = res.tempFiles[0].tempFilePath
@@ -91,12 +91,18 @@ export const uploadImage = () => {
                   showCancel: false
                 })
               }
-            },
-            fail: err => {
-              console.log(err);
             }
           });
         })
+      },
+      fail(err) {
+        reject(err)
+        console.log(err);
+      },
+      finally(res) {
+        debugger
+        resolve(res)
+        console.log(res);
       }
     })
   })

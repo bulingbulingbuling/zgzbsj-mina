@@ -13,22 +13,22 @@
         </button>
       </div> -->
     </div>
-    <div class="index-btn" @click="handleGoPage(1)">
+    <div class="index-btn" @click="handleGoPage('aiHall')">
       ai展馆
     </div>
-    <div class="index-btn" @click="handleGoPage(2)">
+    <div class="index-btn" @click="handleGoPage('productHall')">
       新品展示馆
     </div>
-    <div class="index-btn" @click="handleGoPage(3)">
+    <div class="index-btn" @click="handleGoPage('prize')">
       我的奖品
     </div>
-    <div class="index-btn" @click="handleGoPage(4)">
+    <div class="index-btn">
       活动说明
     </div>
-    <div class="index-btn" @click="handleGoPage(5)">
+    <div class="index-btn" @click="handleGoPage('shop')">
       参与店铺
     </div>
-    <div class="index-btn" @click="handleGoPage(6)">
+    <div class="index-btn" @click="handleGoPage('testPro')">
       测试
     </div>
 
@@ -173,27 +173,8 @@ export default {
         this.isLogin = false
       }
     },
-    handleGoPage(tag) {
-      switch (tag) {
-        case 1:
-          this.go(`/pages/aiHall`)
-          break;
-        case 2:
-          this.go(`/pages/productHall`)
-          break;
-        case 3:
-          this.go(`/pages/prize`)
-          break;
-        case 4:
-          this.go(`/pages/explain`)
-          break;
-        case 5:
-          this.go(`/pages/shop`)
-          break;
-        case 6:
-          this.go(`/pages/testPro`)
-          break;
-      }
+    handleGoPage(page) {
+      this.go(`/pages/${page}`)
     }
   },
   components: {
