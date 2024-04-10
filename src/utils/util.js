@@ -100,7 +100,6 @@ export const uploadImage = (sourceType) => {
         console.log(err);
       },
       finally(res) {
-        debugger
         resolve(res)
         console.log(res);
       }

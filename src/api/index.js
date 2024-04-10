@@ -30,20 +30,6 @@ export const api = {
   async register(param) {
     return await baseApi.post('/referral_miniapp/landing/register', param);
   },
-  // 发送验证码
-  async sendCode({
-    mobile,
-    country_code,
-    scene = '',
-    channel_id = ''
-  } = {}) {
-    return await baseApi.get('/referral_miniapp/landing/send_sms_code', {
-      mobile,
-      country_code,
-      scene,
-      channel_id
-    });
-  },
   // 转介绍 获取oss配置
   async getOssConfig(type = 'referral', upload_prefix) {
     return await ossApi.get(`/api/oss/signature`, {
@@ -68,5 +54,8 @@ export const api = {
   },
   async resetTimes() {
     return await baseApi.post('/referral_miniapp/aitime/del');
+  },
+  async handleRest() {
+    return await baseApi.post('/referral_miniapp/user/del');
   }
 }

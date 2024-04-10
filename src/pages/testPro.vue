@@ -143,7 +143,6 @@ export default {
         }, 80)
       } else {
         this.loading = true
-        debugger
         this.chooseImg()
       }
     },
@@ -158,11 +157,13 @@ export default {
             this.loading = true
             this.TemplateFaceID = element.TemplateFaceID
             this.chooseImg()
+          } else {
+            this.handleQuitClick()
           }
         });
       }
     },
-    // 获取手机号
+    // 选择相册
     async chooseImg() {
       await uploadImage(this.sourceType).then(ImageURL => {
         const { faces } = this.currentFace
@@ -183,6 +184,7 @@ export default {
         if (err.errMsg.indexOf('cancel') > -1) {
           this.toast('取消选择')
         }
+        this.loading = false
         this.testing = false
       })
     },
@@ -213,10 +215,18 @@ export default {
           this.testing = false
           return
         }
-        const { template_id, url } = res
+        const { template_id, url, faces: resFaces } = res
+        const TemplateFaceIArr = resFaces.map(item => item.TemplateFaceID)
         this.templateList = this.templateList.map(item => {
           if (item.template_id === template_id) {
             item.url = url
+            if (item.faces) {
+              item.faces.forEach((element) => {
+                if (TemplateFaceIArr.includes(element.TemplateFaceID)) {
+                  element.ImageURL = resFaces.filter(item => item.TemplateFaceID === element.TemplateFaceID)[0].ImageURL
+                }
+              })
+            }
           }
           return item
         })

@@ -4,23 +4,25 @@
       <!-- <div class="index-container-content">
         <img class="header" :src="bgUrl" alt="">
       </div> -->
-      <!-- <div class="index-container-bottom" :style="btnStyle">
-        <div class="action" v-if="configData.mobile" >
-          <img :src="btnUrl" alt="">
-        </div>
-        <button id="bottom-btn" class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="handleBtnClick" v-else>
-          <img :src="btnUrl" alt="">
-        </button>
-      </div> -->
     </div>
-    <div class="index-btn" @click="handleGoPage('aiHall')">
-      ai展馆
+    <div>
+      <div class="index-btn" @click="handleGoPage('aiHall')" v-if="configData.mobile">
+        AI展馆
+      </div>
+      <button class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="handleBtnClick" v-else>
+        AI展馆
+      </button>
     </div>
     <div class="index-btn" @click="handleGoPage('productHall')">
       新品展示馆
     </div>
-    <div class="index-btn" @click="handleGoPage('prize')">
-      我的奖品
+    <div>
+      <div class="index-btn" @click="handleGoPage('prize')" v-if="configData.mobile">
+        我的奖品
+      </div>
+      <button class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="handleBtnClick" v-else>
+        我的奖品
+      </button>
     </div>
     <div class="index-btn">
       活动说明
@@ -31,7 +33,9 @@
     <div class="index-btn" @click="handleGoPage('testPro')">
       测试
     </div>
-
+    <div class="index-btn" @click="handleRest()">
+      清除授权
+    </div>
     <alert :isShow="showAlert" :isFree="false" :pkg="configData.pkg" @close="closeAlert" :type="alertType" :isLogin="isLogin" :form="form" :scene="scene" @login="register">
     </alert>
   </div>
@@ -88,7 +92,6 @@ export default {
         this.handleNetError(res)
       }
     })
-
     // 获取来源
     const { scene } = wx.getLaunchOptionsSync()
     this.share_type = scene
@@ -148,6 +151,9 @@ export default {
       this.configData = await api.getIndexData()
       this.bgUrl = `${this.imgPath}/ai_mina/newIndex2/default99V1.png`
       this.store.mobile = this.configData.mobile
+    },
+    async handleRest() {
+      this.configData = await api.handleRest()
     },
     handleGetting() {
       if (this.isNetError) {
