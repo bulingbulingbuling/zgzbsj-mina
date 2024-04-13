@@ -38,13 +38,13 @@ export default {
   config: {
     // pages 的首个页面会被编译成首页
     pages: [
+      'pages/shop', // 参与店铺
       'pages/index', // 首页
       'pages/aiHall', // ai展馆
       'pages/aiShare', // 生成结果
       'pages/productHall', // 新品展馆
       'pages/explain', // 活动说明
       'pages/prize', // 我的奖品
-      'pages/shop', // 参与店铺
       'pages/rules' // 规则webview
     ],
     usingComponents: {
