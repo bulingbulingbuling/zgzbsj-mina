@@ -9,10 +9,12 @@ import './assets/css/base.less';
 import './assets/css/index.less';
 import './assets/css/momentLanding.less';
 import './assets/css/AI.less';
+// import { Button } from 'vant';
 
 Vue.use(toast);
 Vue.use(loading);
 Vue.use(store);
+// Vue.use(Button);
 
 Object.keys(filters).forEach((item) => {
   Vue.filter(item, filters[item]);
@@ -45,8 +47,7 @@ export default {
       'pages/explain', // 活动说明
       'pages/prize', // 我的奖品
       'pages/shop', // 参与店铺
-      'pages/rules', // 规则webview
-      'pages/testPro' // 测试页
+      'pages/rules' // 规则webview
     ],
     usingComponents: {
       'timer-comp': './native/timer-comp/index',

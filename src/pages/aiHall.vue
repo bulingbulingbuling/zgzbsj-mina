@@ -37,7 +37,7 @@
         <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
         <h4>下载</h4>
       </button>
-      <button v-if="hasChange" id="bottom-btn" @click="handleQuitClick">
+      <button v-if="hasChange" open-type="share" @click="handleShare">
         <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
         <h4>分享</h4>
       </button>
@@ -45,7 +45,20 @@
         <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
         <h4>重置次数</h4>
       </button>
+      <div class="alert" v-if="shareModal">
+        <div class="mask"></div>
+        <div class="alert-content">
+          <button open-type="share">
+            微信
+          </button>
+          <button id="bottom-btn" @click="handleQuitClick">
+            <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
+            <h4>朋友圈</h4>
+          </button>
+        </div>
+      </div>
     </div>
+    <van-button type="primary">主要按钮</van-button>
   </div>
 </template>
 
@@ -67,8 +80,23 @@ export default {
       type: 1, // type 1 是每日免费的换脸次数。2 是奖励换脸次数 每天3次免费，2次奖励。
       loading: false,
       hasChange: false,
+      shareModal: false,
       btnUrl: `https://oss-ai-peilian-app.xiaoyezi.com/dev/abtest/ai_referral_mina/default-btn1.png`
     }
+  },
+  async created() {
+    wx.setNavigationBarTitle({
+      title: '选择号码归属地'
+    })
+    wx.showShareMenu({
+      withShareTicket: true,
+      menus: ['shareAppMessage', 'shareTimeline']
+    })
+    wx.getNetworkType({
+      success: (res) => {
+        this.handleNetError(res)
+      }
+    })
   },
   onShow(options) {
     // 监听网络状态变化
@@ -77,15 +105,21 @@ export default {
         this.toast('当前网络异常，请检查网络后再试')
       }
     })
-    wx.getNetworkType({
-      success: (res) => {
-        this.handleNetError(res)
-      }
-    })
   },
   // 设置自定义转发的内容
   onShareAppMessage() {
-    // 分享设置
+    return {
+      title: '分享标题',
+      path: `/pages/index`,
+      imageUrl: this.templateList[this.currentIndex].url
+    }
+  },
+  onShareTimeline() {
+    return {
+      title: '分享标题',
+      path: `/pages/index`,
+      imageUrl: this.templateList[this.currentIndex].url
+    }
   },
   methods: {
     handleNetError(res) {
@@ -97,7 +131,6 @@ export default {
       }
     },
     swiperChange(event) {
-      debugger
       this.currentIndex = event.detail.current
       this.hasChange = this.templateList[event.detail.current].hasChange || false
     },
@@ -140,11 +173,13 @@ export default {
             })
         }, 80)
       } else {
+        this.testing = false
         this.loading = true
         this.chooseImg()
       }
     },
     handleClick(event) {
+      if (!this.testing) return
       let { x, y } = event.detail
       x = x - 27.5
       y = y - 20
@@ -155,8 +190,6 @@ export default {
             this.loading = true
             this.TemplateFaceID = element.TemplateFaceID
             this.chooseImg()
-          } else {
-            this.handleQuitClick()
           }
         });
       }
@@ -184,8 +217,6 @@ export default {
       wx.downloadFile({
         url,
         success: (res) => {
-          console.log('downloadfile', res)
-          debugger
           wx.saveImageToPhotosAlbum({
             filePath: res.tempFilePath,
             success: function (data) {
@@ -215,12 +246,10 @@ export default {
     async chooseImg() {
       await uploadImage(this.sourceType).then(ImageURL => {
         const { faces } = this.currentFace
-        const facesDate = []
         if (faces.length) {
           faces.forEach(element => {
             if (element.TemplateFaceID === this.TemplateFaceID) {
               element.ImageURL = ImageURL
-              facesDate.push({ ...element })
             }
           });
           this.changeFace()
@@ -238,8 +267,8 @@ export default {
     },
     async changeFace() {
       let param = {}
-      const { template_id } = this.currentFace
-      param.template_id = template_id
+      const { template_id: currentFaceTemplateId } = this.currentFace
+      param.template_id = currentFaceTemplateId
       param.type = this.type
       const { faces } = this.currentFace
       if (faces.length) {
@@ -257,12 +286,7 @@ export default {
         const { ImageURL } = this.currentFace
         param.url = ImageURL
       }
-      try {
-        const res = await api.aiFaceChange(param)
-        if (res.code === 0) {
-          this.testing = false
-          return
-        }
+      await api.aiFaceChange(param).then(res => {
         const { template_id, url, faces: resFaces } = res
         const TemplateFaceIArr = resFaces.map(item => item.TemplateFaceID)
         this.templateList = this.templateList.map(item => {
@@ -282,9 +306,12 @@ export default {
         this.hasChange = true
         this.loading = false
         this.handleQuitClick()
-      } catch (e) {
+      }).catch(err => {
+        console.log(err)
+        // this.toast(err.errors.err_msg)
+        this.testing = false
         this.loading = false
-      }
+      })
     },
     // 获取初始化数据
     async getTemplateList() {
@@ -293,6 +320,10 @@ export default {
     },
     async handleResetTimes() {
       api.resetTimes()
+    },
+    async handleShare() {
+      const res = await api.shareImage()
+      // {"code":0,"data":{"user_prize":{type:4, content: '恭喜您获得一次AI换脸机会'}}}
     }
   }
 }

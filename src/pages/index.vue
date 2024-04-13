@@ -30,9 +30,6 @@
     <div class="index-btn" @click="handleGoPage('shop')">
       参与店铺
     </div>
-    <div class="index-btn" @click="handleGoPage('testPro')">
-      测试
-    </div>
     <div class="index-btn" @click="handleRest()">
       清除授权
     </div>
@@ -102,14 +99,6 @@ export default {
     this.showAlert = false
     this.hasBtnClicked = false
   },
-  // 设置自定义转发的内容
-  onShareAppMessage() {
-    return {
-      title: '5天智能陪练体验营，打卡返19.8元现金红包',
-      path: `/pages/index?scene=${this.shareScene}`,
-      imageUrl: `${this.imgPath}/ai_mina/newIndex2/share-header.png`
-    }
-  },
   methods: {
     handleNetError(res) {
       if (res.networkType === 'none') {
@@ -160,7 +149,7 @@ export default {
         this.toast('网络异常，请检查网络后重试')
         return
       }
-      this.go(`/pages/testPro`)
+      this.go(`/pages/aiHall`)
     },
     // 手机号注册
     async register(param, isAuth) {

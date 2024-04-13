@@ -37,22 +37,7 @@ const request = (url, params, method, header) => {
             resolve(result)
             return
           }
-          let errMsg
-          if (Array.isArray(res.data.errors)) {
-            if (!res.data.errors[0]) {
-              Object.keys(res.data.errors).forEach(errKey => {
-                errMsg = res.data.errors[errKey][0].err_msg
-              })
-            }
-          } else {
-            errMsg = res.data.errors.err_msg
-          }
-          wx.showToast({
-            title: errMsg || res.data.errors[0].err_msg + '',
-            icon: 'none',
-            duration: 2000
-          });
-          reject(new Error())
+          reject(res.data)
         } else {
           if (url.includes('oss')) {
             resolve(res.data)

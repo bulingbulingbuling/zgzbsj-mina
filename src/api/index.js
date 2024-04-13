@@ -57,5 +57,8 @@ export const api = {
   },
   async handleRest() {
     return await baseApi.post('/referral_miniapp/user/del');
+  },
+  async shareImage() {
+    return await baseApi.post('/referral_miniapp/share_prize/make');
   }
 }
