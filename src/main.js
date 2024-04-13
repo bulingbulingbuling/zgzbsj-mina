@@ -9,12 +9,10 @@ import './assets/css/base.less';
 import './assets/css/index.less';
 import './assets/css/momentLanding.less';
 import './assets/css/AI.less';
-// import { Button } from 'vant';
 
 Vue.use(toast);
 Vue.use(loading);
 Vue.use(store);
-// Vue.use(Button);
 
 Object.keys(filters).forEach((item) => {
   Vue.filter(item, filters[item]);
@@ -51,7 +49,8 @@ export default {
     ],
     usingComponents: {
       'timer-comp': './native/timer-comp/index',
-      'ec-canvas': './native/ec-canvas/ec-canvas'
+      'ec-canvas': './native/ec-canvas/ec-canvas',
+      'van-button': './native/button/index'
     },
     window: {
       backgroundTextStyle: 'dark',

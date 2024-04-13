@@ -1,5 +1,5 @@
 {
-  "appid": "wx57c6f675638b170f",
+  "appid": "wx1e510aa83c656664",
   "compileType": "miniprogram",
   "libVersion": "3.3.5",
   "packOptions": {
@@ -13,6 +13,7 @@
     "minified": true,
     "enhance": true,
     "showShadowRootInWxmlPanel": true,
+    "lazyCodeLoading": "requiredComponents",
     "packNpmRelationList": [],
     "babelSetting": {
       "ignore": [],
