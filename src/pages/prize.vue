@@ -1,73 +1,65 @@
 <template>
-  <div class="price">
-    <div class="price-list">
+  <div class="prize">
+    <div class="prize-list" v-for="item in prizeList" :key="item.id">
       <div class="list-left">
-        <div class="left-title">AI换脸次数两次</div>
-        <div class="left-time">2014.5.30到期</div>
+        <div class="left-title">{{ item.prize_content.replace('恭喜您获得', '') }}</div>
+        <div class="left-time">{{ item.expire_time || '永久有效' }}到期</div>
       </div>
-      <div class="list-right">
-        <div class="right-btn">立即使用</div>
-      </div>
-    </div>
-
-    <div class="price-list">
-      <div class="list-left">
-        <div class="left-title">AI换脸次数两次</div>
-        <div class="left-time">2014.5.30到期</div>
-      </div>
-      <div class="list-right">
-        <div class="right-btn" @click="handleUsePrice">立即使用</div>
+      <div class="list-right" @click="handleUse(item)">
+        <div class="right-btn" v-if="Number(item.prize_type) === 4">立即使用</div>
+        <div class="right-btn" v-else>立即领取</div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+
+import { api } from '@/api'
+
 export default {
   data () {
     return {
-
+      prizeList: []
     }
   },
+  async created() {
+    wx.setNavigationBarTitle({
+      title: '我的奖品'
+    })
+    wx.getNetworkType({
+      success: (res) => {
+        this.handleNetError(res)
+      }
+    })
+  },
   methods: {
-    handleUsePrice() {
+    handleNetError(res) {
+      if (res.networkType === 'none') {
+        this.isNetError = true
+        this.toast('当前网络异常，请检查网络后再试')
+      } else {
+        this.getPrizeList()
+      }
+    },
+    handleUseprize() {
       wx.navigateTo({
         url: '/pages/shop'
       })
+    },
+    handleUse(item) {
+      switch (Number(item.prize_type)) {
+        case 4:
+          this.go('/pages/aiHall')
+          break
+        default:
+      }
+    },
+    async getPrizeList() {
+      const res = await api.getPrizeList()
+      // type= 4 是AI次数。其他的有可能没有过期时间。expire_time = 0 ;
+      this.prize = res.user_prize
     }
   }
 }
 </script>
-<style lang="scss" scoped>
-.price {
-  padding: 20rpx;
-  .price-list{
-    border: 2px solid red;
-    border-radius:20px;
-    background: orange;
-    margin:40rpx;
-    padding: 20rpx;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    .list-left{
-      flex: 3;
-      .left-title{
-        margin-bottom: 20rpx;
-        font-size: 40rpx;
-        font-weight: bolder;
-      }
-    }
-    .list-right{
-      flex: 1;
-      .right-btn{
-        background: green;
-        border-radius:20px;
-        padding:10rpx;
-        text-align:center;
-
-      }
-    }
-  }
-}
-</style>

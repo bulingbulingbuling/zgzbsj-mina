@@ -1,6 +1,6 @@
 <template>
   <div class="shop">
-    <div class="city"v-if="true">
+    <div class="city" v-if="true">
       <div class="city-title">请选择所在地区</div>
       <div class="city-sub-title">选择省份/地区</div>
       <div class="city-list">
@@ -55,62 +55,3 @@ export default {
   }
 }
 </script>
-<style lang = "scss" scoped>
-.shop{
-  .city{
-    padding: 40rpx;
-    .city-title{
-      width: 100%;
-      text-align: center;
-      margin-top: 20rpx;
-      color: green;
-      font-weight:bolder;
-    }
-    .city-sub-title{
-      text-align: left;
-      margin: 20rpx 0;
-    }
-    .city-list{
-      .list-item{
-        display: flex;
-        justify-content: space-between;
-        .left{
-          width:160rpx;
-          text-align:center
-        }
-        .right{
-          flex:1;
-          .item{
-            margin-bottom: 60rpx;
-          }
-        }
-      }
-    }
-  }
-  .list{
-    .list-title{
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 20rpx;
-      color: green;
-    }
-    .shop-card{
-      background: hotpink;
-      margin: 20rpx 40rpx;
-      padding: 20rpx;
-      border-radius: 10rpx;
-      .card-title{
-        font-size: 40rpx;
-        font-weight: bold;
-        margin-bottom: 20rpx;
-      }
-      .card-item{
-        margin-bottom: 10rpx;
-      }
-    }
-  }
-
-}
-</style>

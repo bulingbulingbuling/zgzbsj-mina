@@ -60,5 +60,9 @@ export const api = {
   },
   async shareImage() {
     return await baseApi.post('/referral_miniapp/share_prize/make');
+  },
+  // 获取奖品列表
+  async getPrizeList() {
+    return await baseApi.get('/referral_miniapp/user_prize/list');
   }
 }

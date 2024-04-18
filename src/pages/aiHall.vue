@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="aiHall">
     <div class="container">
       <div class="index-container-content">
         <swiper
@@ -33,11 +33,14 @@
         <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
         <h4>取消试用</h4>
       </button>
-      <button v-if="hasChange && !isAuthSavePhoto" @click="handleDownClick">
+      <button v-if="hasChange && !isAuthSavePhoto" @click="handleDown">
         <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
         <h4>下载</h4>
       </button>
-      <button v-if="hasChange" open-type="share" @click="handleShare">
+      <!-- <button v-if="hasChange" open-type="share" @click="handleShare">
+        <h4>分享</h4>
+      </button> -->
+      <button v-if="hasChange" @click="handleShare">
         <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
         <h4>分享</h4>
       </button>
@@ -57,14 +60,31 @@
           </button>
         </div>
       </div>
+      <van-dialog v-model="showDownModal" title="标题" show-cancel-button>
+        <img :src="synthesisUrl" class="downImg" />
+      </van-dialog>
+      <van-dialog
+        use-slot
+        title="下载预览"
+        :show="showDownModal"
+        show-cancel-button
+        confirm-button-text="下载"
+        confirm-button-open-type="getUserInfo"
+        @close="handleClose"
+        @getuserinfo="handleDownClick"
+      >
+        <div class="downImgWrap">
+          <image mode="aspectFit" class="downImg" :src="synthesisUrl" />
+        </div>
+      </van-dialog>
     </div>
-    <van-button type="primary">主要按钮</van-button>
   </div>
 </template>
 
 <script>
 import { api } from '@/api'
 import { uploadImage } from '@/utils/util'
+import { btoa } from '@/utils/base64'
 
 export default {
   data () {
@@ -81,12 +101,17 @@ export default {
       loading: false,
       hasChange: false,
       shareModal: false,
+      prize: '',
+      synthesisUrl: null,
+      showDownModal: false,
+      downBaseURL: 'https://cjewel.oss-cn-shanghai.aliyuncs.com/download.png',
+      shareBaseURL: 'https://cjewel.oss-cn-shanghai.aliyuncs.com/share.png',
       btnUrl: `https://oss-ai-peilian-app.xiaoyezi.com/dev/abtest/ai_referral_mina/default-btn1.png`
     }
   },
   async created() {
     wx.setNavigationBarTitle({
-      title: '选择号码归属地'
+      title: 'AI换脸'
     })
     wx.showShareMenu({
       withShareTicket: true,
@@ -100,6 +125,7 @@ export default {
   },
   onShow(options) {
     // 监听网络状态变化
+    console.log('onShow')
     wx.onNetworkStatusChange((res) => {
       if (res.networkType === 'none') {
         this.toast('当前网络异常，请检查网络后再试')
@@ -194,8 +220,24 @@ export default {
         });
       }
     },
-    handleDownClick() {
+    formatDownUrl(url, isShare) {
+      const originUrl = url.split('?')[0]
+      const path = originUrl.split('com/')[1]
+      const baseQuery = isShare ? '?x-oss-process=image/resize,m_fixed,w_200,h_278' : '?x-oss-process=image/resize,m_fixed,w_316,h_438'
+      const pathAndQuery = `${path}${baseQuery}`
+      const imageParamStr = btoa(decodeURIComponent(encodeURIComponent(pathAndQuery)))
+      const synthesisUrlQuery = isShare ? `?x-oss-process=image/watermark,image_${imageParamStr},g_sw,y_116,x_92` : `?x-oss-process=image/watermark,image_${imageParamStr},g_south,y_116`
+      this.synthesisUrl = `${isShare ? this.shareBaseURL : this.downBaseURL}${synthesisUrlQuery}`
+    },
+    handleDown() {
       const { url } = this.templateList[this.currentIndex]
+      this.formatDownUrl(url)
+      this.showDownModal = true
+    },
+    handleClose() {
+      this.showDownModal = false
+    },
+    handleDownClick() {
       const that = this
       wx.getSetting({
         success(res) {
@@ -203,11 +245,11 @@ export default {
             wx.authorize({
               scope: 'scope.writePhotosAlbum',
               success () {
-                that.savePhoto(url)
+                that.savePhoto(that.synthesisUrl)
               }
             })
           } else {
-            that.savePhoto(url)
+            that.savePhoto(that.synthesisUrl)
           }
         }
       })
@@ -226,19 +268,12 @@ export default {
               console.log(err);
               if (err.errMsg === 'saveImageToPhotosAlbum:fail auth deny') {
                 that.toast('用户拒绝授权，如需保存请手动设置打开授权')
-                // wx.openSetting({
-                //   success(settingdata) {
-                //     console.log(settingdata)
-                //     if (settingdata.authSetting['scope.writePhotosAlbum']) {
-                //       console.log('获取权限成功，给出再次点击图片保存到相册的提示。')
-                //     } else {
-                //       console.log('获取权限失败，给出不给权限就无法正常使用的提示')
-                //     }
-                //   }
-                // })
               }
             }
           })
+        },
+        fail: (err) => {
+          console.log(err)
         }
       })
     },
@@ -307,8 +342,7 @@ export default {
         this.loading = false
         this.handleQuitClick()
       }).catch(err => {
-        console.log(err)
-        // this.toast(err.errors.err_msg)
+        this.toast(err.errors.err_msg)
         this.testing = false
         this.loading = false
       })
@@ -317,13 +351,18 @@ export default {
     async getTemplateList() {
       const res = await api.getTemplate()
       this.templateList = res.templates
+      // todo 上线钱删掉
+      // this.hasChange = true
+      // this.templateList[0].url = 'https://cjewel.oss-cn-shanghai.aliyuncs.com/aiface/11/1713438455.jpg?Expires=1713467257&OSSAccessKeyId=LTAI5tE1yB78c8ttb2AqaXEo&Signature=gceLfPBNQlxV6%2FuarMfKdmOxoGw%3D'
     },
     async handleResetTimes() {
       api.resetTimes()
     },
     async handleShare() {
-      const res = await api.shareImage()
-      // {"code":0,"data":{"user_prize":{type:4, content: '恭喜您获得一次AI换脸机会'}}}
+      const { url } = this.templateList[this.currentIndex]
+      this.formatDownUrl(url, true)
+      this.store.synthesisUrl = this.synthesisUrl
+      this.go('/pages/share')
     }
   }
 }
