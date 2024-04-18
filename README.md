@@ -19,7 +19,7 @@ npm run build:production
 需求
 
 ```bash
-  落地页
+  落地页 ai展馆 新品展示馆 我的奖品 活动说明 参与店铺 那些需要先授权
   AI互动
   新品展示
   分享获得奖品
