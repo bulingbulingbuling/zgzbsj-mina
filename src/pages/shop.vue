@@ -1,56 +1,63 @@
 <template>
   <div class="shop">
-    <div class="city" v-if="true">
-      <div class="city-title">请选择所在地区</div>
-      <div class="city-sub-title">选择省份/地区</div>
-      <div class="city-list">
-        <div class="list-item">
-          <div class="left">A</div>
-          <div class="right">
-            <div class="item">安徽省1</div>
-            <div class="item">安徽省2</div>
-            <div class="item">安徽省2</div>
-            <div class="item">安徽省2</div>
-            <div class="item">安徽省2</div>
-            <div class="item">安徽省2</div>
-            <div class="item">安徽省2</div>
-            <div class="item">安徽省2</div>
-
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="left">B</div>
-          <div class="right">
-            <div class="item">北京市</div>
-            <div class="item">广东省</div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-    <div class="list" v-if="false">
-      <div class="list-title"> 泉州市</div>
-      <div class="shop-card">
-        <div class="card-title">中国珠宝泉州分公司</div>
-        <div class="card-item">电话：0323-4873726</div>
-        <div class="card-item">地址：泉州市 南京路 新街口街</div>
-        <div class="card-item">营业时间：09:00-18:00</div>
-      </div>
-      <div class="shop-card">
-        <div class="card-title">中国珠宝泉州分公司</div>
-        <div class="card-item">电话：0323-4873726</div>
-        <div class="card-item">地址：泉州市 南京路 新街口街</div>
-        <div class="card-item">营业时间：09:00-18:00</div>
+    <headerNavBar title="参与店铺"/>
+    <div class="list">
+      <div class="list-title">{{ this.store.city_name }}</div>
+      <div class="shop-card" v-for="item in shopList" :key="item.id">
+        <div class="card-title">{{ item.name }}</div>
+        <div class="card-item">地址：{{ item.province }}{{ item.city }}{{ item.address }}</div>
       </div>
     </div>
   </div>
 </template>
 
+<config>
+  {
+    "navigationStyle": "custom"
+  }
+</config>
+
 <script>
+
+import { api } from '@/api'
+
 export default {
   data () {
     return {
-
+      store: this.$mp.app.globalData,
+      shopList: []
+    }
+  },
+  async created() {
+    wx.setNavigationBarTitle({
+      title: '参与店铺'
+    })
+  },
+  onShow() {
+    if (this.store.province_id && this.store.city_id) {
+      wx.getNetworkType({
+        success: (res) => {
+          this.handleNetError(res)
+        }
+      })
+    }
+  },
+  methods: {
+    handleNetError(res) {
+      if (res.networkType === 'none') {
+        this.isNetError = true
+        this.toast('当前网络异常，请检查网络后再试')
+      } else {
+        this.getShopList()
+      }
+    },
+    async getShopList() {
+      const res = await api.getShopList({
+        province_id: this.store.province_id,
+        city_id: this.store.city_id,
+        city_name: this.store.city_name
+      })
+      this.shopList = res.shops
     }
   }
 }

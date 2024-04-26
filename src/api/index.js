@@ -64,5 +64,25 @@ export const api = {
   // 获取奖品列表
   async getPrizeList() {
     return await baseApi.get('/referral_miniapp/user_prize/list');
+  },
+  // 获取奖品列表
+  async getProvinceList() {
+    return await baseApi.get('/referral_miniapp/area/province');
+  },
+  // 获取奖品列表
+  async getCityList(params) {
+    return await baseApi.get('/referral_miniapp/area/city', params);
+  },
+  // 获取奖品列表
+  async getShopList(params) {
+    return await baseApi.get('/referral_miniapp/shop/list', params);
+  },
+  // 获取奖品列表
+  async getProductList(params) {
+    return await baseApi.get('/referral_miniapp/product/list', params);
+  },
+  // 获取奖品列表
+  async getRemainTimes() {
+    return await baseApi.get('/referral_miniapp/aitime/get');
   }
 }

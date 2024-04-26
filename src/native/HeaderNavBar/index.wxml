@@ -1,0 +1,12 @@
+<view style="height:{{hasHeight ? navHeight+5 : 0}}px;">
+  <view class="custom_head {{isTransparent}}" : style="height:{{navHeight+5}}px;">
+    <view class="flex-row j_b" style="height:{{navObj}}px;padding-top:{{navTop}}px;padding-right:{{navObjWid+5}}px;">
+      <view class="head_store text_ellipsis" style="line-height:{{navObj}}px;height:{{navObj}}px;">
+        <view class="navbar-btn" wx:if="{{needBack}}" bindtap="handleBack" style="height:{{navObj}}px;">
+          <image mode="heightFix" class="navbar-icon custom-icon-class" src="./back.svg"></image>
+        </view>
+        <view>{{title}}</view>
+      </view>
+    </view>
+  </view>
+</view>

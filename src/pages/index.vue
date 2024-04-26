@@ -1,80 +1,71 @@
 <template>
-  <div>
+  <div class="index">
+    <headerNavBar :hasHeight="false" isTransparent="isTransparent" :needBack="false" />
     <div class="container index-container">
-      <!-- <div class="index-container-content">
-        <img class="header" :src="bgUrl" alt="">
-      </div> -->
-    </div>
-    <div>
-      <div class="index-btn" @click="handleGoPage('aiHall')" v-if="configData.mobile">
-        AI展馆
+      <div class="index-container-content">
+        <img class="bgImg" src="@/static/imgs/bg.png" alt="">
       </div>
-      <button class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="handleBtnClick" v-else>
-        AI展馆
-      </button>
     </div>
-    <div class="index-btn" @click="handleGoPage('productHall')">
-      新品展示馆
-    </div>
-    <div>
-      <div class="index-btn" @click="handleGoPage('prize')" v-if="configData.mobile">
-        我的奖品
+    <div class="btnGroup">
+      <div>
+        <div class="indexBtn" @click="handleGoPage('aiHall')" v-if="configData.mobile">
+          <div class="content">AI 互动</div>
+          <img class="btnImg" :src="`${activeBtn === 'aiHall' ? require('@/static/imgs/activeBtn.png') : require('@/static/imgs/defaultBtn.png')}`" alt="">
+        </div>
+        <button class="indexBtn action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="handleBtnClick('aiHall')" v-else>
+          <div class="content">AI 互动</div>
+          <img class="btnImg" src="@/static/imgs/defaultBtn.png" alt="">
+        </button>
       </div>
-      <button class="action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="handleBtnClick" v-else>
-        我的奖品
-      </button>
+      <div class="indexBtn" @click="handleGoPage('productHall')">
+        <div class="content">新品展示馆</div>
+        <img class="btnImg" :src="`${activeBtn === 'productHall' ? require('@/static/imgs/activeBtn.png') : require('@/static/imgs/defaultBtn.png')}`" alt="">
+      </div>
+      <div>
+        <div class="indexBtn" @click="handleGoPage('prize')" v-if="configData.mobile">
+          <div class="content">我的奖品</div>
+          <img class="btnImg" :src="`${activeBtn === 'prize' ? require('@/static/imgs/activeBtn.png') : require('@/static/imgs/defaultBtn.png')}`" alt="">
+        </div>
+        <button class="indexBtn action" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" :disabled="hasBtnClicked" @click="handleBtnClick('prize')" v-else>
+          <div class="content">我的奖品</div>
+          <img class="btnImg" src="@/static/imgs/defaultBtn.png" alt="">
+        </button>
+      </div>
+      <div class="indexBtn" @click="handleGoPage('rules')">
+        <div class="content">活动说明</div>
+        <img class="btnImg" :src="`${activeBtn === 'rules' ? require('@/static/imgs/activeBtn.png') : require('@/static/imgs/defaultBtn.png')}`" alt="">
+      </div>
+      <div class="indexBtn" @click="handleGoPage('province')">
+        <div class="content">参与店铺</div>
+        <img class="btnImg" :src="`${activeBtn === 'province' ? require('@/static/imgs/activeBtn.png') : require('@/static/imgs/defaultBtn.png')}`" alt="">
+      </div>
     </div>
-    <div class="index-btn">
-      活动说明
-    </div>
-    <div class="index-btn" @click="handleGoPage('shop')">
-      参与店铺
-    </div>
-    <div class="index-btn" @click="handleRest()">
+    <!-- <div class="indexBtn" @click="handleRest()">
       清除授权
-    </div>
-    <alert :isShow="showAlert" :isFree="false" :pkg="configData.pkg" @close="closeAlert" :type="alertType" :isLogin="isLogin" :form="form" :scene="scene" @login="register">
-    </alert>
+    </div> -->
   </div>
 </template>
+<config>
+  {
+    "navigationStyle": "custom"
+  }
+</config>
 
 <script>
 import { api } from '@/api'
-import Alert from '@/components/alert'
 import { getWxCode } from '@/utils/util'
 
 export default {
   data () {
     return {
-      showAlert: false, // 是否显示弹窗
       store: this.$mp.app.globalData,
       configData: {},
       isLogin: false,
-      scene: '', // 通过小程序码进来
-      source: '', // 记录小程序的入口
       hasBtnClicked: false, // 购买是否已经点了。
-      form: {},
-      platform: '',
-      bgUrl: '',
       imgPath: process.env.VUE_APP_IMG_PATH,
-      shareScene: '', // 分享给他人的scen
       isNetError: false,
-      wxCode: '',
-      query: {},
-      btnUrl: `${process.env.VUE_APP_IMG_PATH}/abtest/ai_referral_mina/default-btn1.png`,
-      btnStyle: {
-        height: '192rpx',
-        bottom: '100rpx'
-      },
-      uuid: '',
-      repeatPkg: ''
-    }
-  },
-  onLoad(options) {
-    if (options.scene) {
-      this.scene = options.scene
-    } else if (options.source) {
-      this.source = options.source
+      activeBtn: '',
+      wxCode: ''
     }
   },
   onShow(options) {
@@ -90,14 +81,6 @@ export default {
       }
     })
     // 获取来源
-    const { scene } = wx.getLaunchOptionsSync()
-    this.share_type = scene
-  },
-  onHide() {
-    this.form = {}
-    this.store.country_code = ''
-    this.showAlert = false
-    this.hasBtnClicked = false
   },
   methods: {
     handleNetError(res) {
@@ -108,14 +91,7 @@ export default {
         this.getConfig()
       }
     },
-    handleShowAlert() {
-      this.showAlert = true
-    },
-    closeAlert() {
-      this.hasBtnClicked = false
-      this.showAlert = false
-    },
-    async handleBtnClick(e) {
+    async handleBtnClick(type) {
       if (this.isNetError) {
         this.toast('网络异常，请检查网络后重试')
         return
@@ -132,57 +108,37 @@ export default {
           encrypted_data: detail.encryptedData
         }, true)
       } else {
-        this.handleShowAlert()
       }
     },
     // 获取首页数据
     async getConfig() {
       this.configData = await api.getIndexData()
-      this.bgUrl = `${this.imgPath}/ai_mina/newIndex2/default99V1.png`
       this.store.mobile = this.configData.mobile
     },
     async handleRest() {
       this.configData = await api.handleRest()
     },
-    handleGetting() {
-      if (this.isNetError) {
-        this.toast('网络异常，请检查网络后重试')
-        return
-      }
-      this.go(`/pages/aiHall`)
-    },
     // 手机号注册
     async register(param, isAuth) {
       this.hasBtnClicked = false
-      param.scene = this.scene
-      param.source = this.source
       if (isAuth) {
         param.wx_code = this.wxCode
       }
       try {
         const data = await api.register(param)
         this.store.mobile = data.mobile
-        this.shareScene = data.share_scene
         this.getConfig()
       } catch (e) {
         this.isLogin = false
       }
     },
     handleGoPage(page) {
+      this.activeBtn = page
+      setTimeout(() => {
+        this.activeBtn = ''
+      }, 1000)
       this.go(`/pages/${page}`)
     }
-  },
-  components: {
-    Alert
   }
 }
 </script>
-<style lang="scss" scoped>
-.index-btn{
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top:80rpx;
-}
-</style>

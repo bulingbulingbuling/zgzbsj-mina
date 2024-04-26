@@ -1,0 +1,31 @@
+.custom_head {
+  width: 750rpx;
+  background: linear-gradient(178.46deg, #CB847F 15.09%, #FFFFFF 98.69%);
+  color: #000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+}
+.isTransparent {
+  background: transparent!important;
+}
+.navbar-btn {
+  position: absolute;
+  left: 15rpx;
+  top: 0;
+  width: 55rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.navbar-icon {
+  height: 35rpx;
+}
+.head_store {
+  font-size: 30rpx;
+  font-weight: bold;
+  width: 750rpx;
+  text-align: center;
+  position: relative;
+}

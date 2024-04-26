@@ -1,22 +1,43 @@
 <template>
   <div class="shareWrap">
+    <headerNavBar :hasHeight="false" isTransparent="isTransparent" />
     <div class="container">
       <div class="index-container-content">
         <image mode="widthFix" class="downImg" :src="synthesisUrl" />
       </div>
       <div class="actionWrap">
-        <button @click="handleGuide">
-          <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
-          <h4>分享朋友圈</h4>
-        </button>
-        <button open-type="share" @click="handleShare">
-          <h4>分享好友</h4>
+        <div class="indexBtn" @click="handleGuide">
+          <div class="content">
+            <img class="icon" src="@/static/imgs/friend.png" alt="" />
+            分享朋友圈
+          </div>
+          <img class="btnImg" :src="`${activeBtn === 'down' ? require('@/static/imgs/activeBtn.png') : require('@/static/imgs/defaultBtn.png')}`" alt="">
+        </div>
+        <button class="indexBtn" open-type="share" @click="handleShare">
+          <div class="content">
+            <img class="icon" src="@/static/imgs/share.png" alt="" />
+            分享好友
+          </div>
+          <img class="btnImg" :src="`${activeBtn === 'share' ? require('@/static/imgs/activeBtn.png') : require('@/static/imgs/defaultBtn.png')}`" alt="">
         </button>
       </div>
       <van-dialog id="van-dialog" />
+      <div class="showGuide" v-if="showGuide" @click="handleClose">
+        <div class="wrap">
+          <img class="arrow" src="@/static/imgs/arrow.png" alt="" />
+          <div class="tip">点击分享</div>
+          <img class="hand" src="@/static/imgs/hand.png" alt="" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
+
+<config>
+  {
+    "navigationStyle": "custom"
+  }
+</config>
 
 <script>
 import { api } from '@/api'
@@ -29,7 +50,9 @@ export default {
       isNetError: false,
       prize: '',
       tip: '',
-      synthesisUrl: null
+      shareUrl: process.env.VUE_APP_SHARE_URL,
+      synthesisUrl: null,
+      showGuide: false
     }
   },
   async created() {
@@ -51,15 +74,12 @@ export default {
     if (this.store.synthesisUrl) {
       this.synthesisUrl = this.store.synthesisUrl
     }
-    if (this.prize || this.tip) {
+    if (this.prize) {
       Dialog.alert({
-        message: this.prize || this.tip
+        message: this.prize
       }).then(() => {
-        if (this.prize) {
-          this.go(`/pages/prize`)
-        } else {
-          this.go(`/pages/aiHall`)
-        }
+        this.prize = ''
+        this.go(`/pages/prize`)
       });
     }
   },
@@ -68,28 +88,37 @@ export default {
     return {
       title: '分享标题',
       path: `/pages/index`,
-      imageUrl: this.store.synthesisUrl
+      imageUrl: this.shareUrl
     }
   },
   onShareTimeline() {
     return {
       title: '分享标题',
       path: `/pages/index`,
-      imageUrl: this.store.synthesisUrl
+      imageUrl: this.shareUrl
     }
   },
   methods: {
     handleGuide() {
-
+      this.showGuide = true
     },
-    async handleShare() {
+    handleClose(e) {
+      this.showGuide = false
+      this.handleShare(true)
+    },
+    async handleShare(isMoments) {
       const res = await api.shareImage()
       if (Array.isArray(res.user_prize) && !res.user_prize.length) {
-        this.tip = '再分享一次，就有机会获得AI换脸的机会哦。'
         this.prize = ''
       } else {
         this.prize = res.user_prize.content
-        this.tip = ''
+        if (isMoments) {
+          Dialog.alert({
+            message: this.prize
+          }).then(() => {
+            this.go(`/pages/prize`)
+          });
+        }
       }
     }
   }

@@ -1,49 +1,117 @@
+.index {
+  font-family: 'FZLanTingHei-R-GBK';
+  .bgImg {
+    position: fixed;
+    z-index: -1;
+    width: 100vw;
+    height: 216vw;
+  }
+  .btnGroup {
+    width: 356rpx;
+    margin: 0 auto;
+    padding-top: 656rpx;
+    .action {
+      background: transparent!important;
+      animation: zoomingBottom 1.5s infinite;
+      ._img {
+        width: 356rpx;
+        height: 109rpx;
+      }
+    }
+    .indexBtn {
+      width: 356rpx;
+      height: 109rpx;
+      position: relative;
+      color: #fff;
+      font-size: 35rpx;
+      line-height: 35rpx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 55rpx;
+      .content {
+        padding-bottom: 8rpx;
+      }
+      .btnImg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 356rpx;
+        height: 109rpx;
+        z-index: -1;
+      }
+    }
+  }
+}
 .aiHall {
+  font-family: 'FZLanTingHei-R-GBK';
   .container {
-    padding-top: 30px;
+    padding-top: 50rpx;
+    padding-bottom: 50rpx;
+    .title {
+      text-align: center;
+      color: rgba(143, 121, 84, 1);
+      font-size: 36rpx;
+      line-height: 36rpx;
+      margin-bottom: 50rpx;
+    }
     .index-container-content {
       position: relative;
-      height: 854rpx;
-      width: 640rpx;
+      height: 920rpx;
+      width: 690rpx;
       margin: 0 auto;
       .swiperWrap {
-        height: 854rpx;
-        width: 640rpx;
+        height: 920rpx;
+        width: 690rpx;
         margin: 0 auto;
+        border: 1rpx solid rgba(143, 121, 84, 1);
+        box-sizing: border-box;
+        border-radius: 6rpx;
         .template {
-          height: 854rpx;
-          width: 640rpx;
-          border-radius: 35px;
+          height: 920rpx;
+          width: 690rpx;
         }
       }
       .canvas {
         position: absolute;
         left: 0;
         top: 0;
-        height: 854rpx;
-        width: 640rpx;
+        height: 920rpx;
+        width: 690rpx;
         border-radius: 35px;
         z-index: 0;
       }
       .loadingMask {
-        position: absolute;
+        position: fixed;
         left: 0;
         top: 0;
-        height: 854rpx;
-        width: 640rpx;
+        height: 100vh;
+        width: 100vw;
         background-color: #fff;
-        border-radius: 35px;
         z-index: 9;
         .wrap {
-          margin: 350rpx auto;
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
           display: flex;
           align-items: center;
           justify-content: center;
           flex-direction: column;
+          .icon {
+            width: 114rpx;
+            height: 118rpx;
+            margin-bottom: 35rpx;
+          }
           .title {
-            font-size: 40rpx;
-            line-height: 45rpx;
-            margin-top: 0;
+            font-size: 34rpx;
+            line-height: 34rpx;
+            margin-bottom: 15rpx;
+            color: rgba(58, 43, 17, 1);
+          }
+          p {
+            font-size: 26rpx;
+            color: rgba(58, 43, 17, 1);
           }
         }
       }
@@ -54,9 +122,106 @@
       display: flex;
       justify-content: center;
       .downImg {
-        width: 640rpx;
+        width: 690rpx;
         height: 890rpx;
       }
+    }
+    .swiperActions {
+      .prev {
+        position: fixed;
+        left: 50rpx;
+        top: 720rpx;
+        width: 80rpx;
+        height: 80rpx;
+      }
+      .next {
+        position: fixed;
+        right: 50rpx;
+        top: 720rpx;
+        width: 80rpx;
+        height: 80rpx;
+      }
+      .icon {
+        width: 80rpx;
+        height: 80rpx;
+      }
+    }
+    .actions {
+      width: 450rpx;
+      margin: 55rpx auto 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      .bottom-btn {
+        margin: 0;
+        padding-top: 38rpx;
+        padding-bottom: 38rpx;
+        background: rgba(255, 251, 244, 1);
+        border: 1px solid rgba(143, 121, 84, 1);
+        width: 160rpx;
+        height: 160rpx;
+        border-radius: 8rpx;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        color: rgba(143, 121, 84, 1);
+        font-size: 22rpx;
+        line-height: 22rpx;
+        .albumIcon {
+          width: 24rpx;
+          height: 24rpx;
+        }
+        .cameraIcon {
+          width: 36rpx;
+          height: 31rpx;
+        }
+      }
+      .indexBtn {
+        width: 180rpx;
+        height: 54rpx;
+        position: relative;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .content {
+          padding-bottom: 8rpx;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 18rpx;
+          line-height: 18rpx;
+          .icon {
+            width: 24rpx;
+            height: 24rpx;
+            margin-right: 16rpx;
+          }
+        }
+        .btnImg {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 180rpx;
+          height: 54rpx;
+          z-index: -1;
+        }
+      }
+    }
+    .tipLine {
+      position: fixed;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 403rpx;
+      height: 80rpx;
+      border-radius: 12rpx;
+      background: rgba(0, 0, 0, 0.5);
+      font-size: 36rpx;
+      font-weight: 300;
+      text-align: center;
+      color: #ffffff;
+      line-height: 80rpx;
     }
     .alert {
       position: fixed;
@@ -85,68 +250,215 @@
         background-color: #fff;
       }
     }
+    .remainTimes {
+      margin-top: 45rpx;
+      text-align: center;
+      color: rgba(58, 43, 17, 1);
+      font-size: 32rpx;
+    }
   }
 }
 .prize {
-  padding: 20rpx;
-  .prize-list{
-    border: 1rpx solid red;
-    border-radius:20px;
-    margin:40rpx;
-    padding: 20rpx;
+  font-family: 'FZLanTingHei-R-GBK';
+  padding-top: 216rpx;
+  padding-bottom: 50rpx;
+  .bg {
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    height: 100vh;
+    left: 0;
+    z-index: -1;
+  }
+  .title {
+    width: 348rpx;
+    height: 48rpx;
+    position: relative;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    .list-left{
-      flex: 3;
-      .left-title{
-        margin-bottom: 20rpx;
-        font-size: 28rpx;
-        font-weight: bolder;
+    justify-content: center;
+    margin: 0 auto;
+    font-size: 22rpx;
+    text-align: center;
+    color: rgba(188, 86, 90, 1);
+    .endTime {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      z-index: -1;
+    }
+  }
+  .content {
+    background: linear-gradient(180deg, #B9464D 0%, #D47971 60%);
+    border: 2rpx solid #f3e0d8;
+    width: 560rpx;
+    height: 1048rpx;
+    border-radius: 24rpx;
+    padding: 40rpx;
+    margin: 60rpx auto 0;
+    overflow: hidden;
+    .likeTab {
+      position: relative;
+      width: 480rpx;
+      height: 72rpx;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      .tabBg {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        top: 0;
       }
-      .left-time{
-        font-size: 22rpx;
+      .indexBtn {
+        width: 240rpx;
+        height: 72rpx;
+        position: relative;
+        z-index: 1;
+        .text {
+          font-size: 32rpx;
+          line-height: 72rpx;
+          text-align: center;
+          color: rgba(255, 255, 255, 0.5);
+          position: relative;
+          z-index: 1;
+          &.active {
+            color: rgba(169, 38, 54, 1);
+          }
+        }
+        .tabImg {
+          position: absolute;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          top: 0;
+        }
       }
     }
-    .list-right{
-      flex: 1;
-      flex-shrink: 0;
-      .right-btn {
-        border: 1rpx solid red;
-        border-radius: 20px;
-        padding: 10rpx;
-        text-align: center;
-        font-size: 18rpx;
+    .prize-list{
+      height: 840rpx;
+      margin-top: 40rpx;
+      overflow-y: auto;
+      .prize-item {
+        width: 480rpx;
+        height: 168rpx;
+        border-radius: 2rpx;
+        border-bottom: 1rpx solid rgba(225, 156, 135, 0.5);
+        padding-bottom: 40rpx;
+        &:last-child {
+          border-bottom: none;
+        }
+        .itemTitle{
+          padding-top: 36rpx;
+          margin: 0;
+          font-size: 28rpx;
+          color: rgba(255, 255, 255, 1);
+        }
+        &:first-child {
+          .itemTitle{
+            padding-top: 0rpx;
+          }
+        }
+        .bottomLine {
+          margin-top: 36rpx;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          .left-time{
+            flex: 1;
+            font-size: 24rpx;
+            color: rgba(255, 255, 255, 0.5);
+          }
+          .list-right {
+            flex-shrink: 0;
+            width: 135rpx;
+            height: 50rpx;
+            .right-btn {
+              width: 128rpx;
+              height: 48rpx;
+              box-shadow: 0rpx 1rpx 0rpx 0rpx rgba(255,0, 0, 0.5);
+              border-radius: 24rpx;
+              text-align: center;
+              background: rgba(255, 228, 181, 1);
+              font-size: 24rpx;
+              color: rgba(169, 38, 54, 1);
+              box-sizing: border-box;
+              line-height: 48rpx;
+            }
+          }
+        }
+      }
+    }
+    .prizeExplain {
+      color: rgba(255, 255, 255, 1);
+      height: 840rpx;
+      margin-top: 40rpx;
+      overflow-y: auto;
+      ._p {
+        font-size: 24rpx;
+        line-height: 36rpx;
+        margin-bottom: 10rpx;
+      }
+      ._div {
+        padding: 12rpx 0;
       }
     }
   }
+  .foot {
+    position: absolute;
+    bottom: 142rpx;
+    width: 152rpx;
+    height: 68rpx;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(169, 38, 54, 1);
+    font-size: 28rpx;
+    .backBtn {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 152rpx;
+      height: 68rpx;
+      z-index: -1;
+    }
+  }
 }
-.shop{
-  .city{
+.shop {
+  font-family: 'FZLanTingHei-R-GBK';
+  padding-bottom: 50rpx;
+  .city {
     padding: 40rpx;
-    .city-title{
+    .city-title {
       width: 100%;
       text-align: center;
-      margin-top: 20rpx;
-      color: green;
+      margin-top: 18rpx;
+      color: rgba(29, 33, 41, 1);
       font-weight:bolder;
+      font-size: 32rpx;
     }
-    .city-sub-title{
+    .city-sub-title {
       text-align: left;
-      margin: 20rpx 0;
+      margin: 40rpx 0 68rpx 0;
+      font-size: 32rpx;
+      color: rgba(29, 33, 41, 1);
     }
-    .city-list{
+    .city-list {
+      padding-top: 0;
+      margin-top: 68rpx;
       .list-item{
-        display: flex;
-        justify-content: space-between;
-        .left{
-          width:160rpx;
-          text-align:center
-        }
-        .right{
-          flex:1;
-          .item{
-            margin-bottom: 60rpx;
+        padding: 0rpx 0rpx 0 106rpx;
+        margin-bottom: 70rpx;
+        .item {
+          font-size: 28rpx;
+          color: rgba(29, 33, 41, 1);
+          &.active {
+            color: rgba(188, 86, 90, 1);
           }
         }
       }
@@ -155,30 +467,35 @@
   .list{
     .list-title{
       width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 20rpx;
-      color: green;
+      text-align: center;
+      margin-top: 38rpx;
+      margin-bottom: 38rpx;
+      color: rgba(29, 33, 41, 1);
+      font-weight:bolder;
+      font-size: 32rpx;
     }
-    .shop-card{
-      background: hotpink;
-      margin: 20rpx 40rpx;
-      padding: 20rpx;
+    .shop-card {
+      margin: 0rpx auto 40rpx;
+      padding: 40rpx;
       border-radius: 10rpx;
-      .card-title{
-        font-size: 40rpx;
-        font-weight: bold;
-        margin-bottom: 20rpx;
+      width: 640rpx;
+      box-shadow: 0px 6rpx 36rpx 0px rgba(0, 0, 0, 0.1);
+      color: rgba(29, 33, 41, 1);
+      .card-title {
+        font-size: 36rpx;
+        line-height: 56rpx;
       }
-      .card-item{
-        margin-bottom: 10rpx;
+      .card-item {
+        font-size: 24rpx;
+        line-height: 38rpx;
+        margin-top: 24rpx;
       }
     }
   }
 
 }
 .shareWrap {
+  font-family: 'FZLanTingHei-R-GBK';
   .container {
     .index-container-content {
       .downImg {
@@ -186,15 +503,230 @@
       }
     }
     .actionWrap {
-      position: fixed;
-      bottom: 92rpx;
+      position: absolute;
+      bottom: 135rpx;
       left: 0;
-      width: 100%;
+      width: 100vw;
       display: flex;
-      padding: 0 125rpx;
+      padding: 0 175rpx;
       align-items: center;
       justify-content: space-between;
-      background-color: #fff;
+      .indexBtn {
+        width: 180rpx;
+        height: 54rpx;
+        margin: 0;
+        position: relative;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .content {
+          position: relative;
+          z-index: 1;
+          padding-bottom: 4rpx;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 18rpx;
+          line-height: 18rpx;
+          .icon {
+            width: 24rpx;
+            height: 24rpx;
+            margin-right: 16rpx;
+          }
+        }
+        .btnImg {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 180rpx;
+          height: 54rpx;
+        }
+      }
+    }
+    .showGuide {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      width: 100vw;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 9;
+      .wrap {
+        .arrow {
+          position: absolute;
+          right: 127rpx;
+          top: 174rpx;
+          width: 240rpx;
+          height: 240rpx;
+        }
+        .tip {
+          width: 256rpx;
+          height: 80rpx;
+          position: absolute;
+          top: 420rpx;
+          right: 240rpx;
+          border-radius: 40rpx;
+          border: 4rpx solid #ffffff;
+          text-align: center;
+          line-height: 72rpx;
+          font-size: 32rpx;
+          color: #fff;
+        }
+        .hand {
+          position: absolute;
+          right: 170rpx;
+          top: 510rpx;
+          width: 86rpx;
+          height: 80rpx;
+        }
+      }
+    }
+  }
+}
+.productHall {
+  font-family: 'FZLanTingHei-R-GBK';
+  padding: 30rpx;
+  padding-bottom: 50rpx;
+  .list {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    .item {
+      margin-bottom: 30rpx;
+      .image {
+        width: 210rpx;
+        height: 280rpx;
+        border-radius: 12rpx;
+        border: 1px solid #8F7954;
+      }
+    }
+  }
+}
+.productDetail {
+  padding-top: 50rpx;
+  .swiperWrap {
+    height: 920rpx;
+    width: 670rpx;
+    margin: 0 auto;
+    .swiperItem {
+      border: 1rpx solid rgba(143, 121, 84, 1);
+      box-sizing: border-box;
+      border-radius: 6rpx;
+      position: relative;
+      .template {
+        width: 670rpx;
+        height: 920rpx;
+      }
+    }
+  }
+  .seriesName {
+    margin-top: 28rpx;
+    text-align: center;
+    font-size: 32rpx;
+    color: rgba(143, 121, 84, 1);
+  }
+  .actions {
+    .prev {
+      position: fixed;
+      left: 75rpx;
+      top: 600rpx;
+      width: 80rpx;
+      height: 80rpx;
+    }
+    .next {
+      position: fixed;
+      right: 75rpx;
+      top: 600rpx;
+      width: 80rpx;
+      height: 80rpx;
+    }
+    .icon {
+      width: 80rpx;
+      height: 80rpx;
+    }
+  }
+}
+.rulesWrap {
+  font-family: 'FZLanTingHei-R-GBK';
+  padding-top: 170rpx;
+  padding-bottom: 50rpx;
+  .bg {
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    height: 100vh;
+    left: 0;
+    z-index: -1;
+  }
+  .content {
+    position: relative;
+    background: linear-gradient(180deg, #B9464D 0%, #D47971 60%);
+    border: 2rpx solid #f3e0d8;
+    width: 560rpx;
+    height: 1136rpx;
+    border-radius: 24rpx;
+    padding: 108rpx 40rpx 40rpx;
+    margin: 60rpx auto 0;
+    overflow: hidden;
+    .subTitle {
+      position: absolute;
+      height: 108rpx;
+      width: 330rpx;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      .text {
+        font-size: 32rpx;
+        color: rgba(169, 38, 54, 1);
+      }
+      .subTitleBg {
+        position: absolute;
+        top: 0;
+        height: 100%;
+        left: 0;
+        width: 100%;
+        z-index: -1;
+      }
+    }
+    .rulesExplain {
+      color: rgba(255, 255, 255, 1);
+      height: 840rpx;
+      margin-top: 40rpx;
+      overflow-y: auto;
+      ._p {
+        font-size: 24rpx;
+        line-height: 36rpx;
+        margin-bottom: 10rpx;
+      }
+      ._div {
+        padding: 12rpx 0;
+      }
+    }
+  }
+  .foot {
+    position: absolute;
+    bottom: 142rpx;
+    width: 152rpx;
+    height: 68rpx;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(169, 38, 54, 1);
+    font-size: 28rpx;
+    .backBtn {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 152rpx;
+      height: 68rpx;
+      z-index: -1;
     }
   }
 }

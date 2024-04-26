@@ -1,10 +1,12 @@
 <template>
   <div class="aiHall">
+    <headerNavBar title="AI 互动"/>
     <div class="container">
+      <h4 class="title">一键体验中华美学大片 试戴国潮珠宝新品</h4>
       <div class="index-container-content">
         <swiper
           circular
-          layout-type="stackLeft"
+          layout-type="tinder"
           class="swiperWrap"
           :current="currentIndex"
           @change="swiperChange"
@@ -13,53 +15,54 @@
             <image mode="aspectFit" class="template" :src="item.url" />
           </swiper-item>
         </swiper>
+        <div class="swiperActions">
+          <div class="prev" @click="handlePage('prev')" v-if="currentIndex > 0">
+            <img mode="aspectFit" class="icon" src="@/static/imgs/prev.png" />
+          </div>
+          <div class="next" @click="handlePage('next')" v-if="currentIndex < templateList.length - 1">
+            <img mode="aspectFit" class="icon" src="@/static/imgs/next.png" />
+          </div>
+        </div>
         <canvas v-show="testing" type="2d" id="myCanvas" class="canvas " @tap="handleClick"></canvas>
         <div class="loadingMask" v-show="loading">
           <div class="wrap">
+            <img class="icon" src="@/static/imgs/loadingIcon.png" alt="" />
             <h3 class="title">生成中...</h3>
             <p>预计还有12秒</p>
           </div>
         </div>
       </div>
-      <button id="bottom-btn" @click="handleBtnClick('album')">
-        <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
-        <h4>上传照片</h4>
-      </button>
-      <button id="bottom-btn" @click="handleBtnClick('camera')">
-        <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
-        <h4>拍摄</h4>
-      </button>
-      <button id="bottom-btn" @click="handleQuitClick">
-        <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
-        <h4>取消试用</h4>
-      </button>
-      <button v-if="hasChange && !isAuthSavePhoto" @click="handleDown">
-        <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
-        <h4>下载</h4>
-      </button>
-      <!-- <button v-if="hasChange" open-type="share" @click="handleShare">
-        <h4>分享</h4>
-      </button> -->
-      <button v-if="hasChange" @click="handleShare">
-        <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
-        <h4>分享</h4>
-      </button>
-      <button id="bottom-btn" @click="handleResetTimes">
-        <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
-        <h4>重置次数</h4>
-      </button>
-      <div class="alert" v-if="shareModal">
-        <div class="mask"></div>
-        <div class="alert-content">
-          <button open-type="share">
-            微信
-          </button>
-          <button id="bottom-btn" @click="handleQuitClick">
-            <!-- <image mode="aspectFit" :src="btnUrl" alt="" /> -->
-            <h4>朋友圈</h4>
-          </button>
+      <div class="actions">
+        <button class="bottom-btn" @click="handleBtnClick('album')">
+          <img class="albumIcon" src="@/static/imgs/album.png" alt="" />
+          <h4>上传照片</h4>
+        </button>
+        <button class="bottom-btn" @click="handleBtnClick('camera')">
+          <img class="cameraIcon" src="@/static/imgs/camera.png" alt="" />
+          <h4>拍摄</h4>
+        </button>
+      </div>
+      <div class="actions" v-if="hasChange">
+        <div class="indexBtn" @click="handleDown('down')">
+          <div class="content">
+            <img class="icon" src="@/static/imgs/downIcon.png" alt="" />
+            下载照片
+          </div>
+          <img class="btnImg" :src="`${activeBtn === 'down' ? require('@/static/imgs/activeBtn.png') : require('@/static/imgs/defaultBtn.png')}`" alt="">
+        </div>
+        <div class="indexBtn" @click="handleShare('share')">
+          <div class="content">
+            <img class="icon" src="@/static/imgs/shareIcon.png" alt="" />
+            分享照片
+          </div>
+          <img class="btnImg" :src="`${activeBtn === 'share' ? require('@/static/imgs/activeBtn.png') : require('@/static/imgs/defaultBtn.png')}`" alt="">
         </div>
       </div>
+      <h4 class="remainTimes">今日剩余生成次数: {{ remainTimes }} 次</h4>
+      <button id="bottom-btn" @click="handleResetTimes">
+        <h4>重置次数</h4>
+      </button>
+      <div v-if="showTip" class="tipLine">选择人物进行脸部融合</div>
       <van-dialog v-model="showDownModal" title="标题" show-cancel-button>
         <img :src="synthesisUrl" class="downImg" />
       </van-dialog>
@@ -81,6 +84,12 @@
   </div>
 </template>
 
+<config>
+  {
+    "navigationStyle": "custom"
+  }
+</config>
+
 <script>
 import { api } from '@/api'
 import { uploadImage } from '@/utils/util'
@@ -100,19 +109,21 @@ export default {
       type: 1, // type 1 是每日免费的换脸次数。2 是奖励换脸次数 每天3次免费，2次奖励。
       loading: false,
       hasChange: false,
-      shareModal: false,
       prize: '',
       synthesisUrl: null,
       showDownModal: false,
-      downBaseURL: 'https://cjewel.oss-cn-shanghai.aliyuncs.com/download.png',
-      shareBaseURL: 'https://cjewel.oss-cn-shanghai.aliyuncs.com/share.png',
-      btnUrl: `https://oss-ai-peilian-app.xiaoyezi.com/dev/abtest/ai_referral_mina/default-btn1.png`
+      shareBaseQuery: '?x-oss-process=image/resize,m_fixed,w_230,h_307',
+      downBaseQuery: '?x-oss-process=image/resize,m_fixed,w_786,h_1048',
+      sharePositionQuery: 'g_south,y_117',
+      downPositionQuery: 'g_south,y_245',
+      downBaseURL: 'https://cjewel.oss-cn-shanghai.aliyuncs.com/download_20240419.jpg',
+      shareBaseURL: 'https://cjewel.oss-cn-shanghai.aliyuncs.com/share_20240426.png',
+      activeBtn: '',
+      showTip: false,
+      remainTimes: ''
     }
   },
   async created() {
-    wx.setNavigationBarTitle({
-      title: 'AI换脸'
-    })
     wx.showShareMenu({
       withShareTicket: true,
       menus: ['shareAppMessage', 'shareTimeline']
@@ -156,6 +167,13 @@ export default {
         this.getTemplateList()
       }
     },
+    handlePage(mode) {
+      if (mode === 'prev') {
+        this.currentIndex = this.currentIndex === 0 ? 0 : this.currentIndex - 1
+      } else {
+        this.currentIndex = this.currentIndex === this.templateList.length - 1 ? this.templateList.length - 1 : this.currentIndex + 1
+      }
+    },
     swiperChange(event) {
       this.currentIndex = event.detail.current
       this.hasChange = this.templateList[event.detail.current].hasChange || false
@@ -164,13 +182,40 @@ export default {
       this.testing = false
       this.currentFace = {}
     },
+    drawRoundRect(ctx, x, y, width, height, radius, strokeColor, fillColor, lineWidth) {
+      strokeColor = strokeColor || '#333';
+      ctx.beginPath();
+      ctx.arc(x + radius, y + radius, radius, Math.PI, Math.PI * 3 / 2);
+      ctx.lineTo(width - radius + x, y);
+      ctx.arc(width - radius + x, radius + y, radius, Math.PI * 3 / 2, Math.PI * 2);
+      ctx.lineTo(width + x, height + y - radius);
+      ctx.arc(width - radius + x, height - radius + y, radius, 0, Math.PI / 2);
+      ctx.lineTo(radius + x, height + y);
+      ctx.arc(radius + x, height - radius + y, radius, Math.PI / 2, Math.PI);
+      ctx.lineTo(x, y + radius);
+      ctx.strokeStyle = strokeColor;
+      ctx.lineWidth = lineWidth;
+      ctx.stroke();
+      if (fillColor) {
+        ctx.fillStyle = fillColor;
+        ctx.fill();
+      }
+      ctx.closePath();
+    },
     handleBtnClick(sourceType) {
+      if (!this.remainTimes) {
+        return this.toast('今日已无剩余生成次数')
+      }
       var query = wx.createSelectorQuery();
       this.currentFace = this.templateList[this.currentIndex]
       this.sourceType = [sourceType]
       const { faces, height: templateHeight, width: templateWidth } = this.currentFace
       if (faces.length) {
         this.testing = true
+        this.showTip = true
+        setTimeout(() => {
+          this.showTip = false
+        }, 1500)
         setTimeout(() => {
           query.select('#myCanvas')
             .fields({ node: true, size: true })
@@ -184,7 +229,7 @@ export default {
               canvas.width = width * dpr
               canvas.height = height * dpr
               ctx.scale(dpr, dpr)
-              ctx.fillStyle = 'rgba(0, 0, 0, .5)'
+              ctx.fillStyle = 'transparent'
               ctx.fillRect(0, 0, width, height)
               faces.forEach(element => {
                 const { X, Y, Height, Width } = element.FaceRect
@@ -194,7 +239,7 @@ export default {
                   XRange: [X * WScale, X * WScale + Width * WScale],
                   YRange: [Y * HScale, Y * HScale + Height * HScale]
                 }
-                ctx.clearRect(X * WScale, Y * HScale, Width * WScale, Height * HScale)
+                this.drawRoundRect(ctx, X * WScale, Y * HScale, Width * WScale, Height * HScale, 10, 'rgba(143, 121, 84, 1)', 'rgba(255, 251, 244, 0.3)', 1)
               });
             })
         }, 80)
@@ -207,8 +252,8 @@ export default {
     handleClick(event) {
       if (!this.testing) return
       let { x, y } = event.detail
-      x = x - 27.5
-      y = y - 20
+      x = x - 20
+      y = y - 160
       const { faces } = this.currentFace
       if (faces.length) {
         faces.forEach(element => {
@@ -223,13 +268,17 @@ export default {
     formatDownUrl(url, isShare) {
       const originUrl = url.split('?')[0]
       const path = originUrl.split('com/')[1]
-      const baseQuery = isShare ? '?x-oss-process=image/resize,m_fixed,w_200,h_278' : '?x-oss-process=image/resize,m_fixed,w_316,h_438'
+      const baseQuery = isShare ? this.shareBaseQuery : this.downBaseQuery
       const pathAndQuery = `${path}${baseQuery}`
       const imageParamStr = btoa(decodeURIComponent(encodeURIComponent(pathAndQuery)))
-      const synthesisUrlQuery = isShare ? `?x-oss-process=image/watermark,image_${imageParamStr},g_sw,y_116,x_92` : `?x-oss-process=image/watermark,image_${imageParamStr},g_south,y_116`
+      const synthesisUrlQuery = isShare ? `?x-oss-process=image/watermark,image_${imageParamStr},${this.sharePositionQuery}` : `?x-oss-process=image/watermark,image_${imageParamStr},${this.downPositionQuery}`
       this.synthesisUrl = `${isShare ? this.shareBaseURL : this.downBaseURL}${synthesisUrlQuery}`
     },
-    handleDown() {
+    handleDown(activeBtn) {
+      this.activeBtn = activeBtn
+      setTimeout(() => {
+        this.activeBtn = ''
+      }, 1000)
       const { url } = this.templateList[this.currentIndex]
       this.formatDownUrl(url)
       this.showDownModal = true
@@ -293,6 +342,8 @@ export default {
           this.changeFace()
         }
       }).catch(err => {
+        console.log(err)
+        debugger
         if (err.errMsg.indexOf('cancel') > -1) {
           this.toast('取消选择')
         }
@@ -322,6 +373,7 @@ export default {
         param.url = ImageURL
       }
       await api.aiFaceChange(param).then(res => {
+        this.getRemainTimes()
         const { template_id, url, faces: resFaces } = res
         const TemplateFaceIArr = resFaces.map(item => item.TemplateFaceID)
         this.templateList = this.templateList.map(item => {
@@ -351,14 +403,20 @@ export default {
     async getTemplateList() {
       const res = await api.getTemplate()
       this.templateList = res.templates
-      // todo 上线钱删掉
-      // this.hasChange = true
-      // this.templateList[0].url = 'https://cjewel.oss-cn-shanghai.aliyuncs.com/aiface/11/1713438455.jpg?Expires=1713467257&OSSAccessKeyId=LTAI5tE1yB78c8ttb2AqaXEo&Signature=gceLfPBNQlxV6%2FuarMfKdmOxoGw%3D'
+      this.getRemainTimes()
+    },
+    async getRemainTimes() {
+      const res = await api.getRemainTimes()
+      this.remainTimes = res.time
     },
     async handleResetTimes() {
       api.resetTimes()
     },
-    async handleShare() {
+    async handleShare(activeBtn) {
+      this.activeBtn = activeBtn
+      setTimeout(() => {
+        this.activeBtn = ''
+      }, 1000)
       const { url } = this.templateList[this.currentIndex]
       this.formatDownUrl(url, true)
       this.store.synthesisUrl = this.synthesisUrl
