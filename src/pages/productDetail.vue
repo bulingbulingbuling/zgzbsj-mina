@@ -41,6 +41,14 @@ export default {
       currentIndex: 0
     }
   },
+  // 设置自定义转发的内容
+  onShareAppMessage() {
+    return {
+      title: '一键生成属于你的AI中华美学大片',
+      path: `/pages/index`,
+      imageUrl: process.env.VUE_APP_SHARE_URL
+    }
+  },
   onShow() {
     if (this.store.parent_id) {
       wx.getNetworkType({
@@ -49,6 +57,10 @@ export default {
         }
       })
     }
+    wx.showShareMenu({
+      withShareTicket: true,
+      menus: ['shareAppMessage']
+    })
   },
   methods: {
     handlePage(mode) {

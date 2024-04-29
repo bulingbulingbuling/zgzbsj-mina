@@ -5,6 +5,7 @@
       <div class="item" v-for="item in productsList" :key="item.id">
         <image mode="widthFix" @click="handleChoose(item)" class="image" :src="item.pic_url" />
       </div>
+      <div class="tip">点击查看系列产品大图</div>
     </div>
   </div>
 </template>
@@ -33,6 +34,18 @@ export default {
         this.handleNetError(res)
       }
     })
+    wx.showShareMenu({
+      withShareTicket: true,
+      menus: ['shareAppMessage']
+    })
+  },
+  // 设置自定义转发的内容
+  onShareAppMessage() {
+    return {
+      title: '一键生成属于你的AI中华美学大片',
+      path: `/pages/index`,
+      imageUrl: process.env.VUE_APP_SHARE_URL
+    }
   },
   methods: {
     handleNetError(res) {

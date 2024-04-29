@@ -68,6 +68,20 @@ export default {
       wxCode: ''
     }
   },
+  // 设置自定义转发的内容
+  onShareAppMessage() {
+    return {
+      title: '一键生成属于你的AI中华美学大片',
+      path: `/pages/index`,
+      imageUrl: process.env.VUE_APP_SHARE_URL
+    }
+  },
+  onShareTimeline() {
+    return {
+      title: '一键生成属于你的AI中华美学大片',
+      imageUrl: process.env.VUE_APP_SHARE_URL
+    }
+  },
   onShow(options) {
     // 监听网络状态变化
     wx.onNetworkStatusChange((res) => {
@@ -79,6 +93,10 @@ export default {
       success: (res) => {
         this.handleNetError(res)
       }
+    })
+    wx.showShareMenu({
+      withShareTicket: true,
+      menus: ['shareAppMessage', 'shareTimeline']
     })
     // 获取来源
   },

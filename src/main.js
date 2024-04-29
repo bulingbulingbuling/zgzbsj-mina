@@ -40,7 +40,6 @@ export default {
       'pages/aiHall', // ai展馆
       'pages/productHall', // 新品展馆
       'pages/productDetail', // 新品展馆
-      'pages/explain', // 活动说明
       'pages/prize', // 我的奖品
       'pages/rules', // 规则
       'pages/province', // 参与店铺 选择省
