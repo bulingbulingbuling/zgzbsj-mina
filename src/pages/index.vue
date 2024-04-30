@@ -21,6 +21,10 @@
         <div class="content">新品展示馆</div>
         <img class="btnImg" :src="`${activeBtn === 'productHall' ? require('@/static/imgs/activeBtn.png') : require('@/static/imgs/defaultBtn.png')}`" alt="">
       </div>
+      <div class="indexBtn" @click="handleGoPage('rules')">
+        <div class="content">活动说明</div>
+        <img class="btnImg" :src="`${activeBtn === 'rules' ? require('@/static/imgs/activeBtn.png') : require('@/static/imgs/defaultBtn.png')}`" alt="">
+      </div>
       <div>
         <div class="indexBtn" @click="handleGoPage('prize')" v-if="configData.mobile">
           <div class="content">我的奖品</div>
@@ -30,10 +34,6 @@
           <div class="content">我的奖品</div>
           <img class="btnImg" src="@/static/imgs/defaultBtn.png" alt="">
         </button>
-      </div>
-      <div class="indexBtn" @click="handleGoPage('rules')">
-        <div class="content">活动说明</div>
-        <img class="btnImg" :src="`${activeBtn === 'rules' ? require('@/static/imgs/activeBtn.png') : require('@/static/imgs/defaultBtn.png')}`" alt="">
       </div>
       <div class="indexBtn" @click="handleGoPage('province')">
         <div class="content">参与店铺</div>

@@ -53,15 +53,15 @@
         <div class="indexBtn" @click="handleShare('share')">
           <div class="content">
             <img class="icon" src="@/static/imgs/shareIcon.png" alt="" />
-            分享照片
+            分享有奖
           </div>
           <img class="btnImg" :src="`${activeBtn === 'share' ? require('@/static/imgs/activeBtn.png') : require('@/static/imgs/defaultBtn.png')}`" alt="">
         </div>
       </div>
       <h4 class="remainTimes">今日剩余生成次数: {{ remainTimes }} 次</h4>
-      <button id="bottom-btn" @click="handleResetTimes">
+      <!-- <button id="bottom-btn" @click="handleResetTimes">
         <h4>重置次数</h4>
-      </button>
+      </button> -->
       <div v-if="showTip" class="tipLine">选择人物进行脸部融合</div>
       <van-dialog v-model="showDownModal" title="标题" show-cancel-button>
         <img :src="synthesisUrl" class="downImg" />
@@ -112,21 +112,29 @@ export default {
       prize: '',
       synthesisUrl: null,
       showDownModal: false,
-      shareBaseQuery: '?x-oss-process=image/resize,m_fixed,w_230,h_307',
+      shareBaseQuery: '?x-oss-process=image/resize,m_fixed,w_553,h_735',
       downBaseQuery: '?x-oss-process=image/resize,m_fixed,w_786,h_1048',
-      sharePositionQuery: 'g_south,y_117',
-      downPositionQuery: 'g_south,y_245',
-      downBaseURL: 'https://cjewel.oss-cn-shanghai.aliyuncs.com/download_20240419.jpg',
-      shareBaseURL: 'https://cjewel.oss-cn-shanghai.aliyuncs.com/share_20240426.png',
+      sharePositionQuery: 'g_south,y_288',
+      downPositionQuery: 'g_center,voffset_-890',
+      downBaseURL: 'https://cjewel.oss-cn-shanghai.aliyuncs.com/',
+      shareBaseURL: 'https://cjewel.oss-cn-shanghai.aliyuncs.com/share_20240428.png',
       activeBtn: '',
       showTip: false,
       remainTimes: ''
     }
   },
+  // 设置自定义转发的内容
+  onShareAppMessage() {
+    return {
+      title: '一键生成属于你的AI中华美学大片',
+      path: `/pages/index`,
+      imageUrl: process.env.VUE_APP_SHARE_URL
+    }
+  },
   async created() {
     wx.showShareMenu({
       withShareTicket: true,
-      menus: ['shareAppMessage', 'shareTimeline']
+      menus: ['shareAppMessage']
     })
     wx.getNetworkType({
       success: (res) => {
@@ -142,21 +150,13 @@ export default {
         this.toast('当前网络异常，请检查网络后再试')
       }
     })
-  },
-  // 设置自定义转发的内容
-  onShareAppMessage() {
-    return {
-      title: '分享标题',
-      path: `/pages/index`,
-      imageUrl: this.templateList[this.currentIndex].url
-    }
-  },
-  onShareTimeline() {
-    return {
-      title: '分享标题',
-      path: `/pages/index`,
-      imageUrl: this.templateList[this.currentIndex].url
-    }
+    wx.setNavigationBarTitle({
+      title: '一键生成属于你的AI中华美学大片'
+    })
+    wx.showShareMenu({
+      withShareTicket: true,
+      menus: ['shareAppMessage']
+    })
   },
   methods: {
     handleNetError(res) {
@@ -271,7 +271,7 @@ export default {
       const baseQuery = isShare ? this.shareBaseQuery : this.downBaseQuery
       const pathAndQuery = `${path}${baseQuery}`
       const imageParamStr = btoa(decodeURIComponent(encodeURIComponent(pathAndQuery)))
-      const synthesisUrlQuery = isShare ? `?x-oss-process=image/watermark,image_${imageParamStr},${this.sharePositionQuery}` : `?x-oss-process=image/watermark,image_${imageParamStr},${this.downPositionQuery}`
+      const synthesisUrlQuery = isShare ? `?x-oss-process=image/watermark,image_${imageParamStr},${this.sharePositionQuery}` : `${path}?x-oss-process=image/watermark,image_ZG93bmxvYWRfYnV0dG9tXzEucG5n,${this.downPositionQuery}`
       this.synthesisUrl = `${isShare ? this.shareBaseURL : this.downBaseURL}${synthesisUrlQuery}`
     },
     handleDown(activeBtn) {
@@ -343,7 +343,6 @@ export default {
         }
       }).catch(err => {
         console.log(err)
-        debugger
         if (err.errMsg.indexOf('cancel') > -1) {
           this.toast('取消选择')
         }

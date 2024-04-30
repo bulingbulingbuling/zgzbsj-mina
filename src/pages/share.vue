@@ -1,21 +1,21 @@
 <template>
   <div class="shareWrap">
-    <headerNavBar :hasHeight="false" isTransparent="isTransparent" />
+    <headerNavBar :hasHeight="timeLine" isTransparent="isTransparent" />
     <div class="container">
       <div class="index-container-content">
-        <image mode="widthFix" class="downImg" :src="synthesisUrl" />
+        <image class="downImg" :src="synthesisUrl || defaultUrl" />
       </div>
-      <div class="actionWrap">
+      <div class="actionWrap" v-if="!timeLine">
         <div class="indexBtn" @click="handleGuide">
           <div class="content">
-            <img class="icon" src="@/static/imgs/friend.png" alt="" />
+            <img class="icon" src="@/static/imgs/share.png" alt="" />
             分享朋友圈
           </div>
           <img class="btnImg" :src="`${activeBtn === 'down' ? require('@/static/imgs/activeBtn.png') : require('@/static/imgs/defaultBtn.png')}`" alt="">
         </div>
         <button class="indexBtn" open-type="share" @click="handleShare">
           <div class="content">
-            <img class="icon" src="@/static/imgs/share.png" alt="" />
+            <img class="icon" src="@/static/imgs/friend.png" alt="" />
             分享好友
           </div>
           <img class="btnImg" :src="`${activeBtn === 'share' ? require('@/static/imgs/activeBtn.png') : require('@/static/imgs/defaultBtn.png')}`" alt="">
@@ -51,13 +51,21 @@ export default {
       prize: '',
       tip: '',
       shareUrl: process.env.VUE_APP_SHARE_URL,
+      defaultUrl: '',
       synthesisUrl: null,
-      showGuide: false
+      showGuide: false,
+      timeLine: false
     }
   },
   async created() {
+    if (this.store.synthesisUrl) {
+      this.synthesisUrl = this.store.synthesisUrl
+    } else {
+      // 不是AI互动过来的 回到首页
+      this.go(`/pages/index`)
+    }
     wx.setNavigationBarTitle({
-      title: '分享'
+      title: '一键生成属于你的AI中华美学大片'
     })
     wx.showShareMenu({
       withShareTicket: true,
@@ -65,36 +73,42 @@ export default {
     })
   },
   onShow(options) {
-    // 监听网络状态变化
+    const launchOptions = wx.getLaunchOptionsSync()
+    if (launchOptions.scene === 1154) {
+      this.timeLine = true
+      this.defaultUrl = 'https://cjewel.oss-cn-shanghai.aliyuncs.com/share_20240428_1.png'
+    }
     wx.onNetworkStatusChange((res) => {
       if (res.networkType === 'none') {
         this.toast('当前网络异常，请检查网络后再试')
       }
     })
-    if (this.store.synthesisUrl) {
-      this.synthesisUrl = this.store.synthesisUrl
-    }
-    if (this.prize) {
+    if (this.prize || this.tip) {
       Dialog.alert({
-        message: this.prize
+        message: this.prize || this.tip
       }).then(() => {
-        this.prize = ''
-        this.go(`/pages/prize`)
+        if (this.prize) {
+          this.prize = ''
+          this.go(`/pages/prize`)
+        } else {
+          this.tip = ''
+          this.go(`/pages/index`)
+        }
       });
     }
   },
   // 设置自定义转发的内容
   onShareAppMessage() {
     return {
-      title: '分享标题',
+      title: '一键生成属于你的AI中华美学大片',
       path: `/pages/index`,
       imageUrl: this.shareUrl
     }
   },
   onShareTimeline() {
     return {
-      title: '分享标题',
-      path: `/pages/index`,
+      title: '一键生成属于你的AI中华美学大片',
+      query: 'backHome=true',
       imageUrl: this.shareUrl
     }
   },
@@ -110,13 +124,19 @@ export default {
       const res = await api.shareImage()
       if (Array.isArray(res.user_prize) && !res.user_prize.length) {
         this.prize = ''
+        this.tip = '继续探索，赢取心动好礼'
       } else {
         this.prize = res.user_prize.content
+        this.tip = ''
         if (isMoments) {
           Dialog.alert({
             message: this.prize
           }).then(() => {
-            this.go(`/pages/prize`)
+            if (this.prize) {
+              this.go(`/pages/prize`)
+            } else {
+              this.go(`/pages/index`)
+            }
           });
         }
       }
