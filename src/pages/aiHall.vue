@@ -271,7 +271,7 @@ export default {
       const baseQuery = isShare ? this.shareBaseQuery : this.downBaseQuery
       const pathAndQuery = `${path}${baseQuery}`
       const imageParamStr = btoa(decodeURIComponent(encodeURIComponent(pathAndQuery)))
-      const synthesisUrlQuery = isShare ? `?x-oss-process=image/watermark,image_${imageParamStr},${this.sharePositionQuery}` : `${path}?x-oss-process=image/watermark,image_ZG93bmxvYWRfYnV0dG9tXzEucG5n,${this.downPositionQuery}`
+      const synthesisUrlQuery = isShare ? `?x-oss-process=image/watermark,image_${imageParamStr},${this.sharePositionQuery}` : `${path}?x-oss-process=image/watermark,image_ZG93bmxvYWRfYnV0dG9tXzIucG5n,${this.downPositionQuery}`
       this.synthesisUrl = `${isShare ? this.shareBaseURL : this.downBaseURL}${synthesisUrlQuery}`
     },
     handleDown(activeBtn) {
