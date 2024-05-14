@@ -8,10 +8,11 @@
       @change="swiperChange"
       id="swiper">
       <swiper-item v-for="item in imgList" :key="item.id" class="swiperItem">
-        <image mode="aspectFit" class="template" :src="item.pic_url" />
+        <image @click="handleGoMini(item)" mode="aspectFit" class="template" :src="item.pic_url" />
       </swiper-item>
     </swiper>
     <div class="seriesName" v-if="imgList.length">{{ imgList[currentIndex].name }}</div>
+    <div class="seriesName">点击图片查看产品详情</div>
     <div class="actions">
       <div class="prev" @click="handlePage('prev')" v-if="currentIndex > 0">
         <img mode="aspectFit" class="icon" src="@/static/imgs/prev.png" />
@@ -80,6 +81,16 @@ export default {
       } else {
         this.getProductList()
       }
+    },
+    handleGoMini(item) {
+      const { path_url } = item
+      wx.navigateToMiniProgram({
+        appId: 'wx107321d97d36af11',
+        path: path_url,
+        success(res) {
+          console.log('成功', res)
+        }
+      })
     },
     async getProductList() {
       const res = await api.getProductList({
