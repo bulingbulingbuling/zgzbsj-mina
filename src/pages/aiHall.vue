@@ -115,7 +115,6 @@ export default {
       shareBaseQuery: '?x-oss-process=image/resize,m_fixed,w_553,h_735',
       downBaseQuery: '?x-oss-process=image/resize,m_fixed,w_786,h_1048',
       sharePositionQuery: 'g_south,y_288',
-      downPositionQuery: 'g_center,voffset_-890',
       downBaseURL: 'https://cjewel.oss-cn-shanghai.aliyuncs.com/',
       shareBaseURL: 'https://cjewel.oss-cn-shanghai.aliyuncs.com/share_20240428.png',
       activeBtn: '',
@@ -271,7 +270,7 @@ export default {
       const baseQuery = isShare ? this.shareBaseQuery : this.downBaseQuery
       const pathAndQuery = `${path}${baseQuery}`
       const imageParamStr = btoa(decodeURIComponent(encodeURIComponent(pathAndQuery)))
-      const synthesisUrlQuery = isShare ? `?x-oss-process=image/watermark,image_${imageParamStr},${this.sharePositionQuery}` : `${path}?x-oss-process=image/watermark,image_ZG93bmxvYWRfYnV0dG9tXzIucG5n,${this.downPositionQuery}`
+      const synthesisUrlQuery = isShare ? `?x-oss-process=image/watermark,image_${imageParamStr},${this.sharePositionQuery}` : `${path}`
       this.synthesisUrl = `${isShare ? this.shareBaseURL : this.downBaseURL}${synthesisUrlQuery}`
     },
     handleDown(activeBtn) {
